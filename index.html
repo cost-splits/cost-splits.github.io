@@ -136,6 +136,22 @@
       onchange="loadStateFromJsonFile(this.files[0])"
     />
 
+    <h2>6. Share</h2>
+    <div style="display: flex; align-items: center; gap: 5px; margin: 5px 0">
+      <input
+        id="share-url-display"
+        type="text"
+        readonly
+        style="
+          flex: 1;
+          white-space: nowrap;
+          overflow-x: auto;
+          background-color: #f0f0f0;
+        "
+        placeholder="Shareable URL"
+      />
+    </div>
+
     <script src="scripts.js"></script>
   </body>
 </html>

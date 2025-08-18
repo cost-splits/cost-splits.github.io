@@ -34,6 +34,7 @@ const transactions = [];
  */
 function afterChange() {
   updateCurrentStateJson();
+  updateShareableUrl();
   calculateSummary();
 }
 
@@ -479,6 +480,17 @@ function updateCurrentStateJson() {
 }
 
 /**
+ * Update the share URL field with a link to the current state.
+ */
+function updateShareableUrl() {
+  const display = document.getElementById("share-url-display");
+  if (!display || typeof window === "undefined") return;
+  const base = `${window.location.origin}${window.location.pathname}`;
+  const state = encodeURIComponent(JSON.stringify({ people, transactions }));
+  display.value = `${base}?state=${state}`;
+}
+
+/**
  * Replace the current state with a loaded state and refresh the UI.
  *
  * @param {object} state - Parsed state object.
@@ -555,6 +567,23 @@ async function loadStateFromJsonFile(file) {
 }
 
 /**
+ * Load state from the `state` query parameter if present.
+ */
+function loadStateFromUrl() {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const value = params.get("state");
+    if (!value) return;
+    const state = JSON.parse(decodeURIComponent(value));
+    applyLoadedState(state);
+  } catch (e) {
+    if (typeof alert === "function") {
+      alert("Failed to load state: " + (e && e.message ? e.message : e));
+    }
+  }
+}
+
+/**
  * Trigger a download of the current state as a JSON file.
  */
 function downloadJson() {
@@ -576,8 +605,10 @@ if (typeof module !== "undefined" && module.exports) {
     resetState,
     addPerson,
     updateCurrentStateJson,
+    updateShareableUrl,
     loadStateFromJson,
     loadStateFromJsonFile,
+    loadStateFromUrl,
     _people: people,
     _transactions: transactions,
     downloadJson,
@@ -600,4 +631,7 @@ if (typeof window !== "undefined") {
   window.loadStateFromJson = loadStateFromJson;
   window.loadStateFromJsonFile = loadStateFromJsonFile;
   window.downloadJson = downloadJson;
+  window.updateShareableUrl = updateShareableUrl;
+  window.loadStateFromUrl = loadStateFromUrl;
+  loadStateFromUrl();
 }
