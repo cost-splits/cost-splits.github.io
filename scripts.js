@@ -28,12 +28,15 @@ function computeSummary(people, transactions) {
 const people = [];
 /** @type {Array<{name?:string, cost:number, payer:number, splits:number[]}>} */
 const transactions = [];
+/* global LZString */
+const lz = typeof LZString !== "undefined" ? LZString : require("lz-string");
 
 /**
  * Handle updates after state changes by refreshing derived values.
  */
 function afterChange() {
   updateCurrentStateJson();
+  updateShareableUrl();
   calculateSummary();
 }
 
@@ -479,6 +482,20 @@ function updateCurrentStateJson() {
 }
 
 /**
+ * Update the share URL field with a link to the current state.
+ * Uses the current page URL (including file:// URLs) as the base.
+ * The state JSON is compressed with LZString to shorten the URL.
+ */
+function updateShareableUrl() {
+  const display = document.getElementById("share-url-display");
+  if (!display || typeof window === "undefined") return;
+  const base = window.location.href.split(/[?#]/)[0];
+  const json = JSON.stringify({ people, transactions });
+  const compressed = lz.compressToEncodedURIComponent(json);
+  display.value = `${base}?state=${compressed}`;
+}
+
+/**
  * Replace the current state with a loaded state and refresh the UI.
  *
  * @param {object} state - Parsed state object.
@@ -555,6 +572,26 @@ async function loadStateFromJsonFile(file) {
 }
 
 /**
+ * Load state from the `state` query parameter if present.
+ * The state is assumed to be compressed with LZString.
+ */
+function loadStateFromUrl() {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const value = params.get("state");
+    if (!value) return;
+    const json = lz.decompressFromEncodedURIComponent(value);
+    if (!json) throw new Error("Failed to decode state");
+    const state = JSON.parse(json);
+    applyLoadedState(state);
+  } catch (e) {
+    if (typeof alert === "function") {
+      alert("Failed to load state: " + (e && e.message ? e.message : e));
+    }
+  }
+}
+
+/**
  * Trigger a download of the current state as a JSON file.
  */
 function downloadJson() {
@@ -576,8 +613,10 @@ if (typeof module !== "undefined" && module.exports) {
     resetState,
     addPerson,
     updateCurrentStateJson,
+    updateShareableUrl,
     loadStateFromJson,
     loadStateFromJsonFile,
+    loadStateFromUrl,
     _people: people,
     _transactions: transactions,
     downloadJson,
@@ -600,4 +639,7 @@ if (typeof window !== "undefined") {
   window.loadStateFromJson = loadStateFromJson;
   window.loadStateFromJsonFile = loadStateFromJsonFile;
   window.downloadJson = downloadJson;
+  window.updateShareableUrl = updateShareableUrl;
+  window.loadStateFromUrl = loadStateFromUrl;
+  loadStateFromUrl();
 }
