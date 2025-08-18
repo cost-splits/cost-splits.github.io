@@ -343,6 +343,46 @@ function resetState() {
 }
 
 // ---- SAVE/LOAD STATE ----
+// Validate the structure and types of the loaded state
+function validateState(state) {
+  if (
+    typeof state !== "object" ||
+    state === null ||
+    !Array.isArray(state.people) ||
+    !Array.isArray(state.transactions)
+  ) {
+    throw new Error("Invalid state: missing people or transactions arrays");
+  }
+  // Validate people: array of non-empty strings
+  if (
+    !state.people.every((p) => typeof p === "string" && p.trim().length > 0)
+  ) {
+    throw new Error("Invalid state: people must be non-empty strings");
+  }
+  // Validate transactions: array of objects with expected fields
+  if (
+    !state.transactions.every(
+      (t) =>
+        typeof t === "object" &&
+        t !== null &&
+        typeof t.description === "string" &&
+        typeof t.amount === "number" &&
+        !isNaN(t.amount) &&
+        typeof t.payer === "string" &&
+        Array.isArray(t.splits) &&
+        t.splits.every(
+          (s) =>
+            typeof s === "object" &&
+            s !== null &&
+            typeof s.person === "string" &&
+            typeof s.amount === "number" &&
+            !isNaN(s.amount),
+        ),
+    )
+  ) {
+    throw new Error("Invalid state: transactions malformed");
+  }
+}
 
 function saveStateToJson() {
   const textarea = document.getElementById("state-json");
@@ -354,14 +394,7 @@ function loadStateFromJson() {
   const textarea = document.getElementById("state-json");
   try {
     const state = JSON.parse(textarea.value);
-    if (
-      !Array.isArray(state.people) ||
-      !Array.isArray(state.transactions) ||
-      !state.people.every(isValidPerson) ||
-      !state.transactions.every(isValidTransaction)
-    ) {
-      throw new Error("Invalid state");
-    }
+    validateState(state);
     people.length = 0;
     transactions.length = 0;
     state.people.forEach((p) => people.push(p));
