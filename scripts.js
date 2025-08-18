@@ -483,12 +483,13 @@ function updateCurrentStateJson() {
 
 /**
  * Update the share URL field with a link to the current state.
+ * Uses the current page URL (including file:// URLs) as the base.
  * The state JSON is compressed with LZString to shorten the URL.
  */
 function updateShareableUrl() {
   const display = document.getElementById("share-url-display");
   if (!display || typeof window === "undefined") return;
-  const base = `${window.location.origin}${window.location.pathname}`;
+  const base = window.location.href.split(/[?#]/)[0];
   const json = JSON.stringify({ people, transactions });
   const compressed = lz.compressToEncodedURIComponent(json);
   display.value = `${base}?state=${compressed}`;

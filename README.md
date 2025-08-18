@@ -4,4 +4,4 @@ A minimal front-end application for splitting costs between people. The state of
 
 ## Sharing
 
-The current state is reflected in a read-only field in the Share section. Copy this link to share with others. The `state` parameter contains a [LZ-String](https://pieroxy.net/blog/pages/lz-string/index.html) compressed JSON representation of the calculator's state. When visiting a link containing this parameter, the page will automatically decompress and load that state.
+The current state is reflected in a read-only field in the Share section. Copy this link to share with others. The `state` parameter contains a [LZ-String](https://pieroxy.net/blog/pages/lz-string/index.html) compressed JSON representation of the calculator's state. When visiting a link containing this parameter, the page will automatically decompress and load that state. If you're opening the page directly from your file system, the generated link will use the `file://` scheme so it works for local development.
