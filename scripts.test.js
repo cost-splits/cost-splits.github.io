@@ -8,6 +8,8 @@ const {
   toggleCollapse,
   resetState,
   loadStateFromJson,
+  loadStateFromJsonFile,
+  downloadJson,
   _people,
   _transactions,
   addPerson,
@@ -81,6 +83,7 @@ describe("updateCurrentStateJson and loadStateFromJson", () => {
     document.body.innerHTML = `
       <input id="state-json-display" />
       <textarea id="state-json-input"></textarea>
+      <input id="state-json-file" type="file" />
       <div id="summary"></div>
       <button id="save-people"></button>
       <button id="save-transactions"></button>
@@ -130,6 +133,75 @@ describe("updateCurrentStateJson and loadStateFromJson", () => {
     expect(alert).toHaveBeenCalled();
     expect(_people).toEqual([]);
     expect(_transactions).toEqual([]);
+  });
+
+  test("loads state from JSON file", async () => {
+    const data = {
+      people: ["Dora"],
+      transactions: [{ name: "Tea", cost: 5, payer: 0, splits: [1] }],
+    };
+    const file = new Blob([JSON.stringify(data)], {
+      type: "application/json",
+    });
+    await loadStateFromJsonFile(file);
+    expect(_people).toEqual(["Dora"]);
+    expect(_transactions).toEqual([
+      { name: "Tea", cost: 5, payer: 0, splits: [1] },
+    ]);
+    expect(document.getElementById("state-json-input").value).toBe(
+      JSON.stringify(data),
+    );
+  });
+});
+
+const originalCreateURL = URL.createObjectURL;
+const originalRevokeURL = URL.revokeObjectURL;
+
+describe("downloadJson", () => {
+  beforeEach(() => {
+    document.body.innerHTML = ``;
+    resetState();
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+    URL.createObjectURL = originalCreateURL;
+    URL.revokeObjectURL = originalRevokeURL;
+  });
+
+  test("creates downloadable file with current state", async () => {
+    _people.push("Eve");
+    _transactions.push({ payer: 0, cost: 12, splits: [1] });
+
+    const anchor = { click: jest.fn() };
+    jest.spyOn(document, "createElement").mockReturnValue(anchor);
+    const appendSpy = jest
+      .spyOn(document.body, "appendChild")
+      .mockImplementation(() => {});
+    const removeSpy = jest
+      .spyOn(document.body, "removeChild")
+      .mockImplementation(() => {});
+    URL.createObjectURL = jest.fn().mockReturnValue("mockurl");
+    URL.revokeObjectURL = jest.fn();
+
+    downloadJson();
+
+    expect(anchor.download).toBe("cost-splits.json");
+    expect(anchor.href).toBe("mockurl");
+    expect(anchor.click).toHaveBeenCalled();
+    expect(appendSpy).toHaveBeenCalledWith(anchor);
+    expect(removeSpy).toHaveBeenCalledWith(anchor);
+    const blob = URL.createObjectURL.mock.calls[0][0];
+    const text = await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = () => reject(reader.error);
+      reader.readAsText(blob);
+    });
+    expect(text).toBe(
+      JSON.stringify({ people: ["Eve"], transactions: _transactions }),
+    );
+    expect(URL.revokeObjectURL).toHaveBeenCalledWith("mockurl");
   });
 });
 

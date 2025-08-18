@@ -405,39 +405,65 @@ function updateCurrentStateJson() {
   if (display) display.value = JSON.stringify(state);
 }
 
+function applyLoadedState(state) {
+  validateState(state);
+  people.length = 0;
+  transactions.length = 0;
+  state.people.forEach((p) => people.push(p));
+  state.transactions.forEach((t) => transactions.push(t));
+
+  if (
+    typeof renderPeople === "function" &&
+    document.getElementById("people-list")
+  ) {
+    renderPeople();
+  }
+  if (
+    typeof renderTransactionTable === "function" &&
+    document.getElementById("transaction-table")
+  ) {
+    renderTransactionTable();
+  }
+  if (
+    typeof renderSplitTable === "function" &&
+    document.getElementById("split-table")
+  ) {
+    renderSplitTable();
+  }
+
+  const summaryEl = document.getElementById("summary");
+  if (summaryEl) summaryEl.innerHTML = "";
+
+  markSaved("people");
+  markSaved("transactions");
+  markSaved("splits");
+  updateCurrentStateJson();
+}
+
 function loadStateFromJson() {
   const textarea = document.getElementById("state-json-input");
   try {
     const state = JSON.parse(textarea.value);
-    validateState(state);
-    people.length = 0;
-    transactions.length = 0;
-    state.people.forEach((p) => people.push(p));
-    state.transactions.forEach((t) => transactions.push(t));
-
-    if (typeof renderPeople === "function" && document.getElementById("people-list")) {
-      renderPeople();
+    applyLoadedState(state);
+  } catch (e) {
+    if (typeof alert === "function") {
+      alert("Failed to load state: " + (e && e.message ? e.message : e));
     }
-    if (
-      typeof renderTransactionTable === "function" &&
-      document.getElementById("transaction-table")
-    ) {
-      renderTransactionTable();
-    }
-    if (
-      typeof renderSplitTable === "function" &&
-      document.getElementById("split-table")
-    ) {
-      renderSplitTable();
-    }
+  }
+}
 
-    const summaryEl = document.getElementById("summary");
-    if (summaryEl) summaryEl.innerHTML = "";
-
-    markSaved("people");
-    markSaved("transactions");
-    markSaved("splits");
-    updateCurrentStateJson();
+async function loadStateFromJsonFile(file) {
+  try {
+    const text = await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = () => reject(reader.error);
+      reader.readAsText(file);
+    });
+    const textarea = document.getElementById("state-json-input");
+    if (textarea) textarea.value = text;
+    const state = JSON.parse(text);
+    applyLoadedState(state);
   } catch (e) {
     if (typeof alert === "function") {
       alert("Failed to load state: " + (e && e.message ? e.message : e));
@@ -458,20 +484,22 @@ function downloadJson() {
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
 }
-  if (typeof module !== "undefined" && module.exports) {
-    module.exports = {
-      computeSummary,
-      markDirty,
-      markSaved,
-      toggleCollapse,
-      resetState,
-      addPerson,
-      updateCurrentStateJson,
-      loadStateFromJson,
-      _people: people,
-      _transactions: transactions,
-    };
-  }
+if (typeof module !== "undefined" && module.exports) {
+  module.exports = {
+    computeSummary,
+    markDirty,
+    markSaved,
+    toggleCollapse,
+    resetState,
+    addPerson,
+    updateCurrentStateJson,
+    loadStateFromJson,
+    loadStateFromJsonFile,
+    _people: people,
+    _transactions: transactions,
+    downloadJson,
+  };
+}
 if (typeof window !== "undefined") {
   window.computeSummary = computeSummary;
   window.markDirty = markDirty;
@@ -492,5 +520,6 @@ if (typeof window !== "undefined") {
   window.calculateSummary = calculateSummary;
   window.updateCurrentStateJson = updateCurrentStateJson;
   window.loadStateFromJson = loadStateFromJson;
+  window.loadStateFromJsonFile = loadStateFromJsonFile;
   window.downloadJson = downloadJson;
 }
