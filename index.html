@@ -3,84 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <title>Cost Split Calculator</title>
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-        margin: 20px;
-      }
-
-      h2 {
-        margin-top: 30px;
-      }
-
-      input,
-      select {
-        margin: 2px;
-      }
-
-      button {
-        margin: 5px 0;
-        padding: 4px 8px;
-      }
-
-      table,
-      th,
-      td {
-        border: 1px solid black;
-        border-collapse: collapse;
-        padding: 5px;
-      }
-
-      table {
-        margin-top: 10px;
-      }
-
-      #transaction-table {
-        table-layout: auto;
-        width: auto;
-      }
-
-      td,
-      th {
-        text-align: right;
-      }
-
-      td:first-child,
-      th:first-child {
-        text-align: left;
-      }
-
-      /* Removed collapsible styles now that split details are always visible */
-
-      .delete-btn {
-        cursor: pointer;
-        color: red;
-        margin-left: 5px;
-      }
-
-      .collapse-btn {
-        cursor: pointer;
-        margin-right: 5px;
-        font-weight: bold;
-      }
-
-      .unused-row {
-        background-color: yellow;
-      }
-
-      .invalid-cell {
-        background-color: rgba(255, 0, 0, 0.4);
-      }
-
-      .dollar-field {
-        display: flex;
-        align-items: center;
-      }
-
-      .dollar-field .prefix {
-        margin-right: 2px;
-      }
-    </style>
+    <link rel="stylesheet" href="styles.css" />
   </head>
 
   <body>
@@ -108,17 +31,12 @@
     <div id="summary"></div>
 
     <h2>5. Save/Load State</h2>
-    <div style="display: flex; align-items: center; gap: 5px; margin: 5px 0">
+    <div class="flex-row">
       <input
         id="state-json-display"
         type="text"
         readonly
-        style="
-          flex: 1;
-          white-space: nowrap;
-          overflow-x: auto;
-          background-color: #f0f0f0;
-        "
+        class="readonly-field"
         placeholder="Current state JSON"
       />
       <button onclick="downloadJson()">Download JSON File</button>
@@ -138,22 +56,17 @@
       type="file"
       id="state-json-file"
       accept="application/json"
-      style="display: none"
+      class="hidden"
       onchange="loadStateFromJsonFile(this.files[0])"
     />
 
     <h2>6. Share</h2>
-    <div style="display: flex; align-items: center; gap: 5px; margin: 5px 0">
+    <div class="flex-row">
       <input
         id="share-url-display"
         type="text"
         readonly
-        style="
-          flex: 1;
-          white-space: nowrap;
-          overflow-x: auto;
-          background-color: #f0f0f0;
-        "
+        class="readonly-field"
         placeholder="Shareable URL"
       />
     </div>
