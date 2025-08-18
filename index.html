@@ -126,16 +126,39 @@
     <div id="summary"></div>
 
     <h2>5. Save/Load State</h2>
+    <div style="display: flex; align-items: center; gap: 5px; margin: 5px 0">
+      <input
+        id="state-json-display"
+        type="text"
+        readonly
+        style="
+          flex: 1;
+          white-space: nowrap;
+          overflow-x: auto;
+          background-color: #f0f0f0;
+        "
+        placeholder="Current state JSON"
+      />
+      <button onclick="downloadJson()">Export JSON File</button>
+    </div>
     <textarea
-      id="state-json"
+      id="state-json-input"
       rows="8"
       cols="50"
       placeholder="State JSON"
     ></textarea>
     <br />
-    <button onclick="saveStateToJson()">Save to JSON</button>
     <button onclick="loadStateFromJson()">Load from JSON</button>
-    <button onclick="downloadJson()">Export JSON File</button>
+    <button onclick="document.getElementById('state-json-file').click()">
+      Load from JSON File
+    </button>
+    <input
+      type="file"
+      id="state-json-file"
+      accept="application/json"
+      style="display: none"
+      onchange="loadStateFromJsonFile(this.files[0])"
+    />
 
     <script src="scripts.js"></script>
   </body>

@@ -21,28 +21,44 @@ let dirty = { people: false, transactions: false, splits: false };
 
 function markDirty(section) {
   dirty[section] = true;
-  if (section === "people")
-    document.getElementById("save-people").classList.add("unsaved");
-  if (section === "transactions")
-    document.getElementById("save-transaction").classList.add("unsaved");
-  if (section === "splits")
-    document.getElementById("save-splits").classList.add("unsaved");
-  if (section === "transactions" || section === "splits") {
-    document.getElementById("calculate-summary").classList.add("unsaved");
+  if (section === "people") {
+    const btn = document.getElementById("save-people");
+    if (btn) btn.classList.add("unsaved");
   }
+  if (section === "transactions") {
+    const btn = document.getElementById("save-transactions");
+    if (btn) btn.classList.add("unsaved");
+  }
+  if (section === "splits") {
+    const btn = document.getElementById("save-splits");
+    if (btn) btn.classList.add("unsaved");
+  }
+  if (section === "transactions" || section === "splits") {
+    const calc = document.getElementById("calculate-summary");
+    if (calc) calc.classList.add("unsaved");
+  }
+  updateCurrentStateJson();
 }
 
 function markSaved(section) {
   dirty[section] = false;
-  if (section === "people")
-    document.getElementById("save-people").classList.remove("unsaved");
-  if (section === "transactions")
-    document.getElementById("save-transaction").classList.remove("unsaved");
-  if (section === "splits")
-    document.getElementById("save-splits").classList.remove("unsaved");
-  if (!dirty.transactions && !dirty.splits) {
-    document.getElementById("calculate-summary").classList.remove("unsaved");
+  if (section === "people") {
+    const btn = document.getElementById("save-people");
+    if (btn) btn.classList.remove("unsaved");
   }
+  if (section === "transactions") {
+    const btn = document.getElementById("save-transactions");
+    if (btn) btn.classList.remove("unsaved");
+  }
+  if (section === "splits") {
+    const btn = document.getElementById("save-splits");
+    if (btn) btn.classList.remove("unsaved");
+  }
+  if (!dirty.transactions && !dirty.splits) {
+    const calc = document.getElementById("calculate-summary");
+    if (calc) calc.classList.remove("unsaved");
+  }
+  updateCurrentStateJson();
 }
 
 // ---- PEOPLE ----
@@ -54,6 +70,7 @@ function addPerson() {
   const name = document.getElementById("person-name").value.trim();
   if (!name) return;
   people.push(name);
+  transactions.forEach((t) => t.splits.push(0));
   document.getElementById("person-name").value = "";
   renderPeople();
   renderTransactionTable();
@@ -340,6 +357,7 @@ function resetState() {
   people.length = 0;
   transactions.length = 0;
   dirty = { people: false, transactions: false, splits: false };
+  updateCurrentStateJson();
 }
 
 // ---- SAVE/LOAD STATE ----
@@ -353,61 +371,103 @@ function validateState(state) {
   ) {
     throw new Error("Invalid state: missing people or transactions arrays");
   }
+
   // Validate people: array of non-empty strings
   if (
     !state.people.every((p) => typeof p === "string" && p.trim().length > 0)
   ) {
     throw new Error("Invalid state: people must be non-empty strings");
   }
+
   // Validate transactions: array of objects with expected fields
-  if (
-    !state.transactions.every(
-      (t) =>
-        typeof t === "object" &&
-        t !== null &&
-        typeof t.description === "string" &&
-        typeof t.amount === "number" &&
-        !isNaN(t.amount) &&
-        typeof t.payer === "string" &&
-        Array.isArray(t.splits) &&
-        t.splits.every(
-          (s) =>
-            typeof s === "object" &&
-            s !== null &&
-            typeof s.person === "string" &&
-            typeof s.amount === "number" &&
-            !isNaN(s.amount),
-        ),
-    )
-  ) {
+  const transactionsValid = state.transactions.every((t) => {
+    return (
+      t &&
+      typeof t === "object" &&
+      (typeof t.name === "undefined" || typeof t.name === "string") &&
+      typeof t.payer === "number" &&
+      Number.isInteger(t.payer) &&
+      typeof t.cost === "number" &&
+      isFinite(t.cost) &&
+      Array.isArray(t.splits) &&
+      t.splits.every((s) => typeof s === "number" && isFinite(s))
+    );
+  });
+
+  if (!transactionsValid) {
     throw new Error("Invalid state: transactions malformed");
   }
 }
 
-function saveStateToJson() {
-  const textarea = document.getElementById("state-json");
+function updateCurrentStateJson() {
+  const display = document.getElementById("state-json-display");
   const state = { people, transactions };
-  textarea.value = JSON.stringify(state);
+  if (display) display.value = JSON.stringify(state);
+}
+
+function applyLoadedState(state) {
+  validateState(state);
+  people.length = 0;
+  transactions.length = 0;
+  state.people.forEach((p) => people.push(p));
+  state.transactions.forEach((t) => transactions.push(t));
+
+  if (
+    typeof renderPeople === "function" &&
+    document.getElementById("people-list")
+  ) {
+    renderPeople();
+  }
+  if (
+    typeof renderTransactionTable === "function" &&
+    document.getElementById("transaction-table")
+  ) {
+    renderTransactionTable();
+  }
+  if (
+    typeof renderSplitTable === "function" &&
+    document.getElementById("split-table")
+  ) {
+    renderSplitTable();
+  }
+
+  const summaryEl = document.getElementById("summary");
+  if (summaryEl) summaryEl.innerHTML = "";
+
+  markSaved("people");
+  markSaved("transactions");
+  markSaved("splits");
+  updateCurrentStateJson();
 }
 
 function loadStateFromJson() {
-  const textarea = document.getElementById("state-json");
+  const textarea = document.getElementById("state-json-input");
   try {
     const state = JSON.parse(textarea.value);
-    validateState(state);
-    people.length = 0;
-    transactions.length = 0;
-    state.people.forEach((p) => people.push(p));
-    state.transactions.forEach((t) => transactions.push(t));
-    renderPeople();
-    renderTransactionTable();
-    renderSplitTable();
-    document.getElementById("summary").innerHTML = "";
-    markSaved("people");
-    markSaved("transactions");
-    markSaved("splits");
+    applyLoadedState(state);
   } catch (e) {
-    alert("Failed to load state: " + (e && e.message ? e.message : e));
+    if (typeof alert === "function") {
+      alert("Failed to load state: " + (e && e.message ? e.message : e));
+    }
+  }
+}
+
+async function loadStateFromJsonFile(file) {
+  try {
+    const text = await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = () => reject(reader.error);
+      reader.readAsText(file);
+    });
+    const textarea = document.getElementById("state-json-input");
+    if (textarea) textarea.value = text;
+    const state = JSON.parse(text);
+    applyLoadedState(state);
+  } catch (e) {
+    if (typeof alert === "function") {
+      alert("Failed to load state: " + (e && e.message ? e.message : e));
+    }
   }
 }
 
@@ -431,6 +491,13 @@ if (typeof module !== "undefined" && module.exports) {
     markSaved,
     toggleCollapse,
     resetState,
+    addPerson,
+    updateCurrentStateJson,
+    loadStateFromJson,
+    loadStateFromJsonFile,
+    _people: people,
+    _transactions: transactions,
+    downloadJson,
   };
 }
 if (typeof window !== "undefined") {
@@ -451,7 +518,8 @@ if (typeof window !== "undefined") {
   window.renderSplitDetails = renderSplitDetails;
   window.toggleCollapse = toggleCollapse;
   window.calculateSummary = calculateSummary;
-  window.saveStateToJson = saveStateToJson;
+  window.updateCurrentStateJson = updateCurrentStateJson;
   window.loadStateFromJson = loadStateFromJson;
+  window.loadStateFromJsonFile = loadStateFromJsonFile;
   window.downloadJson = downloadJson;
 }
