@@ -14,6 +14,7 @@ const {
   updateShareableUrl,
   loadStateFromUrl,
 } = require("./scripts");
+const lz = require("lz-string");
 
 describe("computeSummary", () => {
   test("calculates paid, owed and net for a simple shared expense", () => {
@@ -225,8 +226,12 @@ describe("sharing", () => {
     _people.push("Alice");
     _transactions.push({ payer: 0, cost: 10, splits: [1] });
     updateShareableUrl();
-    const expected = `http://localhost/?state=${encodeURIComponent(
-      JSON.stringify({ people: ["Alice"], transactions: _transactions }),
+    const json = JSON.stringify({
+      people: ["Alice"],
+      transactions: _transactions,
+    });
+    const expected = `http://localhost/?state=${lz.compressToEncodedURIComponent(
+      json,
     )}`;
     expect(document.getElementById("share-url-display").value).toBe(expected);
   });
@@ -236,11 +241,8 @@ describe("sharing", () => {
       people: ["Bob"],
       transactions: [{ payer: 0, cost: 5, splits: [1] }],
     };
-    window.history.replaceState(
-      {},
-      "",
-      `?state=${encodeURIComponent(JSON.stringify(state))}`,
-    );
+    const compressed = lz.compressToEncodedURIComponent(JSON.stringify(state));
+    window.history.replaceState({}, "", `?state=${compressed}`);
     loadStateFromUrl();
     expect(_people).toEqual(["Bob"]);
     expect(_transactions).toEqual([{ payer: 0, cost: 5, splits: [1] }]);
