@@ -3,7 +3,6 @@
  */
 const {
   computeSummary,
-  toggleCollapse,
   resetState,
   loadStateFromJson,
   loadStateFromJsonFile,
@@ -22,24 +21,6 @@ describe("computeSummary", () => {
     expect(paid).toEqual([30, 0]);
     expect(owes).toEqual([15, 15]);
     expect(nets).toEqual([15, -15]);
-  });
-});
-
-describe("toggleCollapse", () => {
-  beforeEach(() => {
-    document.body.innerHTML = `
-      <div id="header"></div>
-      <div id="content"></div>
-    `;
-  });
-
-  test("toggles content display", () => {
-    const header = document.getElementById("header");
-    const content = document.getElementById("content");
-    toggleCollapse(header);
-    expect(content.style.display).toBe("block");
-    toggleCollapse(header);
-    expect(content.style.display).toBe("none");
   });
 });
 

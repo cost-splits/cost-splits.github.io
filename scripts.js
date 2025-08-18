@@ -1,3 +1,12 @@
+/**
+ * Compute the amounts paid, owed and net balance for each person.
+ *
+ * @param {string[]} people - List of participant names.
+ * @param {Array<{payer:number,cost:number,splits:number[]}>} transactions -
+ *   Transactions describing who paid and how the cost is split.
+ * @returns {{paid:number[], owes:number[], nets:number[]}} Summary arrays for
+ *   each person.
+ */
 function computeSummary(people, transactions) {
   const paid = Array(people.length).fill(0);
   const owes = Array(people.length).fill(0);
@@ -15,29 +24,48 @@ function computeSummary(people, transactions) {
   const nets = people.map((_, i) => paid[i] - owes[i]);
   return { paid, owes, nets };
 }
+/** @type {string[]} */
 const people = [];
+/** @type {Array<{name?:string, cost:number, payer:number, splits:number[]}>} */
 const transactions = [];
 
+/**
+ * Handle updates after state changes by refreshing derived values.
+ */
 function afterChange() {
   updateCurrentStateJson();
   calculateSummary();
 }
 
+/**
+ * Check whether a value represents a valid dollar amount.
+ *
+ * @param {string} value - Input string to validate.
+ * @param {boolean} [allowEmpty=false] - Whether an empty string is allowed.
+ * @returns {boolean} True if the value is a valid dollar amount.
+ */
 function isValidDollar(value, allowEmpty = false) {
   if (allowEmpty && value.trim() === "") return true;
   return /^\d+(\.\d{0,2})?$/.test(value);
 }
 
+/**
+ * Validate an arbitrary number allowing any number of decimals.
+ *
+ * @param {string} value - Input string to validate.
+ * @param {boolean} [allowEmpty=false] - Whether an empty string is allowed.
+ * @returns {boolean} True if the value is numeric.
+ */
 function isValidNumber(value, allowEmpty = false) {
   if (allowEmpty && value.trim() === "") return true;
   return /^\d+(\.\d+)?$/.test(value);
 }
 
 // ---- PEOPLE ----
-function isValidPerson(person) {
-  return person && typeof person.name === "string";
-}
 
+/**
+ * Add a new person from the name input field.
+ */
 function addPerson() {
   const input = document.getElementById("person-name");
   const name = input.value.trim();
@@ -55,6 +83,11 @@ function addPerson() {
   afterChange();
 }
 
+/**
+ * Remove a person and any associated transactions.
+ *
+ * @param {number} index - Index of the person to remove.
+ */
 function deletePerson(index) {
   const involved = transactions.some(
     (t) => t.payer === index || (t.splits[index] && t.splits[index] > 0),
@@ -89,6 +122,9 @@ function deletePerson(index) {
   afterChange();
 }
 
+/**
+ * Render the list of people with delete controls.
+ */
 function renderPeople() {
   const list = document.getElementById("people-list");
   list.innerHTML = "";
@@ -105,18 +141,10 @@ function renderPeople() {
 }
 
 // ---- TRANSACTIONS ----
-// Validate that each transaction has 'payer' (string), 'amount' (number), and 'splits' (array of valid splits)
-function isValidTransaction(transaction) {
-  return (
-    transaction &&
-    typeof transaction.payer === "string" &&
-    typeof transaction.amount === "number" &&
-    isFinite(transaction.amount) &&
-    Array.isArray(transaction.splits) &&
-    transaction.splits.every(isValidSplit)
-  );
-}
 
+/**
+ * Render the transactions table allowing editing and deletion.
+ */
 function renderTransactionTable() {
   const table = document.getElementById("transaction-table");
   table.innerHTML = "";
@@ -177,7 +205,9 @@ function renderTransactionTable() {
       `;
   table.appendChild(addRow);
 }
-
+/**
+ * Add a new transaction using values from the input fields.
+ */
 function addTransaction() {
   const nameInput = document.getElementById("new-t-name");
   const costInput = document.getElementById("new-t-cost");
@@ -203,6 +233,14 @@ function addTransaction() {
   afterChange();
 }
 
+/**
+ * Edit a transaction field.
+ *
+ * @param {number} i - Transaction index.
+ * @param {"cost"|"payer"|"name"} field - Field to update.
+ * @param {string} value - New value from the input element.
+ * @param {HTMLInputElement|HTMLSelectElement} el - Element being edited.
+ */
 function editTransaction(i, field, value, el) {
   if (field === "cost") {
     if (!isValidDollar(value)) {
@@ -221,6 +259,11 @@ function editTransaction(i, field, value, el) {
   renderSplitDetails();
 }
 
+/**
+ * Delete a transaction at the given index.
+ *
+ * @param {number} i - Index of transaction to delete.
+ */
 function deleteTransaction(i) {
   transactions.splice(i, 1);
   renderTransactionTable();
@@ -229,16 +272,10 @@ function deleteTransaction(i) {
 }
 
 // ---- SPLITS ----
-// Validate that each split has 'person' (string) and 'share' (number)
-function isValidSplit(split) {
-  return (
-    split &&
-    typeof split.person === "string" &&
-    typeof split.share === "number" &&
-    isFinite(split.share)
-  );
-}
 
+/**
+ * Render the table showing split inputs for each transaction.
+ */
 function renderSplitTable() {
   const splitDiv = document.getElementById("split-table");
   splitDiv.innerHTML = "";
@@ -268,6 +305,14 @@ function renderSplitTable() {
   renderSplitDetails();
 }
 
+/**
+ * Edit an individual split value.
+ *
+ * @param {number} ti - Transaction index.
+ * @param {number} pi - Person index.
+ * @param {string} value - New value from the input element.
+ * @param {HTMLInputElement} el - The input element being edited.
+ */
 function editSplit(ti, pi, value, el) {
   if (!isValidNumber(value, true)) {
     el.classList.add("invalid-cell");
@@ -282,6 +327,9 @@ function editSplit(ti, pi, value, el) {
 }
 
 // ---- SPLIT DETAILS (3a) ----
+/**
+ * Render detailed amounts owed for each transaction and person.
+ */
 function renderSplitDetails() {
   const div = document.getElementById("split-details");
   div.innerHTML = "";
@@ -322,12 +370,10 @@ function renderSplitDetails() {
   div.appendChild(table);
 }
 
-function toggleCollapse(el) {
-  const content = el.nextElementSibling;
-  content.style.display = content.style.display === "block" ? "none" : "block";
-}
-
 // ---- SUMMARY ----
+/**
+ * Render a summary table of totals paid, owed and net for each person.
+ */
 function calculateSummary() {
   const summaryEl = document.getElementById("summary");
   if (!summaryEl) return;
@@ -369,6 +415,9 @@ function calculateSummary() {
 
   summaryEl.innerHTML = html;
 }
+/**
+ * Clear all people and transactions from the current state.
+ */
 function resetState() {
   people.length = 0;
   transactions.length = 0;
@@ -377,6 +426,12 @@ function resetState() {
 
 // ---- SAVE/LOAD STATE ----
 // Validate the structure and types of the loaded state
+/**
+ * Ensure a loaded state object has the expected structure.
+ *
+ * @param {object} state - State object to validate.
+ * @throws {Error} If the state is malformed.
+ */
 function validateState(state) {
   if (
     typeof state !== "object" ||
@@ -414,12 +469,20 @@ function validateState(state) {
   }
 }
 
+/**
+ * Write the current state to the display input as JSON.
+ */
 function updateCurrentStateJson() {
   const display = document.getElementById("state-json-display");
   const state = { people, transactions };
   if (display) display.value = JSON.stringify(state);
 }
 
+/**
+ * Replace the current state with a loaded state and refresh the UI.
+ *
+ * @param {object} state - Parsed state object.
+ */
 function applyLoadedState(state) {
   validateState(state);
   people.length = 0;
@@ -452,6 +515,9 @@ function applyLoadedState(state) {
   afterChange();
 }
 
+/**
+ * Load state from the JSON text area.
+ */
 function loadStateFromJson() {
   const textarea = document.getElementById("state-json-input");
   try {
@@ -464,6 +530,11 @@ function loadStateFromJson() {
   }
 }
 
+/**
+ * Load state from a JSON file chosen by the user.
+ *
+ * @param {File} file - JSON file to read.
+ */
 async function loadStateFromJsonFile(file) {
   try {
     const text = await new Promise((resolve, reject) => {
@@ -483,6 +554,9 @@ async function loadStateFromJsonFile(file) {
   }
 }
 
+/**
+ * Trigger a download of the current state as a JSON file.
+ */
 function downloadJson() {
   const state = { people, transactions };
   const dataStr = JSON.stringify(state);
@@ -499,7 +573,6 @@ function downloadJson() {
 if (typeof module !== "undefined" && module.exports) {
   module.exports = {
     computeSummary,
-    toggleCollapse,
     resetState,
     addPerson,
     updateCurrentStateJson,
@@ -522,7 +595,6 @@ if (typeof window !== "undefined") {
   window.renderSplitTable = renderSplitTable;
   window.editSplit = editSplit;
   window.renderSplitDetails = renderSplitDetails;
-  window.toggleCollapse = toggleCollapse;
   window.calculateSummary = calculateSummary;
   window.updateCurrentStateJson = updateCurrentStateJson;
   window.loadStateFromJson = loadStateFromJson;
