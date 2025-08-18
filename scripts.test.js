@@ -3,8 +3,6 @@
  */
 const {
   computeSummary,
-  markDirty,
-  markSaved,
   toggleCollapse,
   resetState,
   loadStateFromJson,
@@ -13,6 +11,7 @@ const {
   _people,
   _transactions,
   addPerson,
+  updateCurrentStateJson,
 } = require("./scripts");
 
 describe("computeSummary", () => {
@@ -23,40 +22,6 @@ describe("computeSummary", () => {
     expect(paid).toEqual([30, 0]);
     expect(owes).toEqual([15, 15]);
     expect(nets).toEqual([15, -15]);
-  });
-});
-
-describe("markDirty and markSaved", () => {
-  beforeEach(() => {
-    document.body.innerHTML = `
-      <button id="save-people"></button>
-      <button id="save-transactions"></button>
-      <button id="save-splits"></button>
-      <button id="calculate-summary"></button>
-    `;
-    resetState();
-  });
-
-  test("marks and saves people section", () => {
-    markDirty("people");
-    expect(
-      document.getElementById("save-people").classList.contains("unsaved"),
-    ).toBe(true);
-    markSaved("people");
-    expect(
-      document.getElementById("save-people").classList.contains("unsaved"),
-    ).toBe(false);
-  });
-
-  test("transactions dirtiness affects summary button", () => {
-    markDirty("transactions");
-    const saveTransaction = document.getElementById("save-transactions");
-    const calcSummary = document.getElementById("calculate-summary");
-    expect(saveTransaction.classList.contains("unsaved")).toBe(true);
-    expect(calcSummary.classList.contains("unsaved")).toBe(true);
-    markSaved("transactions");
-    expect(saveTransaction.classList.contains("unsaved")).toBe(false);
-    expect(calcSummary.classList.contains("unsaved")).toBe(false);
   });
 });
 
@@ -85,18 +50,19 @@ describe("updateCurrentStateJson and loadStateFromJson", () => {
       <textarea id="state-json-input"></textarea>
       <input id="state-json-file" type="file" />
       <div id="summary"></div>
-      <button id="save-people"></button>
-      <button id="save-transactions"></button>
-      <button id="save-splits"></button>
-      <button id="calculate-summary"></button>
+      <input id="person-name" />
+      <ul id="people-list"></ul>
+      <table id="transaction-table"></table>
+      <div id="split-table"></div>
+      <div id="split-details"></div>
     `;
     resetState();
     global.alert = jest.fn();
   });
 
   test("current state display updates automatically", () => {
-    _people.push("Alice");
-    markSaved("people");
+    document.getElementById("person-name").value = "Alice";
+    addPerson();
     expect(document.getElementById("state-json-display").value).toBe(
       JSON.stringify({ people: ["Alice"], transactions: [] }),
     );
@@ -110,8 +76,7 @@ describe("updateCurrentStateJson and loadStateFromJson", () => {
       payer: 0,
       splits: [1, 1],
     });
-    markSaved("people");
-    markSaved("transactions");
+    updateCurrentStateJson();
     const saved = document.getElementById("state-json-display").value;
 
     resetState();
@@ -232,5 +197,25 @@ describe("addPerson", () => {
     expect(document.getElementById("split-details").textContent).not.toMatch(
       "NaN",
     );
+  });
+});
+
+describe("editSplit", () => {
+  beforeEach(() => {
+    document.body.innerHTML = `
+      <div id="split-table"></div>
+      <div id="split-details"></div>
+    `;
+    resetState();
+    _people.push("Alice");
+    _transactions.push({ name: "Item", cost: 10, payer: 0, splits: [1] });
+    window.renderSplitTable();
+  });
+
+  test("accepts numbers with any decimal places", () => {
+    const input = document.querySelector("#split-table input");
+    window.editSplit(0, 0, "3.123", input);
+    expect(_transactions[0].splits[0]).toBeCloseTo(3.123);
+    expect(input.value).toBe("3.123");
   });
 });
