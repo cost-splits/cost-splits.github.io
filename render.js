@@ -118,51 +118,103 @@ function renderTransactionTable() {
 
   transactions.forEach((t, i) => {
     const row = document.createElement("tr");
-    row.innerHTML = `
-          <td><input type="text" value="${t.name || "Transaction " + (i + 1)}"
-                     onchange="editTransaction(${i},'name',this.value,this)"></td>
-          <td>
-            <select onchange="editTransaction(${i},'payer',this.value,this)">
-              ${people
-                .map(
-                  (p, pi) =>
-                    `<option value="${pi}" ${
-                      pi === t.payer ? "selected" : ""
-                    }>${p}</option>`,
-                )
-                .join("")}
-            </select>
-          </td>
-          <td>
-            <div class="dollar-field">
-              <span class="prefix">$</span>
-              <input type="text" value="${t.cost.toFixed(2)}"
-                     onchange="editTransaction(${i},'cost',this.value,this)">
-            </div>
-          </td>
-          <td><button onclick="deleteTransaction(${i})">Delete</button></td>
-        `;
+
+    const nameCell = document.createElement("td");
+    const nameInput = document.createElement("input");
+    nameInput.type = "text";
+    nameInput.value = t.name || `Transaction ${i + 1}`;
+    nameInput.addEventListener("change", (e) =>
+      editTransaction(i, "name", e.target.value, e.target),
+    );
+    nameCell.appendChild(nameInput);
+    row.appendChild(nameCell);
+
+    const payerCell = document.createElement("td");
+    const payerSelect = document.createElement("select");
+    people.forEach((p, pi) => {
+      const opt = document.createElement("option");
+      opt.value = String(pi);
+      opt.textContent = p;
+      if (pi === t.payer) opt.selected = true;
+      payerSelect.appendChild(opt);
+    });
+    payerSelect.addEventListener("change", (e) =>
+      editTransaction(i, "payer", e.target.value, e.target),
+    );
+    payerCell.appendChild(payerSelect);
+    row.appendChild(payerCell);
+
+    const costCell = document.createElement("td");
+    const costWrapper = document.createElement("div");
+    costWrapper.className = "dollar-field";
+    const prefix = document.createElement("span");
+    prefix.className = "prefix";
+    prefix.textContent = "$";
+    const costInput = document.createElement("input");
+    costInput.type = "text";
+    costInput.value = t.cost.toFixed(2);
+    costInput.addEventListener("change", (e) =>
+      editTransaction(i, "cost", e.target.value, e.target),
+    );
+    costWrapper.appendChild(prefix);
+    costWrapper.appendChild(costInput);
+    costCell.appendChild(costWrapper);
+    row.appendChild(costCell);
+
+    const actionCell = document.createElement("td");
+    const delBtn = document.createElement("button");
+    delBtn.textContent = "Delete";
+    delBtn.addEventListener("click", () => deleteTransaction(i));
+    actionCell.appendChild(delBtn);
+    row.appendChild(actionCell);
+
     table.appendChild(row);
   });
 
   const addRow = document.createElement("tr");
-  addRow.innerHTML = `
-        <td><input type="text" id="new-t-name" placeholder="Name (optional)"></td>
-        <td>
-          <select id="new-t-payer">
-            ${people
-              .map((p, pi) => `<option value="${pi}">${p}</option>`)
-              .join("")}
-          </select>
-        </td>
-        <td>
-          <div class="dollar-field">
-            <span class="prefix">$</span>
-            <input type="text" id="new-t-cost" placeholder="Cost">
-          </div>
-        </td>
-        <td><button onclick="addTransaction()">Add</button></td>
-      `;
+
+  const addNameCell = document.createElement("td");
+  const addNameInput = document.createElement("input");
+  addNameInput.type = "text";
+  addNameInput.id = "new-t-name";
+  addNameInput.placeholder = "Name (optional)";
+  addNameCell.appendChild(addNameInput);
+  addRow.appendChild(addNameCell);
+
+  const addPayerCell = document.createElement("td");
+  const addPayerSelect = document.createElement("select");
+  addPayerSelect.id = "new-t-payer";
+  people.forEach((p, pi) => {
+    const opt = document.createElement("option");
+    opt.value = String(pi);
+    opt.textContent = p;
+    addPayerSelect.appendChild(opt);
+  });
+  addPayerCell.appendChild(addPayerSelect);
+  addRow.appendChild(addPayerCell);
+
+  const addCostCell = document.createElement("td");
+  const addCostWrapper = document.createElement("div");
+  addCostWrapper.className = "dollar-field";
+  const addPrefix = document.createElement("span");
+  addPrefix.className = "prefix";
+  addPrefix.textContent = "$";
+  const addCostInput = document.createElement("input");
+  addCostInput.type = "text";
+  addCostInput.id = "new-t-cost";
+  addCostInput.placeholder = "Cost";
+  addCostWrapper.appendChild(addPrefix);
+  addCostWrapper.appendChild(addCostInput);
+  addCostCell.appendChild(addCostWrapper);
+  addRow.appendChild(addCostCell);
+
+  const addActionCell = document.createElement("td");
+  const addBtn = document.createElement("button");
+  addBtn.textContent = "Add";
+  addBtn.addEventListener("click", addTransaction);
+  addActionCell.appendChild(addBtn);
+  addRow.appendChild(addActionCell);
+
   table.appendChild(addRow);
 }
 
@@ -254,18 +306,22 @@ function renderSplitTable() {
     const row = document.createElement("tr");
     const tName = t.name || `Transaction ${ti + 1}`;
     const arrow = hasItems ? (collapsed ? "▶" : "▼") : "";
-    let cells = `<td>${arrow ? `<span class="collapse-btn" onclick="toggleSplitItems(${ti})">${arrow}</span>` : ""}${tName}</td>`;
+    let cells = `<td>${
+      arrow
+        ? `<span class="collapse-btn" data-action="toggleSplitItems" data-ti="${ti}">${arrow}</span>`
+        : ""
+    }${tName}</td>`;
     cells += `<td>$${t.cost.toFixed(2)}</td>`;
     people.forEach((p, pi) => {
       const rawVal = t.splits[pi];
       const val = rawVal ? String(rawVal) : "";
       const disabled = hasItems ? "disabled" : "";
-      cells += `<td><input type="text" value="${val}" ${disabled} onchange="editSplit(${ti},${pi},this.value,this)"></td>`;
+      cells += `<td><input type="text" value="${val}" ${disabled} data-action="editSplit" data-ti="${ti}" data-pi="${pi}"></td>`;
     });
     if (hasItems) {
-      cells += `<td><button onclick="unitemizeTransaction(${ti})">Normal</button><button onclick="addItem(${ti})">Add Item</button></td>`;
+      cells += `<td><button data-action="unitemizeTransaction" data-ti="${ti}">Normal</button><button data-action="addItem" data-ti="${ti}">Add Item</button></td>`;
     } else {
-      cells += `<td><button onclick="itemizeTransaction(${ti})">Itemize</button></td>`;
+      cells += `<td><button data-action="itemizeTransaction" data-ti="${ti}">Itemize</button></td>`;
     }
     row.innerHTML = cells;
     table.appendChild(row);
@@ -273,19 +329,72 @@ function renderSplitTable() {
     if (hasItems && !collapsed) {
       t.items.forEach((it, ii) => {
         const iRow = document.createElement("tr");
-        let cell = `<td class="indent-cell"><input type="text" value="${it.item || ""}" onchange="editItem(${ti},${ii},'item',this.value)"></td>`;
-        cell += `<td><div class="dollar-field"><span class="prefix">$</span><input type="text" value="${it.cost.toFixed(2)}" onchange="editItem(${ti},${ii},'cost',this.value,this)"></div></td>`;
+        let cell = `<td class="indent-cell"><input type="text" value="${it.item || ""}" data-action="editItem" data-ti="${ti}" data-ii="${ii}" data-field="item"></td>`;
+        cell += `<td><div class="dollar-field"><span class="prefix">$</span><input type="text" value="${it.cost.toFixed(2)}" data-action="editItem" data-ti="${ti}" data-ii="${ii}" data-field="cost"></div></td>`;
         people.forEach((p, pi) => {
           const raw = it.splits[pi];
           const val2 = raw ? String(raw) : "";
-          cell += `<td><input type="text" value="${val2}" onchange="editItemSplit(${ti},${ii},${pi},this.value,this)"></td>`;
+          cell += `<td><input type="text" value="${val2}" data-action="editItemSplit" data-ti="${ti}" data-ii="${ii}" data-pi="${pi}"></td>`;
         });
-        cell += `<td><span class="delete-btn" onclick="deleteItem(${ti},${ii})">❌</span></td>`;
+        cell += `<td><span class="delete-btn" data-action="deleteItem" data-ti="${ti}" data-ii="${ii}">❌</span></td>`;
         iRow.innerHTML = cell;
         table.appendChild(iRow);
       });
     }
   });
+
+  table.onchange = (e) => {
+    const t = e.target;
+    switch (t.dataset.action) {
+      case "editSplit":
+        editSplit(parseInt(t.dataset.ti), parseInt(t.dataset.pi), t.value, t);
+        break;
+      case "editItem":
+        editItem(
+          parseInt(t.dataset.ti),
+          parseInt(t.dataset.ii),
+          t.dataset.field,
+          t.value,
+          t,
+        );
+        break;
+      case "editItemSplit":
+        editItemSplit(
+          parseInt(t.dataset.ti),
+          parseInt(t.dataset.ii),
+          parseInt(t.dataset.pi),
+          t.value,
+          t,
+        );
+        break;
+      default:
+        break;
+    }
+  };
+
+  table.onclick = (e) => {
+    const t = e.target;
+    const ti = parseInt(t.dataset.ti);
+    switch (t.dataset.action) {
+      case "toggleSplitItems":
+        toggleSplitItems(ti);
+        break;
+      case "unitemizeTransaction":
+        unitemizeTransaction(ti);
+        break;
+      case "addItem":
+        addItem(ti);
+        break;
+      case "itemizeTransaction":
+        itemizeTransaction(ti);
+        break;
+      case "deleteItem":
+        deleteItem(ti, parseInt(t.dataset.ii));
+        break;
+      default:
+        break;
+    }
+  };
 
   splitDiv.appendChild(table);
   renderSplitDetails();
@@ -460,7 +569,11 @@ function renderSplitDetails() {
     const tName = t.name || `Transaction ${ti + 1}`;
     const row = document.createElement("tr");
     const arrow = hasItems ? (collapsed ? "▶" : "▼") : "";
-    let cells = `<td>${arrow ? `<span class="collapse-btn" onclick="toggleDetailItems(${ti})">${arrow}</span>` : ""}${tName} - $${t.cost.toFixed(2)}</td>`;
+    let cells = `<td>${
+      arrow
+        ? `<span class="collapse-btn" data-action="toggleDetailItems" data-ti="${ti}">${arrow}</span>`
+        : ""
+    }${tName} - $${t.cost.toFixed(2)}</td>`;
     const personTotals = Array(people.length).fill(0);
     if (hasItems) {
       const itemsTotal = t.items.reduce((sum, it) => sum + it.cost, 0);
@@ -515,6 +628,12 @@ function renderSplitDetails() {
   totals.forEach((val) => (cells += `<td><b>$${val.toFixed(2)}</b></td>`));
   totalRow.innerHTML = cells;
   table.appendChild(totalRow);
+
+  table.onclick = (e) => {
+    if (e.target.dataset.action === "toggleDetailItems") {
+      toggleDetailItems(parseInt(e.target.dataset.ti));
+    }
+  };
 
   div.appendChild(table);
 }
