@@ -103,7 +103,7 @@
     <h2>2. Transactions</h2>
     <div id="transactions-section">
       <table id="transaction-table"></table>
-      <button id="save-transaction" onclick="saveTransactions()">
+      <button id="save-transactions" onclick="saveTransactions()">
         Save Transactions
       </button>
     </div>
@@ -135,7 +135,7 @@
         if (section === "people")
           document.getElementById("save-people").classList.add("unsaved");
         if (section === "transactions")
-          document.getElementById("save-transaction").classList.add("unsaved");
+          document.getElementById("save-transactions").classList.add("unsaved");
         if (section === "splits")
           document.getElementById("save-splits").classList.add("unsaved");
         if (section === "transactions" || section === "splits") {
@@ -149,7 +149,7 @@
           document.getElementById("save-people").classList.remove("unsaved");
         if (section === "transactions")
           document
-            .getElementById("save-transaction")
+            .getElementById("save-transactions")
             .classList.remove("unsaved");
         if (section === "splits")
           document.getElementById("save-splits").classList.remove("unsaved");
