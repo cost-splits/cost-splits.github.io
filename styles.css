@@ -1,0 +1,102 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 20px;
+}
+
+h2 {
+  margin-top: 30px;
+}
+
+input,
+select {
+  margin: 2px;
+}
+
+button {
+  margin: 5px 0;
+  padding: 4px 8px;
+}
+
+table,
+th,
+td {
+  border: 1px solid black;
+  border-collapse: collapse;
+  padding: 5px;
+}
+
+table {
+  margin-top: 10px;
+}
+
+#transaction-table {
+  table-layout: auto;
+  width: auto;
+}
+
+td,
+th {
+  text-align: right;
+}
+
+td:first-child,
+th:first-child {
+  text-align: left;
+}
+
+/* Removed collapsible styles now that split details are always visible */
+
+.delete-btn {
+  cursor: pointer;
+  color: red;
+  margin-left: 5px;
+}
+
+.collapse-btn {
+  cursor: pointer;
+  margin-right: 5px;
+  font-weight: bold;
+}
+
+.unused-row {
+  background-color: yellow;
+}
+
+.invalid-cell {
+  background-color: rgba(255, 0, 0, 0.4);
+}
+
+.dollar-field {
+  display: flex;
+  align-items: center;
+}
+
+.dollar-field .prefix {
+  margin-right: 2px;
+}
+
+.flex-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin: 5px 0;
+}
+
+.readonly-field {
+  flex: 1;
+  white-space: nowrap;
+  overflow-x: auto;
+  background-color: #f0f0f0;
+}
+
+.hidden {
+  display: none;
+}
+
+.indent-cell {
+  padding-left: 20px;
+}
+
+.text-center {
+  text-align: center;
+}

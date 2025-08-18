@@ -360,7 +360,7 @@ function renderSplitTable() {
     if (hasItems && !collapsed) {
       t.items.forEach((it, ii) => {
         const iRow = document.createElement("tr");
-        let cell = `<td style="padding-left:20px;"><input type="text" value="${it.item || ""}" onchange="editItem(${ti},${ii},'item',this.value)"></td>`;
+        let cell = `<td class="indent-cell"><input type="text" value="${it.item || ""}" onchange="editItem(${ti},${ii},'item',this.value)"></td>`;
         cell += `<td><div class="dollar-field"><span class="prefix">$</span><input type="text" value="${it.cost.toFixed(2)}" onchange="editItem(${ti},${ii},'cost',this.value,this)"></div></td>`;
         people.forEach((p, pi) => {
           const raw = it.splits[pi];
@@ -531,7 +531,7 @@ function renderSplitDetails() {
 
   const table = document.createElement("table");
   const colSpan = people.length + 1;
-  let header = `<tr><th colspan="${colSpan}" style="text-align: center;">Split Details</th></tr>`;
+  let header = `<tr><th colspan="${colSpan}" class="text-center">Split Details</th></tr>`;
   header += "<tr><th>Transaction</th>";
   people.forEach((p) => (header += `<th>${p}</th>`));
   header += "</tr>";
@@ -580,7 +580,7 @@ function renderSplitDetails() {
       t.items.forEach((it, ii) => {
         const iRow = document.createElement("tr");
         const itemName = it.item || `Item ${ii + 1}`;
-        let rowCells = `<td style="padding-left:20px;">${itemName} - $${(it.cost * scale).toFixed(2)}</td>`;
+        let rowCells = `<td class="indent-cell">${itemName} - $${(it.cost * scale).toFixed(2)}</td>`;
         const splitSum = it.splits.reduce((a, b) => a + b, 0);
         people.forEach((p, pi) => {
           let portion = 0;
