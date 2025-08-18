@@ -381,7 +381,7 @@ function validateState(state) {
   }
 }
 
-function saveStateToJson() {
+function updateCurrentStateJson() {
   const display = document.getElementById("state-json-display");
   const state = { people, transactions };
   if (display) display.value = JSON.stringify(state);
@@ -446,7 +446,7 @@ function downloadJson() {
       markSaved,
       toggleCollapse,
       resetState,
-      saveStateToJson,
+      updateCurrentStateJson,
       loadStateFromJson,
       _people: people,
       _transactions: transactions,
@@ -470,7 +470,7 @@ if (typeof window !== "undefined") {
   window.renderSplitDetails = renderSplitDetails;
   window.toggleCollapse = toggleCollapse;
   window.calculateSummary = calculateSummary;
-  window.saveStateToJson = saveStateToJson;
+  window.updateCurrentStateJson = updateCurrentStateJson;
   window.loadStateFromJson = loadStateFromJson;
   window.downloadJson = downloadJson;
 }

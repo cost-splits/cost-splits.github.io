@@ -7,7 +7,7 @@ const {
   markSaved,
   toggleCollapse,
   resetState,
-  saveStateToJson,
+  updateCurrentStateJson,
   loadStateFromJson,
   _people,
   _transactions,
@@ -76,7 +76,7 @@ describe("toggleCollapse", () => {
   });
 });
 
-describe("saveStateToJson and loadStateFromJson", () => {
+describe("updateCurrentStateJson and loadStateFromJson", () => {
   beforeEach(() => {
     document.body.innerHTML = `
       <input id="state-json-display" />
@@ -99,7 +99,7 @@ describe("saveStateToJson and loadStateFromJson", () => {
       payer: 0,
       splits: [1, 1],
     });
-    saveStateToJson();
+    updateCurrentStateJson();
     const saved = document.getElementById("state-json-display").value;
 
     resetState();
