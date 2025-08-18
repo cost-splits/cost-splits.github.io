@@ -10,6 +10,7 @@ const {
   loadStateFromJson,
   _people,
   _transactions,
+  addPerson,
 } = require("./scripts");
 
 describe("computeSummary", () => {
@@ -129,5 +130,35 @@ describe("updateCurrentStateJson and loadStateFromJson", () => {
     expect(alert).toHaveBeenCalled();
     expect(_people).toEqual([]);
     expect(_transactions).toEqual([]);
+  });
+});
+
+describe("addPerson", () => {
+  beforeEach(() => {
+    document.body.innerHTML = `
+      <input id="person-name" />
+      <ul id="people-list"></ul>
+      <table id="transaction-table"></table>
+      <div id="split-table"></div>
+      <div id="split-details"></div>
+    `;
+    resetState();
+    _people.push("Alice", "Bob");
+    _transactions.push({
+      name: "Lunch",
+      cost: 20,
+      payer: 0,
+      splits: [1, 1],
+    });
+  });
+
+  test("adds zero splits for new user", () => {
+    document.getElementById("person-name").value = "Charlie";
+    addPerson();
+    expect(_people).toEqual(["Alice", "Bob", "Charlie"]);
+    expect(_transactions[0].splits).toEqual([1, 1, 0]);
+    expect(document.getElementById("split-details").textContent).not.toMatch(
+      "NaN",
+    );
   });
 });

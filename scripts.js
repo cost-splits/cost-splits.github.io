@@ -70,6 +70,7 @@ function addPerson() {
   const name = document.getElementById("person-name").value.trim();
   if (!name) return;
   people.push(name);
+  transactions.forEach((t) => t.splits.push(0));
   document.getElementById("person-name").value = "";
   renderPeople();
   renderTransactionTable();
@@ -464,6 +465,7 @@ function downloadJson() {
       markSaved,
       toggleCollapse,
       resetState,
+      addPerson,
       updateCurrentStateJson,
       loadStateFromJson,
       _people: people,
