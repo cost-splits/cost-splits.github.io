@@ -196,7 +196,9 @@
         people.splice(index, 1);
         transactions.forEach((t) => {
           t.splits.splice(index, 1);
-          if (t.payer >= people.length) t.payer = 0;
+          if (t.payer > index) {
+            t.payer--;
+          }
         });
         renderPeople();
         renderTransactionTable();
