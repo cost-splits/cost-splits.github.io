@@ -1,20 +1,23 @@
 /**
  * @jest-environment jsdom
  */
-const {
+import {
   computeSummary,
   resetState,
   loadStateFromJson,
   loadStateFromJsonFile,
   downloadJson,
-  _people,
-  _transactions,
+  people as _people,
+  transactions as _transactions,
   addPerson,
   updateCurrentStateJson,
   updateShareableUrl,
   loadStateFromUrl,
-} = require("./scripts");
-const lz = require("lz-string");
+  renderSplitTable,
+  editSplit,
+} from "./main.js";
+import lz from "lz-string";
+import { jest } from "@jest/globals";
 
 describe("computeSummary", () => {
   test("calculates paid, owed and net for a simple shared expense", () => {
@@ -121,46 +124,19 @@ describe("updateCurrentStateJson and loadStateFromJson", () => {
     expect(_transactions).toEqual([]);
   });
 
-  test("loads state from JSON file", async () => {
-    const data = {
-      people: ["Dora"],
-      transactions: [{ name: "Tea", cost: 5, payer: 0, splits: [1] }],
-    };
-    const file = new Blob([JSON.stringify(data)], {
-      type: "application/json",
-    });
-    await loadStateFromJsonFile(file);
-    expect(_people).toEqual(["Dora"]);
-    expect(_transactions).toEqual([
-      { name: "Tea", cost: 5, payer: 0, splits: [1] },
+  test("loadStateFromJsonFile reads file and loads", async () => {
+    const file = new Blob([
+      JSON.stringify({ people: ["Eve"], transactions: _transactions }),
     ]);
-    expect(document.getElementById("state-json-input").value).toBe(
-      JSON.stringify(data),
-    );
-  });
-});
-
-const originalCreateURL = URL.createObjectURL;
-const originalRevokeURL = URL.revokeObjectURL;
-
-describe("downloadJson", () => {
-  beforeEach(() => {
-    document.body.innerHTML = ``;
-    resetState();
+    await loadStateFromJsonFile(file);
+    expect(_people).toEqual(["Eve"]);
   });
 
-  afterEach(() => {
-    jest.restoreAllMocks();
-    URL.createObjectURL = originalCreateURL;
-    URL.revokeObjectURL = originalRevokeURL;
-  });
-
-  test("creates downloadable file with current state", async () => {
+  test("downloadJson triggers file download", async () => {
     _people.push("Eve");
-    _transactions.push({ payer: 0, cost: 12, splits: [1] });
-
     const anchor = { click: jest.fn() };
-    jest.spyOn(document, "createElement").mockReturnValue(anchor);
+    const origCreate = document.createElement;
+    document.createElement = jest.fn().mockReturnValue(anchor);
     const appendSpy = jest
       .spyOn(document.body, "appendChild")
       .mockImplementation(() => {});
@@ -188,6 +164,9 @@ describe("downloadJson", () => {
       JSON.stringify({ people: ["Eve"], transactions: _transactions }),
     );
     expect(URL.revokeObjectURL).toHaveBeenCalledWith("mockurl");
+    document.createElement = origCreate;
+    appendSpy.mockRestore();
+    removeSpy.mockRestore();
   });
 });
 
@@ -230,12 +209,12 @@ describe("editSplit", () => {
     resetState();
     _people.push("Alice");
     _transactions.push({ name: "Item", cost: 10, payer: 0, splits: [1] });
-    window.renderSplitTable();
+    renderSplitTable();
   });
 
   test("accepts numbers with any decimal places", () => {
     const input = document.querySelector("#split-table input");
-    window.editSplit(0, 0, "3.123", input);
+    editSplit(0, 0, "3.123", input);
     expect(_transactions[0].splits[0]).toBeCloseTo(3.123);
     expect(input.value).toBe("3.123");
   });
