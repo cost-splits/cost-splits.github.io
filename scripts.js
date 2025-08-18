@@ -316,6 +316,49 @@ function resetState() {
   dirty = { people: false, transactions: false, splits: false };
 }
 
+// ---- SAVE/LOAD STATE ----
+function saveStateToJson() {
+  const textarea = document.getElementById("state-json");
+  const state = { people, transactions };
+  textarea.value = JSON.stringify(state);
+}
+
+function loadStateFromJson() {
+  const textarea = document.getElementById("state-json");
+  try {
+    const state = JSON.parse(textarea.value);
+    if (!Array.isArray(state.people) || !Array.isArray(state.transactions)) {
+      throw new Error("Invalid state");
+    }
+    people.length = 0;
+    transactions.length = 0;
+    state.people.forEach((p) => people.push(p));
+    state.transactions.forEach((t) => transactions.push(t));
+    renderPeople();
+    renderTransactionTable();
+    renderSplitTable();
+    document.getElementById("summary").innerHTML = "";
+    markSaved("people");
+    markSaved("transactions");
+    markSaved("splits");
+  } catch (e) {
+    alert("Invalid JSON");
+  }
+}
+
+function downloadJson() {
+  const state = { people, transactions };
+  const dataStr = JSON.stringify(state);
+  const blob = new Blob([dataStr], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "cost-splits.json";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
 if (typeof module !== "undefined" && module.exports) {
   module.exports = {
     computeSummary,
@@ -343,4 +386,7 @@ if (typeof window !== "undefined") {
   window.renderSplitDetails = renderSplitDetails;
   window.toggleCollapse = toggleCollapse;
   window.calculateSummary = calculateSummary;
+  window.saveStateToJson = saveStateToJson;
+  window.loadStateFromJson = loadStateFromJson;
+  window.downloadJson = downloadJson;
 }
