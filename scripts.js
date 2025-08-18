@@ -58,7 +58,9 @@ const people = [];
  */
 const transactions = [];
 /** @type {Set<number>} */
-const collapsedTransactions = new Set();
+const collapsedSplit = new Set();
+/** @type {Set<number>} */
+const collapsedDetails = new Set();
 /* global LZString */
 const lz = typeof LZString !== "undefined" ? LZString : require("lz-string");
 
@@ -328,18 +330,19 @@ function renderSplitTable() {
   if (transactions.length === 0 || people.length === 0) return;
 
   const table = document.createElement("table");
-  let header = "<tr><th>Transaction</th>";
+  let header = "<tr><th>Name</th><th>Cost</th>";
   people.forEach((p) => (header += `<th>${p}</th>`));
   header += "<th>Action</th></tr>";
   table.innerHTML = header;
 
   transactions.forEach((t, ti) => {
     const hasItems = Array.isArray(t.items);
-    const collapsed = collapsedTransactions.has(ti);
+    const collapsed = collapsedSplit.has(ti);
     const row = document.createElement("tr");
     const tName = t.name || `Transaction ${ti + 1}`;
-    const arrow = hasItems ? (collapsed ? "&gt;" : "v") : "";
-    let cells = `<td>${arrow ? `<span class="collapse-btn" onclick="toggleItems(${ti})">${arrow}</span>` : ""}${tName} - $${t.cost.toFixed(2)}</td>`;
+    const arrow = hasItems ? (collapsed ? "▶" : "▼") : "";
+    let cells = `<td>${arrow ? `<span class="collapse-btn" onclick="toggleSplitItems(${ti})">${arrow}</span>` : ""}${tName}</td>`;
+    cells += `<td>$${t.cost.toFixed(2)}</td>`;
     people.forEach((p, pi) => {
       const rawVal = t.splits[pi];
       const val = rawVal ? String(rawVal) : "";
@@ -357,10 +360,8 @@ function renderSplitTable() {
     if (hasItems && !collapsed) {
       t.items.forEach((it, ii) => {
         const iRow = document.createElement("tr");
-        let cell = `<td style="padding-left:20px;">`;
-        cell += `<input type="text" value="${it.item || ""}" onchange="editItem(${ti},${ii},'item',this.value)">`;
-        cell += `<div class="dollar-field"><span class="prefix">$</span><input type="text" value="${it.cost.toFixed(2)}" onchange="editItem(${ti},${ii},'cost',this.value,this)"></div>`;
-        cell += `</td>`;
+        let cell = `<td style="padding-left:20px;"><input type="text" value="${it.item || ""}" onchange="editItem(${ti},${ii},'item',this.value)"></td>`;
+        cell += `<td><div class="dollar-field"><span class="prefix">$</span><input type="text" value="${it.cost.toFixed(2)}" onchange="editItem(${ti},${ii},'cost',this.value,this)"></div></td>`;
         people.forEach((p, pi) => {
           const raw = it.splits[pi];
           const val2 = raw ? String(raw) : "";
@@ -404,7 +405,8 @@ function editSplit(ti, pi, value, el) {
  */
 function itemizeTransaction(ti) {
   transactions[ti].items = [];
-  collapsedTransactions.delete(ti);
+  collapsedSplit.delete(ti);
+  collapsedDetails.delete(ti);
   renderSplitTable();
   renderSplitDetails();
   afterChange();
@@ -416,7 +418,8 @@ function itemizeTransaction(ti) {
  */
 function unitemizeTransaction(ti) {
   delete transactions[ti].items;
-  collapsedTransactions.delete(ti);
+  collapsedSplit.delete(ti);
+  collapsedDetails.delete(ti);
   renderSplitTable();
   renderSplitDetails();
   afterChange();
@@ -496,14 +499,24 @@ function editItemSplit(ti, ii, pi, value, el) {
   afterChange();
 }
 /**
- * Toggle the collapsed state of item rows for a transaction.
+ * Toggle the collapsed state of item rows in the split table.
  *
  * @param {number} ti - Transaction index.
  */
-function toggleItems(ti) {
-  if (collapsedTransactions.has(ti)) collapsedTransactions.delete(ti);
-  else collapsedTransactions.add(ti);
+function toggleSplitItems(ti) {
+  if (collapsedSplit.has(ti)) collapsedSplit.delete(ti);
+  else collapsedSplit.add(ti);
   renderSplitTable();
+}
+
+/**
+ * Toggle the collapsed state of item rows in the split details table.
+ *
+ * @param {number} ti - Transaction index.
+ */
+function toggleDetailItems(ti) {
+  if (collapsedDetails.has(ti)) collapsedDetails.delete(ti);
+  else collapsedDetails.add(ti);
   renderSplitDetails();
 }
 
@@ -528,11 +541,11 @@ function renderSplitDetails() {
 
   transactions.forEach((t, ti) => {
     const hasItems = Array.isArray(t.items) && t.items.length > 0;
-    const collapsed = collapsedTransactions.has(ti);
+    const collapsed = collapsedDetails.has(ti);
     const tName = t.name || `Transaction ${ti + 1}`;
     const row = document.createElement("tr");
-    const arrow = hasItems ? (collapsed ? "&gt;" : "v") : "";
-    let cells = `<td>${arrow ? `<span class="collapse-btn" onclick="toggleItems(${ti})">${arrow}</span>` : ""}${tName} - $${t.cost.toFixed(2)}</td>`;
+    const arrow = hasItems ? (collapsed ? "▶" : "▼") : "";
+    let cells = `<td>${arrow ? `<span class="collapse-btn" onclick="toggleDetailItems(${ti})">${arrow}</span>` : ""}${tName} - $${t.cost.toFixed(2)}</td>`;
     const personTotals = Array(people.length).fill(0);
     if (hasItems) {
       const itemsTotal = t.items.reduce((sum, it) => sum + it.cost, 0);
@@ -571,7 +584,8 @@ function renderSplitDetails() {
         const splitSum = it.splits.reduce((a, b) => a + b, 0);
         people.forEach((p, pi) => {
           let portion = 0;
-          if (splitSum > 0) portion = (it.splits[pi] / splitSum) * it.cost * scale;
+          if (splitSum > 0)
+            portion = (it.splits[pi] / splitSum) * it.cost * scale;
           rowCells += `<td>$${portion.toFixed(2)}</td>`;
         });
         iRow.innerHTML = rowCells;
@@ -641,7 +655,8 @@ function calculateSummary() {
 function resetState() {
   people.length = 0;
   transactions.length = 0;
-   collapsedTransactions.clear();
+  collapsedSplit.clear();
+  collapsedDetails.clear();
   afterChange();
 }
 
@@ -695,7 +710,7 @@ function validateState(state) {
         isFinite(it.cost) &&
         Array.isArray(it.splits) &&
         it.splits.length === state.people.length &&
-        it.splits.every((s) => typeof s === "number" && isFinite(s))
+        it.splits.every((s) => typeof s === "number" && isFinite(s)),
     );
   });
 
@@ -736,7 +751,8 @@ function applyLoadedState(state) {
   validateState(state);
   people.length = 0;
   transactions.length = 0;
-  collapsedTransactions.clear();
+  collapsedSplit.clear();
+  collapsedDetails.clear();
   state.people.forEach((p) => people.push(p));
   state.transactions.forEach((t) => transactions.push(t));
 
@@ -872,7 +888,8 @@ if (typeof window !== "undefined") {
   window.deleteItem = deleteItem;
   window.editItem = editItem;
   window.editItemSplit = editItemSplit;
-  window.toggleItems = toggleItems;
+  window.toggleSplitItems = toggleSplitItems;
+  window.toggleDetailItems = toggleDetailItems;
   window.renderSplitDetails = renderSplitDetails;
   window.calculateSummary = calculateSummary;
   window.updateCurrentStateJson = updateCurrentStateJson;

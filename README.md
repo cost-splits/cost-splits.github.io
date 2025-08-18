@@ -10,6 +10,7 @@ is split differently. Enter the total cost as usual, then itemize the
 transaction to add items with their own split weights. The calculator scales
 each item's cost so that the sum matches the transaction's total, distributing
 any tax or tip proportionally before applying the item-level splits.
+Item rows can be expanded or collapsed with the ▶/▼ controls, and the split table separates name and cost columns for easier editing.
 
 ## Sharing
 
