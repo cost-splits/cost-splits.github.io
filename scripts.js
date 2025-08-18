@@ -342,7 +342,7 @@ function loadStateFromJson() {
     markSaved("transactions");
     markSaved("splits");
   } catch (e) {
-    alert("Invalid JSON");
+    alert("Failed to load state: " + (e && e.message ? e.message : e));
   }
 }
 
