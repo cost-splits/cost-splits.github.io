@@ -7,6 +7,10 @@ const {
   markSaved,
   toggleCollapse,
   resetState,
+  saveStateToJson,
+  loadStateFromJson,
+  _people,
+  _transactions,
 } = require("./scripts");
 
 describe("computeSummary", () => {
@@ -69,5 +73,52 @@ describe("toggleCollapse", () => {
     expect(content.style.display).toBe("block");
     toggleCollapse(header);
     expect(content.style.display).toBe("none");
+  });
+});
+
+describe("saveStateToJson and loadStateFromJson", () => {
+  beforeEach(() => {
+    document.body.innerHTML = `
+      <textarea id="state-json"></textarea>
+      <div id="summary"></div>
+      <button id="save-people"></button>
+      <button id="save-transaction"></button>
+      <button id="save-splits"></button>
+      <button id="calculate-summary"></button>
+    `;
+    resetState();
+    global.alert = jest.fn();
+  });
+
+  test("round trip saves and loads state", () => {
+    _people.push("Alice", "Bob");
+    _transactions.push({
+      name: "Lunch",
+      cost: 20,
+      payer: 0,
+      splits: [1, 1],
+    });
+    saveStateToJson();
+    const saved = document.getElementById("state-json").value;
+
+    resetState();
+    expect(_people).toHaveLength(0);
+    expect(_transactions).toHaveLength(0);
+
+    document.getElementById("state-json").value = saved;
+    loadStateFromJson();
+    expect(_people).toEqual(["Alice", "Bob"]);
+    expect(_transactions).toEqual([
+      { name: "Lunch", cost: 20, payer: 0, splits: [1, 1] },
+    ]);
+  });
+
+  test("rejects invalid state", () => {
+    document.getElementById("state-json").value =
+      '{"people":["Alice"],"transactions":[{"payer":0,"cost":"NaN","splits":[1]}]}';
+    loadStateFromJson();
+    expect(alert).toHaveBeenCalled();
+    expect(_people).toEqual([]);
+    expect(_transactions).toEqual([]);
   });
 });

@@ -353,33 +353,30 @@ function validateState(state) {
   ) {
     throw new Error("Invalid state: missing people or transactions arrays");
   }
+
   // Validate people: array of non-empty strings
   if (
     !state.people.every((p) => typeof p === "string" && p.trim().length > 0)
   ) {
     throw new Error("Invalid state: people must be non-empty strings");
   }
+
   // Validate transactions: array of objects with expected fields
-  if (
-    !state.transactions.every(
-      (t) =>
-        typeof t === "object" &&
-        t !== null &&
-        typeof t.description === "string" &&
-        typeof t.amount === "number" &&
-        !isNaN(t.amount) &&
-        typeof t.payer === "string" &&
-        Array.isArray(t.splits) &&
-        t.splits.every(
-          (s) =>
-            typeof s === "object" &&
-            s !== null &&
-            typeof s.person === "string" &&
-            typeof s.amount === "number" &&
-            !isNaN(s.amount),
-        ),
-    )
-  ) {
+  const transactionsValid = state.transactions.every((t) => {
+    return (
+      t &&
+      typeof t === "object" &&
+      (typeof t.name === "undefined" || typeof t.name === "string") &&
+      typeof t.payer === "number" &&
+      Number.isInteger(t.payer) &&
+      typeof t.cost === "number" &&
+      isFinite(t.cost) &&
+      Array.isArray(t.splits) &&
+      t.splits.every((s) => typeof s === "number" && isFinite(s))
+    );
+  });
+
+  if (!transactionsValid) {
     throw new Error("Invalid state: transactions malformed");
   }
 }
@@ -390,26 +387,44 @@ function saveStateToJson() {
   textarea.value = JSON.stringify(state);
 }
 
-function loadStateFromJson() {
-  const textarea = document.getElementById("state-json");
-  try {
-    const state = JSON.parse(textarea.value);
-    validateState(state);
-    people.length = 0;
-    transactions.length = 0;
-    state.people.forEach((p) => people.push(p));
-    state.transactions.forEach((t) => transactions.push(t));
-    renderPeople();
-    renderTransactionTable();
-    renderSplitTable();
-    document.getElementById("summary").innerHTML = "";
-    markSaved("people");
-    markSaved("transactions");
-    markSaved("splits");
-  } catch (e) {
-    alert("Failed to load state: " + (e && e.message ? e.message : e));
+  function loadStateFromJson() {
+    const textarea = document.getElementById("state-json");
+    try {
+      const state = JSON.parse(textarea.value);
+      validateState(state);
+      people.length = 0;
+      transactions.length = 0;
+      state.people.forEach((p) => people.push(p));
+      state.transactions.forEach((t) => transactions.push(t));
+
+      if (typeof renderPeople === "function" && document.getElementById("people-list")) {
+        renderPeople();
+      }
+      if (
+        typeof renderTransactionTable === "function" &&
+        document.getElementById("transaction-table")
+      ) {
+        renderTransactionTable();
+      }
+      if (
+        typeof renderSplitTable === "function" &&
+        document.getElementById("split-table")
+      ) {
+        renderSplitTable();
+      }
+
+      const summaryEl = document.getElementById("summary");
+      if (summaryEl) summaryEl.innerHTML = "";
+
+      markSaved("people");
+      markSaved("transactions");
+      markSaved("splits");
+    } catch (e) {
+      if (typeof alert === "function") {
+        alert("Failed to load state: " + (e && e.message ? e.message : e));
+      }
+    }
   }
-}
 
 function downloadJson() {
   const state = { people, transactions };
@@ -424,15 +439,19 @@ function downloadJson() {
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
 }
-if (typeof module !== "undefined" && module.exports) {
-  module.exports = {
-    computeSummary,
-    markDirty,
-    markSaved,
-    toggleCollapse,
-    resetState,
-  };
-}
+  if (typeof module !== "undefined" && module.exports) {
+    module.exports = {
+      computeSummary,
+      markDirty,
+      markSaved,
+      toggleCollapse,
+      resetState,
+      saveStateToJson,
+      loadStateFromJson,
+      _people: people,
+      _transactions: transactions,
+    };
+  }
 if (typeof window !== "undefined") {
   window.computeSummary = computeSummary;
   window.markDirty = markDirty;
