@@ -79,7 +79,8 @@ describe("toggleCollapse", () => {
 describe("saveStateToJson and loadStateFromJson", () => {
   beforeEach(() => {
     document.body.innerHTML = `
-      <textarea id="state-json"></textarea>
+      <input id="state-json-display" />
+      <textarea id="state-json-input"></textarea>
       <div id="summary"></div>
       <button id="save-people"></button>
       <button id="save-transaction"></button>
@@ -99,13 +100,13 @@ describe("saveStateToJson and loadStateFromJson", () => {
       splits: [1, 1],
     });
     saveStateToJson();
-    const saved = document.getElementById("state-json").value;
+    const saved = document.getElementById("state-json-display").value;
 
     resetState();
     expect(_people).toHaveLength(0);
     expect(_transactions).toHaveLength(0);
 
-    document.getElementById("state-json").value = saved;
+    document.getElementById("state-json-input").value = saved;
     loadStateFromJson();
     expect(_people).toEqual(["Alice", "Bob"]);
     expect(_transactions).toEqual([
@@ -114,7 +115,7 @@ describe("saveStateToJson and loadStateFromJson", () => {
   });
 
   test("rejects invalid state", () => {
-    document.getElementById("state-json").value =
+    document.getElementById("state-json-input").value =
       '{"people":["Alice"],"transactions":[{"payer":0,"cost":"NaN","splits":[1]}]}';
     loadStateFromJson();
     expect(alert).toHaveBeenCalled();

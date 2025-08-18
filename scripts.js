@@ -382,49 +382,49 @@ function validateState(state) {
 }
 
 function saveStateToJson() {
-  const textarea = document.getElementById("state-json");
+  const display = document.getElementById("state-json-display");
   const state = { people, transactions };
-  textarea.value = JSON.stringify(state);
+  if (display) display.value = JSON.stringify(state);
 }
 
-  function loadStateFromJson() {
-    const textarea = document.getElementById("state-json");
-    try {
-      const state = JSON.parse(textarea.value);
-      validateState(state);
-      people.length = 0;
-      transactions.length = 0;
-      state.people.forEach((p) => people.push(p));
-      state.transactions.forEach((t) => transactions.push(t));
+function loadStateFromJson() {
+  const textarea = document.getElementById("state-json-input");
+  try {
+    const state = JSON.parse(textarea.value);
+    validateState(state);
+    people.length = 0;
+    transactions.length = 0;
+    state.people.forEach((p) => people.push(p));
+    state.transactions.forEach((t) => transactions.push(t));
 
-      if (typeof renderPeople === "function" && document.getElementById("people-list")) {
-        renderPeople();
-      }
-      if (
-        typeof renderTransactionTable === "function" &&
-        document.getElementById("transaction-table")
-      ) {
-        renderTransactionTable();
-      }
-      if (
-        typeof renderSplitTable === "function" &&
-        document.getElementById("split-table")
-      ) {
-        renderSplitTable();
-      }
+    if (typeof renderPeople === "function" && document.getElementById("people-list")) {
+      renderPeople();
+    }
+    if (
+      typeof renderTransactionTable === "function" &&
+      document.getElementById("transaction-table")
+    ) {
+      renderTransactionTable();
+    }
+    if (
+      typeof renderSplitTable === "function" &&
+      document.getElementById("split-table")
+    ) {
+      renderSplitTable();
+    }
 
-      const summaryEl = document.getElementById("summary");
-      if (summaryEl) summaryEl.innerHTML = "";
+    const summaryEl = document.getElementById("summary");
+    if (summaryEl) summaryEl.innerHTML = "";
 
-      markSaved("people");
-      markSaved("transactions");
-      markSaved("splits");
-    } catch (e) {
-      if (typeof alert === "function") {
-        alert("Failed to load state: " + (e && e.message ? e.message : e));
-      }
+    markSaved("people");
+    markSaved("transactions");
+    markSaved("splits");
+  } catch (e) {
+    if (typeof alert === "function") {
+      alert("Failed to load state: " + (e && e.message ? e.message : e));
     }
   }
+}
 
 function downloadJson() {
   const state = { people, transactions };
