@@ -3,6 +3,14 @@
 A minimal front-end application for splitting costs between people. The state of
 the calculator can now be shared via URL parameters.
 
+## Itemized Transactions
+
+Transactions may include optional item rows to handle receipts where each item
+is split differently. Enter the total cost as usual, then itemize the
+transaction to add items with their own split weights. The calculator scales
+each item's cost so that the sum matches the transaction's total, distributing
+any tax or tip proportionally before applying the item-level splits.
+
 ## Sharing
 
 The current state is reflected in a read-only field in the Share section. Copy
