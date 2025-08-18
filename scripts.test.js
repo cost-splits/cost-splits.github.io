@@ -10,6 +10,8 @@ import {
 } from "./state.js";
 import {
   addPerson,
+  renamePerson,
+  renderPeople,
   renderSplitTable,
   editSplit,
   calculateSummary,
@@ -233,6 +235,44 @@ describe("addPerson", () => {
     expect(document.getElementById("split-details").textContent).not.toMatch(
       "NaN",
     );
+  });
+});
+
+describe("renamePerson", () => {
+  beforeEach(() => {
+    document.body.innerHTML = `
+      <ul id="people-list"></ul>
+      <table id="transaction-table"></table>
+      <div id="split-table"></div>
+      <div id="split-details"></div>
+    `;
+    resetState();
+    people.push("Alice", "Bob");
+    renderPeople();
+  });
+
+  test("renames a person when new name is valid", () => {
+    const result = renamePerson(1, "Charlie");
+    expect(result).toBe(true);
+    expect(people[1]).toBe("Charlie");
+    const inputs = document.querySelectorAll("#people-list input");
+    expect(inputs[1].value).toBe("Charlie");
+  });
+
+  test("prevents duplicate names", () => {
+    const result = renamePerson(1, "Alice");
+    expect(result).toBe(false);
+    expect(people[1]).toBe("Bob");
+    const inputs = document.querySelectorAll("#people-list input");
+    expect(inputs[1].value).toBe("Bob");
+  });
+
+  test("prevents empty names", () => {
+    const result = renamePerson(0, "");
+    expect(result).toBe(false);
+    expect(people[0]).toBe("Alice");
+    const inputs = document.querySelectorAll("#people-list input");
+    expect(inputs[0].value).toBe("Alice");
   });
 });
 
