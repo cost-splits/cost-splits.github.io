@@ -126,13 +126,12 @@
     <div id="summary"></div>
 
     <h2>5. Save/Load State</h2>
-    <button onclick="updateCurrentStateJson()">Save to JSON</button>
     <div style="display: flex; align-items: center; gap: 5px; margin: 5px 0;">
       <input
         id="state-json-display"
         type="text"
         readonly
-        style="flex: 1; white-space: nowrap; overflow-x: auto;"
+        style="flex: 1; white-space: nowrap; overflow-x: auto; background-color: #f0f0f0;"
         placeholder="Current state JSON"
       />
       <button onclick="downloadJson()">Export JSON File</button>

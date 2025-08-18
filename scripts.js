@@ -21,28 +21,44 @@ let dirty = { people: false, transactions: false, splits: false };
 
 function markDirty(section) {
   dirty[section] = true;
-  if (section === "people")
-    document.getElementById("save-people").classList.add("unsaved");
-  if (section === "transactions")
-    document.getElementById("save-transaction").classList.add("unsaved");
-  if (section === "splits")
-    document.getElementById("save-splits").classList.add("unsaved");
-  if (section === "transactions" || section === "splits") {
-    document.getElementById("calculate-summary").classList.add("unsaved");
+  if (section === "people") {
+    const btn = document.getElementById("save-people");
+    if (btn) btn.classList.add("unsaved");
   }
+  if (section === "transactions") {
+    const btn = document.getElementById("save-transactions");
+    if (btn) btn.classList.add("unsaved");
+  }
+  if (section === "splits") {
+    const btn = document.getElementById("save-splits");
+    if (btn) btn.classList.add("unsaved");
+  }
+  if (section === "transactions" || section === "splits") {
+    const calc = document.getElementById("calculate-summary");
+    if (calc) calc.classList.add("unsaved");
+  }
+  updateCurrentStateJson();
 }
 
 function markSaved(section) {
   dirty[section] = false;
-  if (section === "people")
-    document.getElementById("save-people").classList.remove("unsaved");
-  if (section === "transactions")
-    document.getElementById("save-transaction").classList.remove("unsaved");
-  if (section === "splits")
-    document.getElementById("save-splits").classList.remove("unsaved");
-  if (!dirty.transactions && !dirty.splits) {
-    document.getElementById("calculate-summary").classList.remove("unsaved");
+  if (section === "people") {
+    const btn = document.getElementById("save-people");
+    if (btn) btn.classList.remove("unsaved");
   }
+  if (section === "transactions") {
+    const btn = document.getElementById("save-transactions");
+    if (btn) btn.classList.remove("unsaved");
+  }
+  if (section === "splits") {
+    const btn = document.getElementById("save-splits");
+    if (btn) btn.classList.remove("unsaved");
+  }
+  if (!dirty.transactions && !dirty.splits) {
+    const calc = document.getElementById("calculate-summary");
+    if (calc) calc.classList.remove("unsaved");
+  }
+  updateCurrentStateJson();
 }
 
 // ---- PEOPLE ----
@@ -340,6 +356,7 @@ function resetState() {
   people.length = 0;
   transactions.length = 0;
   dirty = { people: false, transactions: false, splits: false };
+  updateCurrentStateJson();
 }
 
 // ---- SAVE/LOAD STATE ----
@@ -419,6 +436,7 @@ function loadStateFromJson() {
     markSaved("people");
     markSaved("transactions");
     markSaved("splits");
+    updateCurrentStateJson();
   } catch (e) {
     if (typeof alert === "function") {
       alert("Failed to load state: " + (e && e.message ? e.message : e));

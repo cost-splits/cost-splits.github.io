@@ -7,7 +7,6 @@ const {
   markSaved,
   toggleCollapse,
   resetState,
-  updateCurrentStateJson,
   loadStateFromJson,
   _people,
   _transactions,
@@ -28,7 +27,7 @@ describe("markDirty and markSaved", () => {
   beforeEach(() => {
     document.body.innerHTML = `
       <button id="save-people"></button>
-      <button id="save-transaction"></button>
+      <button id="save-transactions"></button>
       <button id="save-splits"></button>
       <button id="calculate-summary"></button>
     `;
@@ -48,7 +47,7 @@ describe("markDirty and markSaved", () => {
 
   test("transactions dirtiness affects summary button", () => {
     markDirty("transactions");
-    const saveTransaction = document.getElementById("save-transaction");
+    const saveTransaction = document.getElementById("save-transactions");
     const calcSummary = document.getElementById("calculate-summary");
     expect(saveTransaction.classList.contains("unsaved")).toBe(true);
     expect(calcSummary.classList.contains("unsaved")).toBe(true);
@@ -83,12 +82,20 @@ describe("updateCurrentStateJson and loadStateFromJson", () => {
       <textarea id="state-json-input"></textarea>
       <div id="summary"></div>
       <button id="save-people"></button>
-      <button id="save-transaction"></button>
+      <button id="save-transactions"></button>
       <button id="save-splits"></button>
       <button id="calculate-summary"></button>
     `;
     resetState();
     global.alert = jest.fn();
+  });
+
+  test("current state display updates automatically", () => {
+    _people.push("Alice");
+    markSaved("people");
+    expect(document.getElementById("state-json-display").value).toBe(
+      JSON.stringify({ people: ["Alice"], transactions: [] }),
+    );
   });
 
   test("round trip saves and loads state", () => {
@@ -99,7 +106,8 @@ describe("updateCurrentStateJson and loadStateFromJson", () => {
       payer: 0,
       splits: [1, 1],
     });
-    updateCurrentStateJson();
+    markSaved("people");
+    markSaved("transactions");
     const saved = document.getElementById("state-json-display").value;
 
     resetState();
