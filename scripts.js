@@ -46,6 +46,10 @@ function markSaved(section) {
 }
 
 // ---- PEOPLE ----
+function isValidPerson(person) {
+  return person && typeof person.name === "string";
+}
+
 function addPerson() {
   const name = document.getElementById("person-name").value.trim();
   if (!name) return;
@@ -108,6 +112,18 @@ function renderPeople() {
 }
 
 // ---- TRANSACTIONS ----
+// Validate that each transaction has 'payer' (string), 'amount' (number), and 'splits' (array of valid splits)
+function isValidTransaction(transaction) {
+  return (
+    transaction &&
+    typeof transaction.payer === "string" &&
+    typeof transaction.amount === "number" &&
+    isFinite(transaction.amount) &&
+    Array.isArray(transaction.splits) &&
+    transaction.splits.every(isValidSplit)
+  );
+}
+
 function renderTransactionTable() {
   const table = document.getElementById("transaction-table");
   table.innerHTML = "";
@@ -185,6 +201,16 @@ function saveTransactions() {
 }
 
 // ---- SPLITS ----
+// Validate that each split has 'person' (string) and 'share' (number)
+function isValidSplit(split) {
+  return (
+    split &&
+    typeof split.person === "string" &&
+    typeof split.share === "number" &&
+    isFinite(split.share)
+  );
+}
+
 function renderSplitTable() {
   const splitDiv = document.getElementById("split-table");
   splitDiv.innerHTML = "";
@@ -316,6 +342,88 @@ function resetState() {
   dirty = { people: false, transactions: false, splits: false };
 }
 
+// ---- SAVE/LOAD STATE ----
+// Validate the structure and types of the loaded state
+function validateState(state) {
+  if (
+    typeof state !== "object" ||
+    state === null ||
+    !Array.isArray(state.people) ||
+    !Array.isArray(state.transactions)
+  ) {
+    throw new Error("Invalid state: missing people or transactions arrays");
+  }
+  // Validate people: array of non-empty strings
+  if (
+    !state.people.every((p) => typeof p === "string" && p.trim().length > 0)
+  ) {
+    throw new Error("Invalid state: people must be non-empty strings");
+  }
+  // Validate transactions: array of objects with expected fields
+  if (
+    !state.transactions.every(
+      (t) =>
+        typeof t === "object" &&
+        t !== null &&
+        typeof t.description === "string" &&
+        typeof t.amount === "number" &&
+        !isNaN(t.amount) &&
+        typeof t.payer === "string" &&
+        Array.isArray(t.splits) &&
+        t.splits.every(
+          (s) =>
+            typeof s === "object" &&
+            s !== null &&
+            typeof s.person === "string" &&
+            typeof s.amount === "number" &&
+            !isNaN(s.amount),
+        ),
+    )
+  ) {
+    throw new Error("Invalid state: transactions malformed");
+  }
+}
+
+function saveStateToJson() {
+  const textarea = document.getElementById("state-json");
+  const state = { people, transactions };
+  textarea.value = JSON.stringify(state);
+}
+
+function loadStateFromJson() {
+  const textarea = document.getElementById("state-json");
+  try {
+    const state = JSON.parse(textarea.value);
+    validateState(state);
+    people.length = 0;
+    transactions.length = 0;
+    state.people.forEach((p) => people.push(p));
+    state.transactions.forEach((t) => transactions.push(t));
+    renderPeople();
+    renderTransactionTable();
+    renderSplitTable();
+    document.getElementById("summary").innerHTML = "";
+    markSaved("people");
+    markSaved("transactions");
+    markSaved("splits");
+  } catch (e) {
+    alert("Failed to load state: " + (e && e.message ? e.message : e));
+  }
+}
+
+function downloadJson() {
+  const state = { people, transactions };
+  const dataStr = JSON.stringify(state);
+  const blob = new Blob([dataStr], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "cost-splits.json";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
 if (typeof module !== "undefined" && module.exports) {
   module.exports = {
     computeSummary,
@@ -343,4 +451,7 @@ if (typeof window !== "undefined") {
   window.renderSplitDetails = renderSplitDetails;
   window.toggleCollapse = toggleCollapse;
   window.calculateSummary = calculateSummary;
+  window.saveStateToJson = saveStateToJson;
+  window.loadStateFromJson = loadStateFromJson;
+  window.downloadJson = downloadJson;
 }

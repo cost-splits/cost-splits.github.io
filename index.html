@@ -125,6 +125,18 @@
     </button>
     <div id="summary"></div>
 
+    <h2>5. Save/Load State</h2>
+    <textarea
+      id="state-json"
+      rows="8"
+      cols="50"
+      placeholder="State JSON"
+    ></textarea>
+    <br />
+    <button onclick="saveStateToJson()">Save to JSON</button>
+    <button onclick="loadStateFromJson()">Load from JSON</button>
+    <button onclick="downloadJson()">Export JSON File</button>
+
     <script src="scripts.js"></script>
   </body>
 </html>
