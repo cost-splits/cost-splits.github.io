@@ -25,6 +25,30 @@ describe("computeSummary", () => {
     expect(owes).toEqual([15, 15]);
     expect(nets).toEqual([15, -15]);
   });
+
+  test("handles itemized transactions with proportional extras", () => {
+    const people = ["A", "B", "C"];
+    const transactions = [
+      {
+        payer: 0,
+        cost: 40,
+        splits: [0, 0, 0],
+        items: [
+          { item: "I1", cost: 10, splits: [1, 1, 0] },
+          { item: "I2", cost: 20, splits: [1, 1, 1] },
+          { item: "I3", cost: 5, splits: [1, 0, 0] },
+        ],
+      },
+    ];
+    const { paid, owes, nets } = computeSummary(people, transactions);
+    expect(paid).toEqual([40, 0, 0]);
+    expect(owes[0]).toBeCloseTo(19.0476, 4);
+    expect(owes[1]).toBeCloseTo(13.3333, 4);
+    expect(owes[2]).toBeCloseTo(7.619, 4);
+    expect(nets[0]).toBeCloseTo(20.9524, 4);
+    expect(nets[1]).toBeCloseTo(-13.3333, 4);
+    expect(nets[2]).toBeCloseTo(-7.619, 4);
+  });
 });
 
 describe("updateCurrentStateJson and loadStateFromJson", () => {
@@ -58,7 +82,11 @@ describe("updateCurrentStateJson and loadStateFromJson", () => {
       name: "Lunch",
       cost: 20,
       payer: 0,
-      splits: [1, 1],
+      splits: [0, 0],
+      items: [
+        { item: "Sandwich", cost: 12, splits: [1, 1] },
+        { item: "Drink", cost: 4, splits: [1, 0] },
+      ],
     });
     updateCurrentStateJson();
     const saved = document.getElementById("state-json-display").value;
@@ -71,7 +99,16 @@ describe("updateCurrentStateJson and loadStateFromJson", () => {
     loadStateFromJson();
     expect(_people).toEqual(["Alice", "Bob"]);
     expect(_transactions).toEqual([
-      { name: "Lunch", cost: 20, payer: 0, splits: [1, 1] },
+      {
+        name: "Lunch",
+        cost: 20,
+        payer: 0,
+        splits: [0, 0],
+        items: [
+          { item: "Sandwich", cost: 12, splits: [1, 1] },
+          { item: "Drink", cost: 4, splits: [1, 0] },
+        ],
+      },
     ]);
   });
 
