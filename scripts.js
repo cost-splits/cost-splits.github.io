@@ -273,7 +273,9 @@ function renderSplitDetails() {
   if (transactions.length === 0 || people.length === 0) return;
 
   const table = document.createElement("table");
-  let header = "<tr><th>Transaction</th>";
+  const colSpan = people.length + 1;
+  let header = `<tr><th colspan="${colSpan}" style="text-align: center;">Split Details</th></tr>`;
+  header += "<tr><th>Transaction</th>";
   people.forEach((p) => (header += `<th>${p}</th>`));
   header += "</tr>";
   table.innerHTML = header;
