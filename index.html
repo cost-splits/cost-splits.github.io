@@ -12,7 +12,7 @@
     <h2>1. People</h2>
     <div id="people-section">
       <input type="text" id="person-name" placeholder="Name" />
-      <button id="save-people" onclick="addPerson()">Add Person</button>
+      <button id="save-people">Add Person</button>
       <ul id="people-list"></ul>
     </div>
 
@@ -39,7 +39,7 @@
         class="readonly-field"
         placeholder="Current state JSON"
       />
-      <button onclick="downloadJson()">Download JSON File</button>
+      <button id="download-json">Download JSON File</button>
     </div>
     <textarea
       id="state-json-input"
@@ -48,16 +48,13 @@
       placeholder="State JSON"
     ></textarea>
     <br />
-    <button onclick="loadStateFromJson()">Load from JSON</button>
-    <button onclick="document.getElementById('state-json-file').click()">
-      Load from JSON File
-    </button>
+    <button id="load-json">Load from JSON</button>
+    <button id="load-json-file">Load from JSON File</button>
     <input
       type="file"
       id="state-json-file"
       accept="application/json"
       class="hidden"
-      onchange="loadStateFromJsonFile(this.files[0])"
     />
 
     <h2>6. Share</h2>
@@ -72,6 +69,6 @@
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js"></script>
-    <script src="scripts.js"></script>
+    <script type="module" src="main.js"></script>
   </body>
 </html>

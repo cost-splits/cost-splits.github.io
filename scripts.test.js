@@ -1,20 +1,35 @@
 /**
  * @jest-environment jsdom
  */
-const {
+import {
   computeSummary,
   resetState,
-  loadStateFromJson,
-  loadStateFromJsonFile,
-  downloadJson,
-  _people,
-  _transactions,
+  people,
+  transactions,
+  setAfterChange,
+} from "./state.js";
+import {
   addPerson,
+  renderSplitTable,
+  editSplit,
+  calculateSummary,
+} from "./render.js";
+import {
   updateCurrentStateJson,
   updateShareableUrl,
+  loadStateFromJson,
+  loadStateFromJsonFile,
   loadStateFromUrl,
-} = require("./scripts");
-const lz = require("lz-string");
+  downloadJson,
+} from "./share.js";
+import lz from "lz-string";
+import { jest } from "@jest/globals";
+
+setAfterChange(() => {
+  updateCurrentStateJson();
+  updateShareableUrl();
+  calculateSummary();
+});
 
 describe("computeSummary", () => {
   test("calculates paid, owed and net for a simple shared expense", () => {
@@ -77,8 +92,8 @@ describe("updateCurrentStateJson and loadStateFromJson", () => {
   });
 
   test("round trip saves and loads state", () => {
-    _people.push("Alice", "Bob");
-    _transactions.push({
+    people.push("Alice", "Bob");
+    transactions.push({
       name: "Lunch",
       cost: 20,
       payer: 0,
@@ -92,13 +107,13 @@ describe("updateCurrentStateJson and loadStateFromJson", () => {
     const saved = document.getElementById("state-json-display").value;
 
     resetState();
-    expect(_people).toHaveLength(0);
-    expect(_transactions).toHaveLength(0);
+    expect(people).toHaveLength(0);
+    expect(transactions).toHaveLength(0);
 
     document.getElementById("state-json-input").value = saved;
     loadStateFromJson();
-    expect(_people).toEqual(["Alice", "Bob"]);
-    expect(_transactions).toEqual([
+    expect(people).toEqual(["Alice", "Bob"]);
+    expect(transactions).toEqual([
       {
         name: "Lunch",
         cost: 20,
@@ -117,8 +132,8 @@ describe("updateCurrentStateJson and loadStateFromJson", () => {
       '{"people":["Alice"],"transactions":[{"payer":0,"cost":"NaN","splits":[1]}]}';
     loadStateFromJson();
     expect(alert).toHaveBeenCalled();
-    expect(_people).toEqual([]);
-    expect(_transactions).toEqual([]);
+    expect(people).toEqual([]);
+    expect(transactions).toEqual([]);
   });
 
   test("loads state from JSON file", async () => {
@@ -130,8 +145,8 @@ describe("updateCurrentStateJson and loadStateFromJson", () => {
       type: "application/json",
     });
     await loadStateFromJsonFile(file);
-    expect(_people).toEqual(["Dora"]);
-    expect(_transactions).toEqual([
+    expect(people).toEqual(["Dora"]);
+    expect(transactions).toEqual([
       { name: "Tea", cost: 5, payer: 0, splits: [1] },
     ]);
     expect(document.getElementById("state-json-input").value).toBe(
@@ -156,8 +171,8 @@ describe("downloadJson", () => {
   });
 
   test("creates downloadable file with current state", async () => {
-    _people.push("Eve");
-    _transactions.push({ payer: 0, cost: 12, splits: [1] });
+    people.push("Eve");
+    transactions.push({ payer: 0, cost: 12, splits: [1] });
 
     const anchor = { click: jest.fn() };
     jest.spyOn(document, "createElement").mockReturnValue(anchor);
@@ -185,7 +200,7 @@ describe("downloadJson", () => {
       reader.readAsText(blob);
     });
     expect(text).toBe(
-      JSON.stringify({ people: ["Eve"], transactions: _transactions }),
+      JSON.stringify({ people: ["Eve"], transactions: transactions }),
     );
     expect(URL.revokeObjectURL).toHaveBeenCalledWith("mockurl");
   });
@@ -201,8 +216,8 @@ describe("addPerson", () => {
       <div id="split-details"></div>
     `;
     resetState();
-    _people.push("Alice", "Bob");
-    _transactions.push({
+    people.push("Alice", "Bob");
+    transactions.push({
       name: "Lunch",
       cost: 20,
       payer: 0,
@@ -213,8 +228,8 @@ describe("addPerson", () => {
   test("adds zero splits for new user", () => {
     document.getElementById("person-name").value = "Charlie";
     addPerson();
-    expect(_people).toEqual(["Alice", "Bob", "Charlie"]);
-    expect(_transactions[0].splits).toEqual([1, 1, 0]);
+    expect(people).toEqual(["Alice", "Bob", "Charlie"]);
+    expect(transactions[0].splits).toEqual([1, 1, 0]);
     expect(document.getElementById("split-details").textContent).not.toMatch(
       "NaN",
     );
@@ -228,15 +243,15 @@ describe("editSplit", () => {
       <div id="split-details"></div>
     `;
     resetState();
-    _people.push("Alice");
-    _transactions.push({ name: "Item", cost: 10, payer: 0, splits: [1] });
-    window.renderSplitTable();
+    people.push("Alice");
+    transactions.push({ name: "Item", cost: 10, payer: 0, splits: [1] });
+    renderSplitTable();
   });
 
   test("accepts numbers with any decimal places", () => {
     const input = document.querySelector("#split-table input");
-    window.editSplit(0, 0, "3.123", input);
-    expect(_transactions[0].splits[0]).toBeCloseTo(3.123);
+    editSplit(0, 0, "3.123", input);
+    expect(transactions[0].splits[0]).toBeCloseTo(3.123);
     expect(input.value).toBe("3.123");
   });
 });
@@ -260,12 +275,12 @@ describe("sharing", () => {
   });
 
   test("updateShareableUrl builds URL with state", () => {
-    _people.push("Alice");
-    _transactions.push({ payer: 0, cost: 10, splits: [1] });
+    people.push("Alice");
+    transactions.push({ payer: 0, cost: 10, splits: [1] });
     updateShareableUrl();
     const json = JSON.stringify({
       people: ["Alice"],
-      transactions: _transactions,
+      transactions: transactions,
     });
     const expected = `http://localhost/?state=${lz.compressToEncodedURIComponent(
       json,
@@ -281,7 +296,7 @@ describe("sharing", () => {
     const compressed = lz.compressToEncodedURIComponent(JSON.stringify(state));
     window.history.replaceState({}, "", `?state=${compressed}`);
     loadStateFromUrl();
-    expect(_people).toEqual(["Bob"]);
-    expect(_transactions).toEqual([{ payer: 0, cost: 5, splits: [1] }]);
+    expect(people).toEqual(["Bob"]);
+    expect(transactions).toEqual([{ payer: 0, cost: 5, splits: [1] }]);
   });
 });
