@@ -46,6 +46,10 @@ function markSaved(section) {
 }
 
 // ---- PEOPLE ----
+function isValidPerson(person) {
+  return person && typeof person.name === "string";
+}
+
 function addPerson() {
   const name = document.getElementById("person-name").value.trim();
   if (!name) return;
@@ -108,6 +112,18 @@ function renderPeople() {
 }
 
 // ---- TRANSACTIONS ----
+// Validate that each transaction has 'payer' (string), 'amount' (number), and 'splits' (array of valid splits)
+function isValidTransaction(transaction) {
+  return (
+    transaction &&
+    typeof transaction.payer === "string" &&
+    typeof transaction.amount === "number" &&
+    isFinite(transaction.amount) &&
+    Array.isArray(transaction.splits) &&
+    transaction.splits.every(isValidSplit)
+  );
+}
+
 function renderTransactionTable() {
   const table = document.getElementById("transaction-table");
   table.innerHTML = "";
@@ -185,6 +201,16 @@ function saveTransactions() {
 }
 
 // ---- SPLITS ----
+// Validate that each split has 'person' (string) and 'share' (number)
+function isValidSplit(split) {
+  return (
+    split &&
+    typeof split.person === "string" &&
+    typeof split.share === "number" &&
+    isFinite(split.share)
+  );
+}
+
 function renderSplitTable() {
   const splitDiv = document.getElementById("split-table");
   splitDiv.innerHTML = "";
@@ -317,6 +343,7 @@ function resetState() {
 }
 
 // ---- SAVE/LOAD STATE ----
+
 function saveStateToJson() {
   const textarea = document.getElementById("state-json");
   const state = { people, transactions };
@@ -327,7 +354,12 @@ function loadStateFromJson() {
   const textarea = document.getElementById("state-json");
   try {
     const state = JSON.parse(textarea.value);
-    if (!Array.isArray(state.people) || !Array.isArray(state.transactions)) {
+    if (
+      !Array.isArray(state.people) ||
+      !Array.isArray(state.transactions) ||
+      !state.people.every(isValidPerson) ||
+      !state.transactions.every(isValidTransaction)
+    ) {
       throw new Error("Invalid state");
     }
     people.length = 0;
