@@ -17,48 +17,15 @@ function computeSummary(people, transactions) {
 }
 const people = [];
 const transactions = [];
-let dirty = { people: false, transactions: false, splits: false };
 
-function markDirty(section) {
-  dirty[section] = true;
-  if (section === "people") {
-    const btn = document.getElementById("save-people");
-    if (btn) btn.classList.add("unsaved");
-  }
-  if (section === "transactions") {
-    const btn = document.getElementById("save-transactions");
-    if (btn) btn.classList.add("unsaved");
-  }
-  if (section === "splits") {
-    const btn = document.getElementById("save-splits");
-    if (btn) btn.classList.add("unsaved");
-  }
-  if (section === "transactions" || section === "splits") {
-    const calc = document.getElementById("calculate-summary");
-    if (calc) calc.classList.add("unsaved");
-  }
+function afterChange() {
   updateCurrentStateJson();
+  calculateSummary();
 }
 
-function markSaved(section) {
-  dirty[section] = false;
-  if (section === "people") {
-    const btn = document.getElementById("save-people");
-    if (btn) btn.classList.remove("unsaved");
-  }
-  if (section === "transactions") {
-    const btn = document.getElementById("save-transactions");
-    if (btn) btn.classList.remove("unsaved");
-  }
-  if (section === "splits") {
-    const btn = document.getElementById("save-splits");
-    if (btn) btn.classList.remove("unsaved");
-  }
-  if (!dirty.transactions && !dirty.splits) {
-    const calc = document.getElementById("calculate-summary");
-    if (calc) calc.classList.remove("unsaved");
-  }
-  updateCurrentStateJson();
+function isValidDollar(value, allowEmpty = false) {
+  if (allowEmpty && value.trim() === "") return true;
+  return /^\d+(\.\d{0,2})?$/.test(value);
 }
 
 // ---- PEOPLE ----
@@ -67,15 +34,20 @@ function isValidPerson(person) {
 }
 
 function addPerson() {
-  const name = document.getElementById("person-name").value.trim();
-  if (!name) return;
+  const input = document.getElementById("person-name");
+  const name = input.value.trim();
+  if (!name || people.includes(name)) {
+    input.classList.add("invalid-cell");
+    return;
+  }
+  input.classList.remove("invalid-cell");
   people.push(name);
   transactions.forEach((t) => t.splits.push(0));
-  document.getElementById("person-name").value = "";
+  input.value = "";
   renderPeople();
   renderTransactionTable();
   renderSplitTable();
-  markSaved("people");
+  afterChange();
 }
 
 function deletePerson(index) {
@@ -109,8 +81,7 @@ function deletePerson(index) {
   renderPeople();
   renderTransactionTable();
   renderSplitTable();
-  markDirty("transactions");
-  markDirty("splits");
+  afterChange();
 }
 
 function renderPeople() {
@@ -156,14 +127,21 @@ function renderTransactionTable() {
     const row = document.createElement("tr");
     row.innerHTML = `
           <td><input type="text" value="${t.name || "Transaction " + (i + 1)}"
-                     onchange="editTransaction(${i},'name',this.value)"></td>
+                     onchange="editTransaction(${i},'name',this.value,this)"></td>
           <td>
-            <select onchange="editTransaction(${i},'payer',this.value)">
-              ${people.map((p, pi) => `<option value="${pi}" ${pi === t.payer ? "selected" : ""}>${p}</option>`).join("")}
+            <select onchange="editTransaction(${i},'payer',this.value,this)">
+              ${people
+                .map(
+                  (p, pi) =>
+                    `<option value="${pi}" ${
+                      pi === t.payer ? "selected" : ""
+                    }>${p}</option>`,
+                )
+                .join("")}
             </select>
           </td>
-          <td><input type="number" step="0.01" value="${t.cost}"
-                     onchange="editTransaction(${i},'cost',this.value)"></td>
+          <td><input type="text" value="${t.cost.toFixed(2)}"
+                     onchange="editTransaction(${i},'cost',this.value,this)"></td>
           <td><button onclick="deleteTransaction(${i})">Delete</button></td>
         `;
     table.appendChild(row);
@@ -174,47 +152,65 @@ function renderTransactionTable() {
         <td><input type="text" id="new-t-name" placeholder="Name (optional)"></td>
         <td>
           <select id="new-t-payer">
-            ${people.map((p, pi) => `<option value="${pi}">${p}</option>`).join("")}
+            ${people
+              .map((p, pi) => `<option value="${pi}">${p}</option>`)
+              .join("")}
           </select>
         </td>
-        <td><input type="number" step="0.01" id="new-t-cost" placeholder="Cost"></td>
+        <td><input type="text" id="new-t-cost" placeholder="Cost"></td>
         <td><button onclick="addTransaction()">Add</button></td>
       `;
   table.appendChild(addRow);
 }
 
 function addTransaction() {
-  const name = document.getElementById("new-t-name").value.trim();
-  const cost = parseFloat(document.getElementById("new-t-cost").value);
+  const nameInput = document.getElementById("new-t-name");
+  const costInput = document.getElementById("new-t-cost");
   const payer = parseInt(document.getElementById("new-t-payer").value);
-  if (isNaN(cost)) return;
+  const costVal = costInput.value.trim();
+  if (!isValidDollar(costVal)) {
+    costInput.classList.add("invalid-cell");
+    return;
+  }
+  costInput.classList.remove("invalid-cell");
+  const name = nameInput.value.trim();
+  const cost = parseFloat(costVal);
   transactions.push({
     name,
     cost,
     payer,
     splits: Array(people.length).fill(0),
   });
+  nameInput.value = "";
+  costInput.value = "";
   renderTransactionTable();
   renderSplitTable();
-  markDirty("transactions");
+  afterChange();
 }
 
-function editTransaction(i, field, value) {
-  if (field === "cost") transactions[i].cost = parseFloat(value) || 0;
-  else if (field === "payer") transactions[i].payer = parseInt(value);
-  else if (field === "name") transactions[i].name = value;
-  markDirty("transactions");
+function editTransaction(i, field, value, el) {
+  if (field === "cost") {
+    if (!isValidDollar(value)) {
+      el.classList.add("invalid-cell");
+      return;
+    }
+    el.classList.remove("invalid-cell");
+    transactions[i].cost = parseFloat(value);
+    el.value = transactions[i].cost.toFixed(2);
+  } else if (field === "payer") {
+    transactions[i].payer = parseInt(value);
+  } else if (field === "name") {
+    transactions[i].name = value;
+  }
+  afterChange();
+  renderSplitDetails();
 }
 
 function deleteTransaction(i) {
   transactions.splice(i, 1);
   renderTransactionTable();
   renderSplitTable();
-  markDirty("transactions");
-}
-
-function saveTransactions() {
-  markSaved("transactions");
+  afterChange();
 }
 
 // ---- SPLITS ----
@@ -244,9 +240,10 @@ function renderSplitTable() {
     const tName = t.name || `Transaction ${ti + 1}`;
     let cells = `<td>${tName} - $${t.cost.toFixed(2)}</td>`;
     people.forEach((p, pi) => {
-      const val = t.splits[pi] || "";
-      cells += `<td><input type="number" step="0.01" value="${val}" 
-                     onchange="editSplit(${ti},${pi},this.value)"></td>`;
+      const rawVal = t.splits[pi];
+      const val = rawVal ? rawVal.toFixed(2) : "";
+      cells += `<td><input type="text" value="${val}"
+                     onchange="editSplit(${ti},${pi},this.value,this)"></td>`;
     });
     row.innerHTML = cells;
     table.appendChild(row);
@@ -256,14 +253,17 @@ function renderSplitTable() {
   renderSplitDetails();
 }
 
-function editSplit(ti, pi, value) {
-  transactions[ti].splits[pi] = parseFloat(value) || 0;
-  markDirty("splits");
-}
-
-function saveAllSplits() {
-  markSaved("splits");
+function editSplit(ti, pi, value, el) {
+  if (!isValidDollar(value, true)) {
+    el.classList.add("invalid-cell");
+    return;
+  }
+  el.classList.remove("invalid-cell");
+  const num = value.trim() === "" ? 0 : parseFloat(value);
+  transactions[ti].splits[pi] = num;
+  el.value = num ? num.toFixed(2) : "";
   renderSplitDetails();
+  afterChange();
 }
 
 // ---- SPLIT DETAILS (3a) ----
@@ -312,6 +312,8 @@ function toggleCollapse(el) {
 
 // ---- SUMMARY ----
 function calculateSummary() {
+  const summaryEl = document.getElementById("summary");
+  if (!summaryEl) return;
   const { paid, owes, nets } = computeSummary(people, transactions);
   const maxAbs = Math.max(...nets.map((n) => Math.abs(n)), 1);
 
@@ -348,16 +350,12 @@ function calculateSummary() {
         <td><b>$${totalNet.toFixed(2)}</b></td></tr>`;
   html += "</table>";
 
-  document.getElementById("summary").innerHTML = html;
-
-  markSaved("transactions");
-  markSaved("splits");
+  summaryEl.innerHTML = html;
 }
 function resetState() {
   people.length = 0;
   transactions.length = 0;
-  dirty = { people: false, transactions: false, splits: false };
-  updateCurrentStateJson();
+  afterChange();
 }
 
 // ---- SAVE/LOAD STATE ----
@@ -434,10 +432,7 @@ function applyLoadedState(state) {
   const summaryEl = document.getElementById("summary");
   if (summaryEl) summaryEl.innerHTML = "";
 
-  markSaved("people");
-  markSaved("transactions");
-  markSaved("splits");
-  updateCurrentStateJson();
+  afterChange();
 }
 
 function loadStateFromJson() {
@@ -487,8 +482,6 @@ function downloadJson() {
 if (typeof module !== "undefined" && module.exports) {
   module.exports = {
     computeSummary,
-    markDirty,
-    markSaved,
     toggleCollapse,
     resetState,
     addPerson,
@@ -502,8 +495,6 @@ if (typeof module !== "undefined" && module.exports) {
 }
 if (typeof window !== "undefined") {
   window.computeSummary = computeSummary;
-  window.markDirty = markDirty;
-  window.markSaved = markSaved;
   window.addPerson = addPerson;
   window.deletePerson = deletePerson;
   window.renderPeople = renderPeople;
@@ -511,10 +502,8 @@ if (typeof window !== "undefined") {
   window.addTransaction = addTransaction;
   window.editTransaction = editTransaction;
   window.deleteTransaction = deleteTransaction;
-  window.saveTransactions = saveTransactions;
   window.renderSplitTable = renderSplitTable;
   window.editSplit = editSplit;
-  window.saveAllSplits = saveAllSplits;
   window.renderSplitDetails = renderSplitDetails;
   window.toggleCollapse = toggleCollapse;
   window.calculateSummary = calculateSummary;

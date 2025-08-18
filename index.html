@@ -23,15 +23,6 @@
         padding: 4px 8px;
       }
 
-      button.unsaved {
-        background-color: yellow;
-      }
-
-      button.invalid {
-        background-color: red;
-        color: white;
-      }
-
       table,
       th,
       td {
@@ -103,14 +94,10 @@
     <h2>2. Transactions</h2>
     <div id="transactions-section">
       <table id="transaction-table"></table>
-      <button id="save-transactions" onclick="saveTransactions()">
-        Save Transactions
-      </button>
     </div>
 
     <h2>3. Cost Splits</h2>
     <div id="splits-section">
-      <button id="save-splits" onclick="saveAllSplits()">Save Splits</button>
       <div id="split-table"></div>
     </div>
 
@@ -120,9 +107,6 @@
     <div class="content" id="split-details"></div>
 
     <h2>4. Summary</h2>
-    <button id="calculate-summary" onclick="calculateSummary()">
-      Calculate Summary
-    </button>
     <div id="summary"></div>
 
     <h2>5. Save/Load State</h2>
