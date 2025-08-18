@@ -44,10 +44,10 @@ describe("computeSummary", () => {
     expect(paid).toEqual([40, 0, 0]);
     expect(owes[0]).toBeCloseTo(19.0476, 4);
     expect(owes[1]).toBeCloseTo(13.3333, 4);
-    expect(owes[2]).toBeCloseTo(7.6190, 4);
+    expect(owes[2]).toBeCloseTo(7.619, 4);
     expect(nets[0]).toBeCloseTo(20.9524, 4);
     expect(nets[1]).toBeCloseTo(-13.3333, 4);
-    expect(nets[2]).toBeCloseTo(-7.6190, 4);
+    expect(nets[2]).toBeCloseTo(-7.619, 4);
   });
 });
 
