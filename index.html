@@ -59,20 +59,7 @@
         text-align: left;
       }
 
-      .collapsible {
-        cursor: pointer;
-        background: #eee;
-        border: 1px solid #aaa;
-        padding: 5px;
-        margin-top: 5px;
-      }
-
-      .content {
-        display: none;
-        padding: 5px;
-        border: 1px solid #aaa;
-        margin-bottom: 10px;
-      }
+      /* Removed collapsible styles now that split details are always visible */
 
       .delete-btn {
         cursor: pointer;
@@ -112,12 +99,8 @@
     <div id="splits-section">
       <button id="save-splits" onclick="saveAllSplits()">Save Splits</button>
       <div id="split-table"></div>
+      <div id="split-details"></div>
     </div>
-
-    <h2 class="collapsible" onclick="toggleCollapse(this)">
-      3a. Split Details (click to view)
-    </h2>
-    <div class="content" id="split-details"></div>
 
     <h2>4. Summary</h2>
     <button id="calculate-summary" onclick="calculateSummary()">
