@@ -199,3 +199,23 @@ describe("addPerson", () => {
     );
   });
 });
+
+describe("editSplit", () => {
+  beforeEach(() => {
+    document.body.innerHTML = `
+      <div id="split-table"></div>
+      <div id="split-details"></div>
+    `;
+    resetState();
+    _people.push("Alice");
+    _transactions.push({ name: "Item", cost: 10, payer: 0, splits: [1] });
+    window.renderSplitTable();
+  });
+
+  test("accepts numbers with any decimal places", () => {
+    const input = document.querySelector("#split-table input");
+    window.editSplit(0, 0, "3.123", input);
+    expect(_transactions[0].splits[0]).toBeCloseTo(3.123);
+    expect(input.value).toBe("3.123");
+  });
+});

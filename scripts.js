@@ -28,6 +28,11 @@ function isValidDollar(value, allowEmpty = false) {
   return /^\d+(\.\d{0,2})?$/.test(value);
 }
 
+function isValidNumber(value, allowEmpty = false) {
+  if (allowEmpty && value.trim() === "") return true;
+  return /^\d+(\.\d+)?$/.test(value);
+}
+
 // ---- PEOPLE ----
 function isValidPerson(person) {
   return person && typeof person.name === "string";
@@ -140,8 +145,13 @@ function renderTransactionTable() {
                 .join("")}
             </select>
           </td>
-          <td><input type="text" value="${t.cost.toFixed(2)}"
-                     onchange="editTransaction(${i},'cost',this.value,this)"></td>
+          <td>
+            <div class="dollar-field">
+              <span class="prefix">$</span>
+              <input type="text" value="${t.cost.toFixed(2)}"
+                     onchange="editTransaction(${i},'cost',this.value,this)">
+            </div>
+          </td>
           <td><button onclick="deleteTransaction(${i})">Delete</button></td>
         `;
     table.appendChild(row);
@@ -157,7 +167,12 @@ function renderTransactionTable() {
               .join("")}
           </select>
         </td>
-        <td><input type="text" id="new-t-cost" placeholder="Cost"></td>
+        <td>
+          <div class="dollar-field">
+            <span class="prefix">$</span>
+            <input type="text" id="new-t-cost" placeholder="Cost">
+          </div>
+        </td>
         <td><button onclick="addTransaction()">Add</button></td>
       `;
   table.appendChild(addRow);
@@ -241,7 +256,7 @@ function renderSplitTable() {
     let cells = `<td>${tName} - $${t.cost.toFixed(2)}</td>`;
     people.forEach((p, pi) => {
       const rawVal = t.splits[pi];
-      const val = rawVal ? rawVal.toFixed(2) : "";
+      const val = rawVal ? String(rawVal) : "";
       cells += `<td><input type="text" value="${val}"
                      onchange="editSplit(${ti},${pi},this.value,this)"></td>`;
     });
@@ -254,14 +269,14 @@ function renderSplitTable() {
 }
 
 function editSplit(ti, pi, value, el) {
-  if (!isValidDollar(value, true)) {
+  if (!isValidNumber(value, true)) {
     el.classList.add("invalid-cell");
     return;
   }
   el.classList.remove("invalid-cell");
   const num = value.trim() === "" ? 0 : parseFloat(value);
   transactions[ti].splits[pi] = num;
-  el.value = num ? num.toFixed(2) : "";
+  el.value = num ? String(num) : "";
   renderSplitDetails();
   afterChange();
 }
