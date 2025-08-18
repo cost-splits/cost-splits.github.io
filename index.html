@@ -386,6 +386,7 @@
       }
 
       // ---- SUMMARY ----
+      // Summary table columns: Person, Total Paid, Total Cost, Net Balance
       function calculateSummary() {
         const paid = Array(people.length).fill(0);
         const owes = Array(people.length).fill(0);
@@ -404,7 +405,7 @@
         const maxAbs = Math.max(...nets.map((n) => Math.abs(n)), 1);
 
         let html =
-          "<table><tr><th>Person</th><th>Total Paid</th><th>Total Cost</th><th>Total Owed</th></tr>";
+          "<table><tr><th>Person</th><th>Total Paid</th><th>Total Cost</th><th>Net Balance</th></tr>";
         let totalPaid = 0,
           totalOwes = 0,
           totalNet = 0;
