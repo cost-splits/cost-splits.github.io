@@ -88,6 +88,8 @@ export function computeSettlements(people, transactions) {
   return settlements;
 }
 
+/** @type {string} */
+export let pool = "";
 /** @type {string[]} */
 export const people = [];
 /**
@@ -123,6 +125,17 @@ export function setAfterChange(fn) {
  */
 export function afterChange() {
   afterChangeHandler();
+}
+
+/**
+ * Update the global pool name and notify listeners of the change.
+ *
+ * @param {string} name - The new pool name.
+ * @returns {void}
+ */
+export function setPool(name) {
+  pool = name;
+  afterChange();
 }
 
 /**
@@ -162,5 +175,6 @@ export function resetState() {
   transactions.length = 0;
   collapsedSplit.clear();
   collapsedDetails.clear();
+  pool = "";
   afterChange();
 }

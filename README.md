@@ -11,6 +11,7 @@ groups. Try the live demo at
 - Responsive design that works on mobile and desktop
 - Itemized transactions with proportional tax and tip
 - Shareable URLs encoding the current calculator state
+- Optional session pool name to label each set of transactions
 
 ## Getting Started
 
@@ -26,6 +27,9 @@ Serve `index.html` with any static server or open the file directly in a
 browser.
 
 ## Usage
+
+Before adding participants, optionally enter a name for your pool of
+transactions using the field beneath the page title.
 
 1. Add participants and transactions.
 2. Use the ▶/▼ controls to itemize a transaction when needed.

@@ -1,4 +1,4 @@
-import { setAfterChange } from "./state.js";
+import { setAfterChange, setPool } from "./state.js";
 import { calculateSummary, addPerson } from "./render.js";
 import {
   updateCurrentStateJson,
@@ -19,6 +19,9 @@ setAfterChange(() => {
 loadStateFromUrl();
 
 // UI bindings
+document
+  .getElementById("pool-name")
+  .addEventListener("input", (e) => setPool(e.target.value));
 document.getElementById("save-people").addEventListener("click", addPerson);
 document
   .getElementById("download-json")

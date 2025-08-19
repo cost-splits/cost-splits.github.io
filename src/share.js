@@ -1,4 +1,6 @@
 import {
+  pool,
+  setPool,
   people,
   transactions,
   collapsedSplit,
@@ -36,6 +38,10 @@ function validateState(state) {
     !Array.isArray(state.transactions)
   ) {
     throw new Error("Invalid state: missing people or transactions arrays");
+  }
+
+  if (typeof state.pool !== "undefined" && typeof state.pool !== "string") {
+    throw new Error("Invalid state: pool must be a string");
   }
 
   // Validate people: array of non-empty strings
@@ -84,7 +90,7 @@ function validateState(state) {
  */
 function updateCurrentStateJson() {
   const display = document.getElementById("state-json-display");
-  const state = { people, transactions };
+  const state = { pool, people, transactions };
   if (display) display.value = JSON.stringify(state);
 }
 
@@ -97,7 +103,7 @@ function updateShareableUrl() {
   const display = document.getElementById("share-url-display");
   if (!display || typeof window === "undefined") return;
   const base = window.location.href.split(/[?#]/)[0];
-  const json = JSON.stringify({ people, transactions });
+  const json = JSON.stringify({ pool, people, transactions });
   const compressed = lz.compressToEncodedURIComponent(json);
   display.value = `${base}?state=${compressed}`;
 }
@@ -113,8 +119,12 @@ function applyLoadedState(state) {
   transactions.length = 0;
   collapsedSplit.clear();
   collapsedDetails.clear();
+  setPool(typeof state.pool === "string" ? state.pool : "");
   state.people.forEach((p) => people.push(p));
   state.transactions.forEach((t) => transactions.push(t));
+
+  const poolInput = document.getElementById("pool-name");
+  if (poolInput) poolInput.value = pool;
 
   if (
     typeof renderPeople === "function" &&
@@ -204,7 +214,7 @@ function loadStateFromUrl() {
  * Trigger a download of the current state as a JSON file.
  */
 function downloadJson() {
-  const state = { people, transactions };
+  const state = { pool, people, transactions };
   const dataStr = JSON.stringify(state);
   const blob = new Blob([dataStr], { type: "application/json" });
   const url = URL.createObjectURL(blob);
