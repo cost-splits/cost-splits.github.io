@@ -1,6 +1,8 @@
 body {
   font-family: Arial, sans-serif;
-  margin: 1.25rem;
+  max-width: 60rem;
+  margin: 0 auto;
+  padding: 1.25rem;
 }
 
 h2 {
