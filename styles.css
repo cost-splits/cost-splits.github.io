@@ -34,17 +34,17 @@ table {
   width: auto;
 }
 
-td,
 th {
+  text-align: center;
+}
+
+td {
   text-align: right;
 }
 
-td:first-child,
-th:first-child {
+td:first-child {
   text-align: left;
 }
-
-/* Removed collapsible styles now that split details are always visible */
 
 .delete-btn {
   cursor: pointer;
