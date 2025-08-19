@@ -189,80 +189,94 @@ function renderPeople() {
 // ---- TRANSACTIONS ----
 
 /**
- * Render the transactions table allowing editing and deletion.
+ * Create table header row for transaction table.
+ *
+ * @returns {HTMLTableRowElement} Header row element.
  */
-function renderTransactionTable() {
-  const table = document.getElementById("transaction-table");
-  table.innerHTML = "";
-  if (people.length === 0) {
-    table.innerHTML = "<tr><td>Please add people first</td></tr>";
-    return;
-  }
-  let header =
-    "<tr><th>Name</th><th>Paid By</th><th>Cost</th><th>Action</th></tr>";
-  table.innerHTML = header;
-
-  transactions.forEach((t, i) => {
-    const row = document.createElement("tr");
-
-    const nameCell = document.createElement("td");
-    const nameInput = document.createElement("input");
-    nameInput.type = "text";
-    nameInput.value = t.name || `Transaction ${i + 1}`;
-    nameInput.id = `transaction-name-${i}`;
-    nameInput.setAttribute("aria-label", `Transaction ${i + 1} name`);
-    nameInput.addEventListener("change", (e) =>
-      editTransaction(i, "name", e.target.value, e.target),
-    );
-    nameCell.appendChild(nameInput);
-    row.appendChild(nameCell);
-
-    const payerCell = document.createElement("td");
-    const payerSelect = document.createElement("select");
-    payerSelect.id = `transaction-payer-${i}`;
-    payerSelect.setAttribute("aria-label", `Transaction ${i + 1} payer`);
-    people.forEach((p, pi) => {
-      const opt = document.createElement("option");
-      opt.value = String(pi);
-      opt.textContent = p;
-      if (pi === t.payer) opt.selected = true;
-      payerSelect.appendChild(opt);
-    });
-    payerSelect.addEventListener("change", (e) =>
-      editTransaction(i, "payer", e.target.value, e.target),
-    );
-    payerCell.appendChild(payerSelect);
-    row.appendChild(payerCell);
-
-    const costCell = document.createElement("td");
-    const costWrapper = document.createElement("div");
-    costWrapper.className = "dollar-field";
-    const prefix = document.createElement("span");
-    prefix.className = "prefix";
-    prefix.textContent = "$";
-    const costInput = document.createElement("input");
-    costInput.type = "text";
-    costInput.value = t.cost.toFixed(2);
-    costInput.id = `transaction-cost-${i}`;
-    costInput.setAttribute("aria-label", `Transaction ${i + 1} cost`);
-    costInput.addEventListener("change", (e) =>
-      editTransaction(i, "cost", e.target.value, e.target),
-    );
-    costWrapper.appendChild(prefix);
-    costWrapper.appendChild(costInput);
-    costCell.appendChild(costWrapper);
-    row.appendChild(costCell);
-
-    const actionCell = document.createElement("td");
-    const delBtn = document.createElement("button");
-    delBtn.textContent = "Delete";
-    delBtn.addEventListener("click", () => deleteTransaction(i));
-    actionCell.appendChild(delBtn);
-    row.appendChild(actionCell);
-
-    table.appendChild(row);
+function createTransactionHeaderRow() {
+  const header = document.createElement("tr");
+  ["Name", "Paid By", "Cost", "Action"].forEach((text) => {
+    const th = document.createElement("th");
+    th.textContent = text;
+    header.appendChild(th);
   });
+  return header;
+}
 
+/**
+ * Create a table row for a transaction.
+ *
+ * @param {object} t - Transaction data.
+ * @param {number} i - Index of the transaction.
+ * @returns {HTMLTableRowElement} Row element representing the transaction.
+ */
+function createTransactionRow(t, i) {
+  const row = document.createElement("tr");
+
+  const nameCell = document.createElement("td");
+  const nameInput = document.createElement("input");
+  nameInput.type = "text";
+  nameInput.value = t.name || `Transaction ${i + 1}`;
+  nameInput.id = `transaction-name-${i}`;
+  nameInput.setAttribute("aria-label", `Transaction ${i + 1} name`);
+  nameInput.addEventListener("change", (e) =>
+    editTransaction(i, "name", e.target.value, e.target),
+  );
+  nameCell.appendChild(nameInput);
+  row.appendChild(nameCell);
+
+  const payerCell = document.createElement("td");
+  const payerSelect = document.createElement("select");
+  payerSelect.id = `transaction-payer-${i}`;
+  payerSelect.setAttribute("aria-label", `Transaction ${i + 1} payer`);
+  people.forEach((p, pi) => {
+    const opt = document.createElement("option");
+    opt.value = String(pi);
+    opt.textContent = p;
+    if (pi === t.payer) opt.selected = true;
+    payerSelect.appendChild(opt);
+  });
+  payerSelect.addEventListener("change", (e) =>
+    editTransaction(i, "payer", e.target.value, e.target),
+  );
+  payerCell.appendChild(payerSelect);
+  row.appendChild(payerCell);
+
+  const costCell = document.createElement("td");
+  const costWrapper = document.createElement("div");
+  costWrapper.className = "dollar-field";
+  const prefix = document.createElement("span");
+  prefix.className = "prefix";
+  prefix.textContent = "$";
+  const costInput = document.createElement("input");
+  costInput.type = "text";
+  costInput.value = t.cost.toFixed(2);
+  costInput.id = `transaction-cost-${i}`;
+  costInput.setAttribute("aria-label", `Transaction ${i + 1} cost`);
+  costInput.addEventListener("change", (e) =>
+    editTransaction(i, "cost", e.target.value, e.target),
+  );
+  costWrapper.appendChild(prefix);
+  costWrapper.appendChild(costInput);
+  costCell.appendChild(costWrapper);
+  row.appendChild(costCell);
+
+  const actionCell = document.createElement("td");
+  const delBtn = document.createElement("button");
+  delBtn.textContent = "Delete";
+  delBtn.addEventListener("click", () => deleteTransaction(i));
+  actionCell.appendChild(delBtn);
+  row.appendChild(actionCell);
+
+  return row;
+}
+
+/**
+ * Create the input row for adding a transaction.
+ *
+ * @returns {HTMLTableRowElement} Row element for adding a transaction.
+ */
+function createAddTransactionRow() {
   const addRow = document.createElement("tr");
 
   const addNameCell = document.createElement("td");
@@ -311,7 +325,23 @@ function renderTransactionTable() {
   addActionCell.appendChild(addBtn);
   addRow.appendChild(addActionCell);
 
-  table.appendChild(addRow);
+  return addRow;
+}
+
+/**
+ * Render the transaction table with all existing transactions and input row.
+ */
+function renderTransactionTable() {
+  const table = document.getElementById("transaction-table");
+  table.innerHTML = "";
+  if (people.length === 0) {
+    table.innerHTML = "<tr><td>Please add people first</td></tr>";
+    return;
+  }
+
+  table.appendChild(createTransactionHeaderRow());
+  transactions.forEach((t, i) => table.appendChild(createTransactionRow(t, i)));
+  table.appendChild(createAddTransactionRow());
 }
 
 /**
@@ -801,6 +831,9 @@ export {
   deletePerson,
   renamePerson,
   renderPeople,
+  createTransactionHeaderRow,
+  createTransactionRow,
+  createAddTransactionRow,
   renderTransactionTable,
   addTransaction,
   editTransaction,
