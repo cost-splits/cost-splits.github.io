@@ -271,27 +271,88 @@ function listSavedPools() {
 }
 
 /**
- * Populate the saved pools picker with options from local storage.
+ * Remove a saved pool from local storage.
+ *
+ * @param {string} name - Pool name to remove.
  */
-function renderSavedPoolsPicker() {
-  const select = document.getElementById("saved-pools-picker");
-  if (!select) return;
-  const current = select.value;
-  select.innerHTML = "";
-  const placeholder = document.createElement("option");
-  placeholder.value = "";
-  placeholder.textContent = "Load saved pool";
-  placeholder.disabled = true;
-  const names = listSavedPools();
-  placeholder.selected = !names.includes(current);
-  select.appendChild(placeholder);
-  names.forEach((name) => {
-    const option = document.createElement("option");
-    option.value = name;
-    option.textContent = name;
-    if (name === current) option.selected = true;
-    select.appendChild(option);
+function deletePoolFromLocalStorage(name) {
+  if (typeof localStorage === "undefined") return;
+  try {
+    const raw = localStorage.getItem(LOCAL_STORAGE_KEY);
+    if (!raw) return;
+    const pools = JSON.parse(raw);
+    if (pools && typeof pools === "object" && name in pools) {
+      delete pools[name];
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(pools));
+    }
+  } catch (e) {
+    // Fail silently
+  }
+}
+
+/**
+ * Render a table of saved pools with load and delete actions.
+ *
+ * @returns {void}
+ */
+function renderSavedPoolsTable() {
+  const table = document.getElementById("saved-pools-table");
+  if (!table || typeof localStorage === "undefined") return;
+  table.innerHTML = "";
+
+  const thead = document.createElement("thead");
+  const headerRow = document.createElement("tr");
+  ["Pool", "People", "Transactions", "Actions"].forEach((h) => {
+    const th = document.createElement("th");
+    th.textContent = h;
+    headerRow.appendChild(th);
   });
+  thead.appendChild(headerRow);
+  table.appendChild(thead);
+
+  const tbody = document.createElement("tbody");
+  let pools;
+  try {
+    const raw = localStorage.getItem(LOCAL_STORAGE_KEY);
+    pools = raw ? JSON.parse(raw) : {};
+  } catch (e) {
+    pools = {};
+  }
+
+  Object.entries(pools).forEach(([name, data]) => {
+    const row = document.createElement("tr");
+    const nameCell = document.createElement("td");
+    nameCell.textContent = name;
+    row.appendChild(nameCell);
+
+    const peopleCell = document.createElement("td");
+    peopleCell.textContent = Array.isArray(data.people)
+      ? data.people.length
+      : 0;
+    row.appendChild(peopleCell);
+
+    const txCell = document.createElement("td");
+    txCell.textContent = Array.isArray(data.transactions)
+      ? data.transactions.length
+      : 0;
+    row.appendChild(txCell);
+
+    const actionsCell = document.createElement("td");
+    const deleteBtn = document.createElement("button");
+    deleteBtn.textContent = "Delete";
+    deleteBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      deletePoolFromLocalStorage(name);
+      renderSavedPoolsTable();
+    });
+    actionsCell.appendChild(deleteBtn);
+    row.appendChild(actionsCell);
+
+    row.addEventListener("click", () => loadPoolFromLocalStorage(name));
+    tbody.appendChild(row);
+  });
+
+  table.appendChild(tbody);
 }
 
 /**
@@ -320,7 +381,8 @@ export {
   savePoolToLocalStorage,
   loadPoolFromLocalStorage,
   listSavedPools,
-  renderSavedPoolsPicker,
+  deletePoolFromLocalStorage,
+  renderSavedPoolsTable,
   downloadJson,
   validateState,
   applyLoadedState,

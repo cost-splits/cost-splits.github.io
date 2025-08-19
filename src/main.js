@@ -14,8 +14,7 @@ import {
   loadStateFromJsonFile,
   downloadJson,
   savePoolToLocalStorage,
-  loadPoolFromLocalStorage,
-  renderSavedPoolsPicker,
+  renderSavedPoolsTable,
 } from "./share.js";
 
 setAfterChange(() => {
@@ -26,7 +25,7 @@ setAfterChange(() => {
 
 // initial load
 loadStateFromUrl();
-renderSavedPoolsPicker();
+renderSavedPoolsTable();
 
 // UI bindings
 document
@@ -56,16 +55,8 @@ document.getElementById("save-local").addEventListener("click", () => {
     return;
   }
   savePoolToLocalStorage(pool, { people, transactions });
-  renderSavedPoolsPicker();
+  renderSavedPoolsTable();
 });
-
-document
-  .getElementById("saved-pools-picker")
-  .addEventListener("change", (e) => {
-    if (e.target.value) {
-      loadPoolFromLocalStorage(e.target.value);
-    }
-  });
 
 export * from "./state.js";
 export * from "./render.js";

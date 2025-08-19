@@ -26,7 +26,7 @@ import {
   savePoolToLocalStorage,
   loadPoolFromLocalStorage,
   listSavedPools,
-  renderSavedPoolsPicker,
+  renderSavedPoolsTable,
   downloadJson,
 } from "../src/share.js";
 import lz from "lz-string";
@@ -424,7 +424,7 @@ describe("local storage helpers", () => {
       <div id="split-table"></div>
       <div id="split-details"></div>
       <input id="share-url-display" />
-      <select id="saved-pools-picker"></select>
+      <table id="saved-pools-table"></table>
     `;
     resetState();
     localStorage.clear();
@@ -446,21 +446,20 @@ describe("local storage helpers", () => {
     expect(listSavedPools().sort()).toEqual(["a", "b"]);
   });
 
-  test("renderSavedPoolsPicker populates DOM and loads pool", () => {
+  test("renderSavedPoolsTable populates DOM, loads and deletes pool", () => {
     people.push("Ann");
     transactions.push({ payer: 0, cost: 5, splits: [1] });
     savePoolToLocalStorage("picnic", { people, transactions });
     resetState();
-    renderSavedPoolsPicker();
-    const select = document.getElementById("saved-pools-picker");
-    const options = Array.from(select.options).map((o) => o.textContent);
-    expect(options).toContain("picnic");
-    select.addEventListener("change", (e) =>
-      loadPoolFromLocalStorage(e.target.value),
-    );
-    select.value = "picnic";
-    select.dispatchEvent(new Event("change"));
+    renderSavedPoolsTable();
+    const row = document.querySelector("#saved-pools-table tbody tr");
+    expect(row).not.toBeNull();
+    row.click();
     expect(people).toEqual(["Ann"]);
     expect(transactions).toEqual([{ payer: 0, cost: 5, splits: [1] }]);
+    renderSavedPoolsTable();
+    const btn = document.querySelector("#saved-pools-table tbody tr button");
+    btn.click();
+    expect(listSavedPools()).toEqual([]);
   });
 });

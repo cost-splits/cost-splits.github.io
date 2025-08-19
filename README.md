@@ -12,8 +12,8 @@ groups. Try the live demo at
 - Itemized transactions with proportional tax and tip
 - Shareable URLs encoding the current calculator state
 - Optional session pool name to label each set of transactions
-- Save and load named pools using browser local storage with a drop-down pool
-  picker for quick loading
+- Save and load named pools using browser local storage with a table of saved
+  pools for quick loading or deletion
 
 ## Getting Started
 
@@ -32,8 +32,8 @@ browser.
 
 Before adding participants, optionally enter a name for your pool of
 transactions using the field beneath the page title. Use the adjacent **Save
-Pool** button to store the pool locally and the drop-down to reload previously
-saved pools.
+Pool** button to store the pool locally and the table below to reload or delete
+previously saved pools.
 
 1. Add participants and transactions.
 2. Use the ▶/▼ controls to itemize a transaction when needed.
