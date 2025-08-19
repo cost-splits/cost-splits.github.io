@@ -1,3 +1,7 @@
+html {
+  font-size: clamp(14px, 2vw, 16px);
+}
+
 body {
   font-family: Arial, sans-serif;
   max-width: 60rem;
