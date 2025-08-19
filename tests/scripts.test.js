@@ -123,6 +123,7 @@ describe("calculateSummary settlements", () => {
 describe("updateCurrentStateJson and loadStateFromJson", () => {
   beforeEach(() => {
     document.body.innerHTML = `
+      <input id="pool-name" />
       <input id="state-json-display" />
       <textarea id="state-json-input"></textarea>
       <input id="state-json-file" type="file" />
@@ -141,7 +142,7 @@ describe("updateCurrentStateJson and loadStateFromJson", () => {
     document.getElementById("person-name").value = "Alice";
     addPerson();
     expect(document.getElementById("state-json-display").value).toBe(
-      JSON.stringify({ people: ["Alice"], transactions: [] }),
+      JSON.stringify({ pool: "", people: ["Alice"], transactions: [] }),
     );
   });
 
@@ -179,6 +180,7 @@ describe("updateCurrentStateJson and loadStateFromJson", () => {
         ],
       },
     ]);
+    expect(document.getElementById("pool-name").value).toBe("");
   });
 
   test("rejects invalid state", () => {
@@ -254,7 +256,7 @@ describe("downloadJson", () => {
       reader.readAsText(blob);
     });
     expect(text).toBe(
-      JSON.stringify({ people: ["Eve"], transactions: transactions }),
+      JSON.stringify({ pool: "", people: ["Eve"], transactions: transactions }),
     );
     expect(URL.revokeObjectURL).toHaveBeenCalledWith("mockurl");
   });
@@ -359,6 +361,7 @@ describe("editSplit", () => {
 describe("sharing", () => {
   beforeEach(() => {
     document.body.innerHTML = `
+      <input id="pool-name" />
       <input id="state-json-display" />
       <textarea id="state-json-input"></textarea>
       <input id="state-json-file" type="file" />
@@ -379,6 +382,7 @@ describe("sharing", () => {
     transactions.push({ payer: 0, cost: 10, splits: [1] });
     updateShareableUrl();
     const json = JSON.stringify({
+      pool: "",
       people: ["Alice"],
       transactions: transactions,
     });
@@ -390,6 +394,7 @@ describe("sharing", () => {
 
   test("loadStateFromUrl loads state when param present", () => {
     const state = {
+      pool: "",
       people: ["Bob"],
       transactions: [{ payer: 0, cost: 5, splits: [1] }],
     };
