@@ -9,6 +9,7 @@ groups. Try the live demo at
 ## Features
 
 - Responsive design that works on mobile and desktop
+- Light and dark themes with a sun/moon toggle that remembers your choice
 - Itemized transactions with proportional tax and tip
 - Shareable URLs encoding the current calculator state
 - Optional session pool name to label each set of transactions

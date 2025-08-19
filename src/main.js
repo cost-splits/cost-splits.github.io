@@ -20,6 +20,27 @@ import {
   savePoolToLocalStorage,
   startNewPool,
 } from "./share.js";
+import { initTheme, toggleTheme } from "./theme.js";
+
+/**
+ * Update the theme toggle button icon and accessible label.
+ *
+ * @param {"light"|"dark"} theme - Current theme.
+ * @returns {void}
+ */
+function updateThemeToggle(theme) {
+  const btn = document.getElementById("theme-toggle");
+  if (!btn) return;
+  if (theme === "dark") {
+    btn.textContent = "☀️";
+    btn.setAttribute("aria-label", "Switch to light mode");
+    btn.title = "Switch to light mode";
+  } else {
+    btn.textContent = "🌙";
+    btn.setAttribute("aria-label", "Switch to dark mode");
+    btn.title = "Switch to dark mode";
+  }
+}
 
 setAfterChange(() => {
   updateCurrentStateJson();
@@ -30,6 +51,8 @@ setAfterChange(() => {
 // initial load
 loadStateFromUrl();
 renderSavedPoolsTable();
+const theme = initTheme();
+updateThemeToggle(theme);
 
 // UI bindings
 document
@@ -71,6 +94,14 @@ document.getElementById("new-pool").addEventListener("click", () => {
   renderSavedPoolsTable();
 });
 
+const themeToggleBtn = document.getElementById("theme-toggle");
+if (themeToggleBtn)
+  themeToggleBtn.addEventListener("click", () => {
+    const newTheme = toggleTheme();
+    updateThemeToggle(newTheme);
+  });
+
 export * from "./state.js";
 export * from "./render.js";
 export * from "./share.js";
+export * from "./theme.js";

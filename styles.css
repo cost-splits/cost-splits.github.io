@@ -17,20 +17,18 @@
     Arial, sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background-color: #121212;
-    --text-color: #eee;
-    --border-color: #555;
-    --muted-bg: #1e1e1e;
-    --alt-row-bg: #1a1a1a;
-    --primary-color: #569aff;
-    --danger-color: #ff7b72;
-    --warning-bg: #665c00;
-    --error-bg: rgba(255, 123, 114, 0.2);
-    --error-tooltip-bg: #3d1a1a;
-    --error-tooltip-color: #ff7b72;
-  }
+:root[data-theme="dark"] {
+  --background-color: #121212;
+  --text-color: #eee;
+  --border-color: #555;
+  --muted-bg: #1e1e1e;
+  --alt-row-bg: #1a1a1a;
+  --primary-color: #569aff;
+  --danger-color: #ff7b72;
+  --warning-bg: #665c00;
+  --error-bg: rgba(255, 123, 114, 0.2);
+  --error-tooltip-bg: #3d1a1a;
+  --error-tooltip-color: #ff7b72;
 }
 
 html {
