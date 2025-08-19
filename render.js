@@ -683,7 +683,7 @@ function calculateSummary() {
         <td><b>$${totalNet.toFixed(2)}</b></td></tr>`;
   html += "</table>";
   if (settlements.length > 0) {
-    html += "<h3>Settlements</h3><ul>";
+    html += "<h3>Suggested Settlements</h3><ul>";
     settlements.forEach((s) => {
       html += `<li>${people[s.from]} pays ${people[s.to]} $${s.amount.toFixed(
         2,
