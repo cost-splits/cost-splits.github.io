@@ -204,6 +204,17 @@ input[data-action="editItemSplit"] {
 
 .indent-cell {
   padding-left: calc(var(--spacing) * 2.5);
+  position: relative;
+}
+
+.indent-cell::before {
+  content: "↳";
+  position: absolute;
+  left: var(--spacing);
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--primary-color);
+  pointer-events: none;
 }
 
 .text-center {
