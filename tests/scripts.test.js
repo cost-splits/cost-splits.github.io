@@ -7,6 +7,8 @@ import {
   resetState,
   people,
   transactions,
+  pool,
+  setPool,
   setAfterChange,
 } from "../src/state.js";
 import {
@@ -16,6 +18,7 @@ import {
   renderSplitTable,
   editSplit,
   calculateSummary,
+  renderSavedPoolsTable,
 } from "../src/render.js";
 import {
   updateCurrentStateJson,
@@ -23,6 +26,10 @@ import {
   loadStateFromJson,
   loadStateFromJsonFile,
   loadStateFromUrl,
+  savePoolToLocalStorage,
+  loadPoolFromLocalStorage,
+  listSavedPools,
+  startNewPool,
   downloadJson,
 } from "../src/share.js";
 import lz from "lz-string";
@@ -403,5 +410,74 @@ describe("sharing", () => {
     loadStateFromUrl();
     expect(people).toEqual(["Bob"]);
     expect(transactions).toEqual([{ payer: 0, cost: 5, splits: [1] }]);
+  });
+});
+
+describe("local storage helpers", () => {
+  beforeEach(() => {
+    document.body.innerHTML = `
+      <input id="pool-name" />
+      <input id="state-json-display" />
+      <textarea id="state-json-input"></textarea>
+      <input id="state-json-file" type="file" />
+      <div id="summary"></div>
+      <input id="person-name" />
+      <ul id="people-list"></ul>
+      <table id="transaction-table"></table>
+      <div id="split-table"></div>
+      <div id="split-details"></div>
+      <input id="share-url-display" />
+      <table id="saved-pools-table"></table>
+    `;
+    resetState();
+    localStorage.clear();
+  });
+
+  test("startNewPool resets state and clears pool name", () => {
+    people.push("Old");
+    transactions.push({ payer: 0, cost: 1, splits: [1] });
+    setPool("existing");
+    document.getElementById("pool-name").value = "existing";
+    startNewPool();
+    expect(people).toEqual([]);
+    expect(transactions).toEqual([]);
+    expect(pool).toBe("");
+    expect(document.getElementById("pool-name").value).toBe("");
+  });
+
+  test("save and load pool round trip", () => {
+    people.push("Alice");
+    transactions.push({ payer: 0, cost: 10, splits: [1] });
+    savePoolToLocalStorage("trip", { people, transactions });
+    resetState();
+    loadPoolFromLocalStorage("trip");
+    expect(people).toEqual(["Alice"]);
+    expect(transactions).toEqual([{ payer: 0, cost: 10, splits: [1] }]);
+  });
+
+  test("listSavedPools returns stored names", () => {
+    savePoolToLocalStorage("a", { people: [], transactions: [] });
+    savePoolToLocalStorage("b", { people: [], transactions: [] });
+    expect(listSavedPools().sort()).toEqual(["a", "b"]);
+  });
+
+  test("renderSavedPoolsTable populates DOM, highlights and deletes pool", () => {
+    people.push("Ann");
+    transactions.push({ payer: 0, cost: 5, splits: [1] });
+    savePoolToLocalStorage("picnic", { people, transactions });
+    resetState();
+    renderSavedPoolsTable();
+    const row = document.querySelector("#saved-pools-table tbody tr");
+    expect(row).not.toBeNull();
+    row.click();
+    expect(people).toEqual(["Ann"]);
+    expect(transactions).toEqual([{ payer: 0, cost: 5, splits: [1] }]);
+    const active = document.querySelector(
+      "#saved-pools-table tbody tr.active-pool",
+    );
+    expect(active).not.toBeNull();
+    const btn = active.querySelector("button");
+    btn.click();
+    expect(listSavedPools()).toEqual([]);
   });
 });

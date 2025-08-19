@@ -22,6 +22,8 @@ if (!lz) {
   lz = mod.default;
 }
 
+export const LOCAL_STORAGE_KEY = "costSplitPools";
+
 // ---- SAVE/LOAD STATE ----
 // Validate the structure and types of the loaded state
 /**
@@ -210,6 +212,96 @@ function loadStateFromUrl() {
   }
 }
 
+// ---- LOCAL STORAGE ----
+
+/**
+ * Save a pool's people and transactions to local storage.
+ *
+ * @param {string} name - Name of the pool.
+ * @param {{people: string[], transactions: object[]}} data - Pool data.
+ */
+function savePoolToLocalStorage(name, { people: p, transactions: t }) {
+  if (typeof localStorage === "undefined") return;
+  try {
+    const raw = localStorage.getItem(LOCAL_STORAGE_KEY);
+    const pools = raw ? JSON.parse(raw) : {};
+    pools[name] = { people: p, transactions: t };
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(pools));
+  } catch (e) {
+    // Fail silently; local storage may be unavailable or full.
+  }
+}
+
+/**
+ * Load a pool from local storage and apply it to the current state.
+ *
+ * @param {string} name - Name of the stored pool.
+ * @returns {object|undefined} Loaded state if successful.
+ */
+function loadPoolFromLocalStorage(name) {
+  if (typeof localStorage === "undefined") return undefined;
+  try {
+    const raw = localStorage.getItem(LOCAL_STORAGE_KEY);
+    if (!raw) return undefined;
+    const pools = JSON.parse(raw);
+    if (!pools || typeof pools !== "object" || !pools[name]) return undefined;
+    const state = { pool: name, ...pools[name] };
+    applyLoadedState(state);
+    return state;
+  } catch (e) {
+    return undefined;
+  }
+}
+
+/**
+ * List the names of pools saved in local storage.
+ *
+ * @returns {string[]} Array of pool names.
+ */
+function listSavedPools() {
+  if (typeof localStorage === "undefined") return [];
+  try {
+    const raw = localStorage.getItem(LOCAL_STORAGE_KEY);
+    if (!raw) return [];
+    const pools = JSON.parse(raw);
+    return pools && typeof pools === "object" ? Object.keys(pools) : [];
+  } catch (e) {
+    return [];
+  }
+}
+
+/**
+ * Remove a saved pool from local storage.
+ *
+ * @param {string} name - Pool name to remove.
+ */
+function deletePoolFromLocalStorage(name) {
+  if (typeof localStorage === "undefined") return;
+  try {
+    const raw = localStorage.getItem(LOCAL_STORAGE_KEY);
+    if (!raw) return;
+    const pools = JSON.parse(raw);
+    if (pools && typeof pools === "object" && name in pools) {
+      delete pools[name];
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(pools));
+    }
+  } catch (e) {
+    // Fail silently
+  }
+}
+
+/**
+ * Start a new, empty pool and refresh the UI.
+ *
+ * Resets people, transactions and pool name using the existing state
+ * application logic.
+ *
+ * @returns {void}
+ */
+function startNewPool() {
+  applyLoadedState({ pool: "", people: [], transactions: [] });
+}
+
 /**
  * Trigger a download of the current state as a JSON file.
  */
@@ -233,6 +325,11 @@ export {
   loadStateFromJson,
   loadStateFromJsonFile,
   loadStateFromUrl,
+  savePoolToLocalStorage,
+  loadPoolFromLocalStorage,
+  listSavedPools,
+  deletePoolFromLocalStorage,
+  startNewPool,
   downloadJson,
   validateState,
   applyLoadedState,

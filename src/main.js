@@ -1,5 +1,15 @@
-import { setAfterChange, setPool } from "./state.js";
-import { calculateSummary, addPerson } from "./render.js";
+import {
+  setAfterChange,
+  setPool,
+  pool,
+  people,
+  transactions,
+} from "./state.js";
+import {
+  calculateSummary,
+  addPerson,
+  renderSavedPoolsTable,
+} from "./render.js";
 import {
   updateCurrentStateJson,
   updateShareableUrl,
@@ -7,6 +17,8 @@ import {
   loadStateFromJson,
   loadStateFromJsonFile,
   downloadJson,
+  savePoolToLocalStorage,
+  startNewPool,
 } from "./share.js";
 
 setAfterChange(() => {
@@ -17,6 +29,7 @@ setAfterChange(() => {
 
 // initial load
 loadStateFromUrl();
+renderSavedPoolsTable();
 
 // UI bindings
 document
@@ -26,18 +39,36 @@ document.getElementById("save-people").addEventListener("click", addPerson);
 document
   .getElementById("download-json")
   .addEventListener("click", downloadJson);
-document
-  .getElementById("load-json")
-  .addEventListener("click", loadStateFromJson);
+document.getElementById("load-json").addEventListener("click", () => {
+  loadStateFromJson();
+  renderSavedPoolsTable();
+});
 document
   .getElementById("load-json-file")
   .addEventListener("click", () =>
     document.getElementById("state-json-file").click(),
   );
-document.getElementById("state-json-file").addEventListener("change", (e) => {
-  if (e.target.files[0]) {
-    loadStateFromJsonFile(e.target.files[0]);
+document
+  .getElementById("state-json-file")
+  .addEventListener("change", async (e) => {
+    if (e.target.files[0]) {
+      await loadStateFromJsonFile(e.target.files[0]);
+      renderSavedPoolsTable();
+    }
+  });
+
+document.getElementById("save-local").addEventListener("click", () => {
+  if (!pool) {
+    alert("Enter a pool name before saving");
+    return;
   }
+  savePoolToLocalStorage(pool, { people, transactions });
+  renderSavedPoolsTable();
+});
+
+document.getElementById("new-pool").addEventListener("click", () => {
+  startNewPool();
+  renderSavedPoolsTable();
 });
 
 export * from "./state.js";

@@ -93,6 +93,16 @@ tbody tr:nth-child(even) {
   background-color: var(--alt-row-bg);
 }
 
+#saved-pools-table tr.active-pool {
+  background-color: var(--primary-color);
+  color: #fff;
+}
+
+#saved-pools-table tr.active-pool button {
+  background-color: #fff;
+  color: var(--primary-color);
+}
+
 #transaction-table {
   table-layout: auto;
   width: 100%;
