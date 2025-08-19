@@ -123,6 +123,8 @@ function renderTransactionTable() {
     const nameInput = document.createElement("input");
     nameInput.type = "text";
     nameInput.value = t.name || `Transaction ${i + 1}`;
+    nameInput.id = `transaction-name-${i}`;
+    nameInput.setAttribute("aria-label", `Transaction ${i + 1} name`);
     nameInput.addEventListener("change", (e) =>
       editTransaction(i, "name", e.target.value, e.target),
     );
@@ -131,6 +133,8 @@ function renderTransactionTable() {
 
     const payerCell = document.createElement("td");
     const payerSelect = document.createElement("select");
+    payerSelect.id = `transaction-payer-${i}`;
+    payerSelect.setAttribute("aria-label", `Transaction ${i + 1} payer`);
     people.forEach((p, pi) => {
       const opt = document.createElement("option");
       opt.value = String(pi);
@@ -153,6 +157,8 @@ function renderTransactionTable() {
     const costInput = document.createElement("input");
     costInput.type = "text";
     costInput.value = t.cost.toFixed(2);
+    costInput.id = `transaction-cost-${i}`;
+    costInput.setAttribute("aria-label", `Transaction ${i + 1} cost`);
     costInput.addEventListener("change", (e) =>
       editTransaction(i, "cost", e.target.value, e.target),
     );
@@ -178,12 +184,14 @@ function renderTransactionTable() {
   addNameInput.type = "text";
   addNameInput.id = "new-t-name";
   addNameInput.placeholder = "Name (optional)";
+  addNameInput.setAttribute("aria-label", "New transaction name");
   addNameCell.appendChild(addNameInput);
   addRow.appendChild(addNameCell);
 
   const addPayerCell = document.createElement("td");
   const addPayerSelect = document.createElement("select");
   addPayerSelect.id = "new-t-payer";
+  addPayerSelect.setAttribute("aria-label", "New transaction payer");
   people.forEach((p, pi) => {
     const opt = document.createElement("option");
     opt.value = String(pi);
@@ -203,6 +211,7 @@ function renderTransactionTable() {
   addCostInput.type = "text";
   addCostInput.id = "new-t-cost";
   addCostInput.placeholder = "Cost";
+  addCostInput.setAttribute("aria-label", "New transaction cost");
   addCostWrapper.appendChild(addPrefix);
   addCostWrapper.appendChild(addCostInput);
   addCostCell.appendChild(addCostWrapper);
@@ -316,7 +325,9 @@ function renderSplitTable() {
       const rawVal = t.splits[pi];
       const val = rawVal ? String(rawVal) : "";
       const disabled = hasItems ? "disabled" : "";
-      cells += `<td><input type="text" value="${val}" ${disabled} data-action="editSplit" data-ti="${ti}" data-pi="${pi}"></td>`;
+      const splitId = `split-${ti}-${pi}`;
+      const ariaLabel = `Split for ${p} in ${tName}`;
+      cells += `<td><input id="${splitId}" type="text" value="${val}" ${disabled} data-action="editSplit" data-ti="${ti}" data-pi="${pi}" aria-label="${ariaLabel}"></td>`;
     });
     if (hasItems) {
       cells += `<td><button data-action="unitemizeTransaction" data-ti="${ti}">Normal</button><button data-action="addItem" data-ti="${ti}">Add Item</button></td>`;
@@ -329,12 +340,16 @@ function renderSplitTable() {
     if (hasItems && !collapsed) {
       t.items.forEach((it, ii) => {
         const iRow = document.createElement("tr");
-        let cell = `<td class="indent-cell"><input type="text" value="${it.item || ""}" data-action="editItem" data-ti="${ti}" data-ii="${ii}" data-field="item"></td>`;
-        cell += `<td><div class="dollar-field"><span class="prefix">$</span><input type="text" value="${it.cost.toFixed(2)}" data-action="editItem" data-ti="${ti}" data-ii="${ii}" data-field="cost"></div></td>`;
+        const itemNameId = `item-name-${ti}-${ii}`;
+        let cell = `<td class="indent-cell"><input id="${itemNameId}" type="text" value="${it.item || ""}" data-action="editItem" data-ti="${ti}" data-ii="${ii}" data-field="item" aria-label="Item ${ii + 1} name for ${tName}"></td>`;
+        const itemCostId = `item-cost-${ti}-${ii}`;
+        cell += `<td><div class="dollar-field"><span class="prefix">$</span><input id="${itemCostId}" type="text" value="${it.cost.toFixed(2)}" data-action="editItem" data-ti="${ti}" data-ii="${ii}" data-field="cost" aria-label="Item ${ii + 1} cost for ${tName}"></div></td>`;
         people.forEach((p, pi) => {
           const raw = it.splits[pi];
           const val2 = raw ? String(raw) : "";
-          cell += `<td><input type="text" value="${val2}" data-action="editItemSplit" data-ti="${ti}" data-ii="${ii}" data-pi="${pi}"></td>`;
+          const splitId = `item-split-${ti}-${ii}-${pi}`;
+          const aria = `Split for ${p} in item ${ii + 1} of ${tName}`;
+          cell += `<td><input id="${splitId}" type="text" value="${val2}" data-action="editItemSplit" data-ti="${ti}" data-ii="${ii}" data-pi="${pi}" aria-label="${aria}"></td>`;
         });
         cell += `<td><span class="delete-btn" data-action="deleteItem" data-ti="${ti}" data-ii="${ii}">❌</span></td>`;
         iRow.innerHTML = cell;
