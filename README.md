@@ -3,6 +3,12 @@
 A minimal front-end application for splitting costs between people. The state of
 the calculator can now be shared via URL parameters.
 
+## Responsive Design
+
+The interface uses relative units and viewport-based font sizing so it remains
+readable on devices from mobile phones to large desktop monitors. Tables and
+form controls adapt at narrow widths to keep the layout touch-friendly.
+
 ## Itemized Transactions
 
 Transactions may include optional item rows to handle receipts where each item
