@@ -1,4 +1,10 @@
-import { setAfterChange, setPool } from "./state.js";
+import {
+  setAfterChange,
+  setPool,
+  pool,
+  people,
+  transactions,
+} from "./state.js";
 import { calculateSummary, addPerson } from "./render.js";
 import {
   updateCurrentStateJson,
@@ -7,6 +13,9 @@ import {
   loadStateFromJson,
   loadStateFromJsonFile,
   downloadJson,
+  savePoolToLocalStorage,
+  loadPoolFromLocalStorage,
+  renderSavedPoolsPicker,
 } from "./share.js";
 
 setAfterChange(() => {
@@ -17,6 +26,7 @@ setAfterChange(() => {
 
 // initial load
 loadStateFromUrl();
+renderSavedPoolsPicker();
 
 // UI bindings
 document
@@ -39,6 +49,23 @@ document.getElementById("state-json-file").addEventListener("change", (e) => {
     loadStateFromJsonFile(e.target.files[0]);
   }
 });
+
+document.getElementById("save-local").addEventListener("click", () => {
+  if (!pool) {
+    alert("Enter a pool name before saving");
+    return;
+  }
+  savePoolToLocalStorage(pool, { people, transactions });
+  renderSavedPoolsPicker();
+});
+
+document
+  .getElementById("saved-pools-picker")
+  .addEventListener("change", (e) => {
+    if (e.target.value) {
+      loadPoolFromLocalStorage(e.target.value);
+    }
+  });
 
 export * from "./state.js";
 export * from "./render.js";

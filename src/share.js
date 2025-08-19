@@ -22,6 +22,8 @@ if (!lz) {
   lz = mod.default;
 }
 
+const LOCAL_STORAGE_KEY = "costSplitPools";
+
 // ---- SAVE/LOAD STATE ----
 // Validate the structure and types of the loaded state
 /**
@@ -210,6 +212,88 @@ function loadStateFromUrl() {
   }
 }
 
+// ---- LOCAL STORAGE ----
+
+/**
+ * Save a pool's people and transactions to local storage.
+ *
+ * @param {string} name - Name of the pool.
+ * @param {{people: string[], transactions: object[]}} data - Pool data.
+ */
+function savePoolToLocalStorage(name, { people: p, transactions: t }) {
+  if (typeof localStorage === "undefined") return;
+  try {
+    const raw = localStorage.getItem(LOCAL_STORAGE_KEY);
+    const pools = raw ? JSON.parse(raw) : {};
+    pools[name] = { people: p, transactions: t };
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(pools));
+  } catch (e) {
+    // Fail silently; local storage may be unavailable or full.
+  }
+}
+
+/**
+ * Load a pool from local storage and apply it to the current state.
+ *
+ * @param {string} name - Name of the stored pool.
+ * @returns {object|undefined} Loaded state if successful.
+ */
+function loadPoolFromLocalStorage(name) {
+  if (typeof localStorage === "undefined") return undefined;
+  try {
+    const raw = localStorage.getItem(LOCAL_STORAGE_KEY);
+    if (!raw) return undefined;
+    const pools = JSON.parse(raw);
+    if (!pools || typeof pools !== "object" || !pools[name]) return undefined;
+    const state = { pool: name, ...pools[name] };
+    applyLoadedState(state);
+    return state;
+  } catch (e) {
+    return undefined;
+  }
+}
+
+/**
+ * List the names of pools saved in local storage.
+ *
+ * @returns {string[]} Array of pool names.
+ */
+function listSavedPools() {
+  if (typeof localStorage === "undefined") return [];
+  try {
+    const raw = localStorage.getItem(LOCAL_STORAGE_KEY);
+    if (!raw) return [];
+    const pools = JSON.parse(raw);
+    return pools && typeof pools === "object" ? Object.keys(pools) : [];
+  } catch (e) {
+    return [];
+  }
+}
+
+/**
+ * Populate the saved pools picker with options from local storage.
+ */
+function renderSavedPoolsPicker() {
+  const select = document.getElementById("saved-pools-picker");
+  if (!select) return;
+  const current = select.value;
+  select.innerHTML = "";
+  const placeholder = document.createElement("option");
+  placeholder.value = "";
+  placeholder.textContent = "Load saved pool";
+  placeholder.disabled = true;
+  const names = listSavedPools();
+  placeholder.selected = !names.includes(current);
+  select.appendChild(placeholder);
+  names.forEach((name) => {
+    const option = document.createElement("option");
+    option.value = name;
+    option.textContent = name;
+    if (name === current) option.selected = true;
+    select.appendChild(option);
+  });
+}
+
 /**
  * Trigger a download of the current state as a JSON file.
  */
@@ -233,6 +317,10 @@ export {
   loadStateFromJson,
   loadStateFromJsonFile,
   loadStateFromUrl,
+  savePoolToLocalStorage,
+  loadPoolFromLocalStorage,
+  listSavedPools,
+  renderSavedPoolsPicker,
   downloadJson,
   validateState,
   applyLoadedState,
