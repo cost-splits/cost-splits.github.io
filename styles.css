@@ -162,6 +162,10 @@ input[data-action="editItemSplit"] {
     align-items: stretch;
   }
 
+  body {
+    padding: 0.5rem;
+  }
+
   button {
     padding: 0.25rem 0.5rem;
   }
@@ -170,21 +174,5 @@ input[data-action="editItemSplit"] {
   th,
   td {
     padding: 0.25rem;
-  }
-
-  .table-container tr {
-    display: block;
-    margin-bottom: 0.625rem;
-  }
-
-  .table-container th,
-  .table-container td {
-    display: block;
-    width: 100%;
-    text-align: right;
-  }
-
-  .table-container td:first-child {
-    text-align: left;
   }
 }

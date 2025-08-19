@@ -6,8 +6,9 @@ the calculator can now be shared via URL parameters.
 ## Responsive Design
 
 The interface uses relative units and viewport-based font sizing so it remains
-readable on devices from mobile phones to large desktop monitors. Tables and
-form controls adapt at narrow widths to keep the layout touch-friendly.
+readable on devices from mobile phones to large desktop monitors. Tables stay
+horizontally scrollable instead of collapsing, and form controls stack at narrow
+widths to keep the layout touch-friendly.
 
 ## Itemized Transactions
 
