@@ -8,6 +8,7 @@ import {
   isValidNumber,
   computeSummary,
   computeSettlements,
+  pool,
 } from "./state.js";
 import {
   loadPoolFromLocalStorage,
@@ -64,7 +65,7 @@ function clearError(el) {
 // ---- SAVED POOLS ----
 
 /**
- * Render a table of saved pools with load and delete actions.
+ * Render a table of saved pools with load/delete actions and active highlight.
  *
  * @returns {void}
  */
@@ -121,7 +122,13 @@ function renderSavedPoolsTable() {
     actionsCell.appendChild(deleteBtn);
     row.appendChild(actionsCell);
 
-    row.addEventListener("click", () => loadPoolFromLocalStorage(name));
+    if (name === pool) {
+      row.classList.add("active-pool");
+    }
+    row.addEventListener("click", () => {
+      loadPoolFromLocalStorage(name);
+      renderSavedPoolsTable();
+    });
     tbody.appendChild(row);
   });
 

@@ -7,6 +7,8 @@ import {
   resetState,
   people,
   transactions,
+  pool,
+  setPool,
   setAfterChange,
 } from "../src/state.js";
 import {
@@ -27,6 +29,7 @@ import {
   savePoolToLocalStorage,
   loadPoolFromLocalStorage,
   listSavedPools,
+  startNewPool,
   downloadJson,
 } from "../src/share.js";
 import lz from "lz-string";
@@ -430,6 +433,18 @@ describe("local storage helpers", () => {
     localStorage.clear();
   });
 
+  test("startNewPool resets state and clears pool name", () => {
+    people.push("Old");
+    transactions.push({ payer: 0, cost: 1, splits: [1] });
+    setPool("existing");
+    document.getElementById("pool-name").value = "existing";
+    startNewPool();
+    expect(people).toEqual([]);
+    expect(transactions).toEqual([]);
+    expect(pool).toBe("");
+    expect(document.getElementById("pool-name").value).toBe("");
+  });
+
   test("save and load pool round trip", () => {
     people.push("Alice");
     transactions.push({ payer: 0, cost: 10, splits: [1] });
@@ -446,7 +461,7 @@ describe("local storage helpers", () => {
     expect(listSavedPools().sort()).toEqual(["a", "b"]);
   });
 
-  test("renderSavedPoolsTable populates DOM, loads and deletes pool", () => {
+  test("renderSavedPoolsTable populates DOM, highlights and deletes pool", () => {
     people.push("Ann");
     transactions.push({ payer: 0, cost: 5, splits: [1] });
     savePoolToLocalStorage("picnic", { people, transactions });
@@ -457,8 +472,11 @@ describe("local storage helpers", () => {
     row.click();
     expect(people).toEqual(["Ann"]);
     expect(transactions).toEqual([{ payer: 0, cost: 5, splits: [1] }]);
-    renderSavedPoolsTable();
-    const btn = document.querySelector("#saved-pools-table tbody tr button");
+    const active = document.querySelector(
+      "#saved-pools-table tbody tr.active-pool",
+    );
+    expect(active).not.toBeNull();
+    const btn = active.querySelector("button");
     btn.click();
     expect(listSavedPools()).toEqual([]);
   });

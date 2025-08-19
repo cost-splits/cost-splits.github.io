@@ -13,7 +13,8 @@ groups. Try the live demo at
 - Shareable URLs encoding the current calculator state
 - Optional session pool name to label each set of transactions
 - Save and load named pools using browser local storage with a table of saved
-  pools for quick loading or deletion
+  pools for quick loading or deletion, highlighting the active pool and offering
+  a quick **New Pool** reset
 
 ## Getting Started
 
@@ -31,9 +32,9 @@ browser.
 ## Usage
 
 Before adding participants, optionally enter a name for your pool of
-transactions using the field beneath the page title. Use the adjacent **Save
-Pool** button to store the pool locally and the table below to reload or delete
-previously saved pools.
+transactions using the field beneath the page title. Use the **New Pool** button
+to start over or the **Save Pool** button to store the pool locally. The table
+below highlights the current pool and lets you reload or delete saved pools.
 
 1. Add participants and transactions.
 2. Use the ▶/▼ controls to itemize a transaction when needed.

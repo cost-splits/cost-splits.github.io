@@ -291,6 +291,18 @@ function deletePoolFromLocalStorage(name) {
 }
 
 /**
+ * Start a new, empty pool and refresh the UI.
+ *
+ * Resets people, transactions and pool name using the existing state
+ * application logic.
+ *
+ * @returns {void}
+ */
+function startNewPool() {
+  applyLoadedState({ pool: "", people: [], transactions: [] });
+}
+
+/**
  * Trigger a download of the current state as a JSON file.
  */
 function downloadJson() {
@@ -317,6 +329,7 @@ export {
   loadPoolFromLocalStorage,
   listSavedPools,
   deletePoolFromLocalStorage,
+  startNewPool,
   downloadJson,
   validateState,
   applyLoadedState,
