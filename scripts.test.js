@@ -259,6 +259,14 @@ describe("renamePerson", () => {
     expect(inputs[1].value).toBe("Charlie");
   });
 
+  test("accepts unchanged name without error", () => {
+    const result = renamePerson(1, "Bob");
+    expect(result).toBe(true);
+    expect(people[1]).toBe("Bob");
+    const inputs = document.querySelectorAll("#people-list input");
+    expect(inputs[1].value).toBe("Bob");
+  });
+
   test("prevents duplicate names", () => {
     const result = renamePerson(1, "Alice");
     expect(result).toBe(false);

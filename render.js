@@ -91,6 +91,10 @@ function deletePerson(index) {
  */
 function renamePerson(index, newName) {
   const name = newName.trim();
+  const oldName = people[index];
+  if (name === oldName) {
+    return true;
+  }
   if (!name || people.includes(name)) {
     return false;
   }
