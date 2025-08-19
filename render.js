@@ -7,6 +7,7 @@ import {
   isValidDollar,
   isValidNumber,
   computeSummary,
+  computeSettlements,
 } from "./state.js";
 
 // ---- PEOPLE ----
@@ -698,6 +699,7 @@ function calculateSummary() {
   const summaryEl = document.getElementById("summary");
   if (!summaryEl) return;
   const { paid, owes, nets } = computeSummary(people, transactions);
+  const settlements = computeSettlements(people, transactions);
   const maxAbs = Math.max(...nets.map((n) => Math.abs(n)), 1);
 
   let html =
@@ -732,6 +734,15 @@ function calculateSummary() {
         <td><b>$${totalOwes.toFixed(2)}</b></td>
         <td><b>$${totalNet.toFixed(2)}</b></td></tr>`;
   html += "</table>";
+  if (settlements.length > 0) {
+    html += "<h3>Suggested Settlements</h3><ul>";
+    settlements.forEach((s) => {
+      html += `<li>${people[s.from]} pays ${people[s.to]} $${s.amount.toFixed(
+        2,
+      )}</li>`;
+    });
+    html += "</ul>";
+  }
 
   summaryEl.innerHTML = html;
 }

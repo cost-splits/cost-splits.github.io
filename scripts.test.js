@@ -3,6 +3,7 @@
  */
 import {
   computeSummary,
+  computeSettlements,
   resetState,
   people,
   transactions,
@@ -65,6 +66,57 @@ describe("computeSummary", () => {
     expect(nets[0]).toBeCloseTo(20.9524, 4);
     expect(nets[1]).toBeCloseTo(-13.3333, 4);
     expect(nets[2]).toBeCloseTo(-7.619, 4);
+  });
+});
+
+describe("computeSettlements", () => {
+  test("suggests settlement for simple case", () => {
+    const people = ["Alice", "Bob"];
+    const transactions = [{ payer: 0, cost: 30, splits: [1, 1] }];
+    const settlements = computeSettlements(people, transactions);
+    expect(settlements).toEqual([{ from: 1, to: 0, amount: 15 }]);
+  });
+
+  test("handles multiple creditors and debtors", () => {
+    const people = ["A", "B", "C"];
+    const transactions = [
+      { payer: 0, cost: 20, splits: [1, 0, 1] },
+      { payer: 1, cost: 40, splits: [0, 1, 1] },
+    ];
+    const settlements = computeSettlements(people, transactions);
+    expect(settlements).toEqual([
+      { from: 2, to: 1, amount: 20 },
+      { from: 2, to: 0, amount: 10 },
+    ]);
+  });
+
+  test("handles uneven fractional amounts", () => {
+    const people = ["A", "B", "C"];
+    const transactions = [
+      { payer: 0, cost: 25, splits: [2, 1, 1] },
+      { payer: 1, cost: 35, splits: [3, 3, 2] },
+    ];
+    const settlements = computeSettlements(people, transactions);
+    expect(settlements).toEqual([
+      { from: 2, to: 1, amount: 15 },
+      { from: 0, to: 1, amount: 0.625 },
+    ]);
+  });
+});
+
+describe("calculateSummary settlements", () => {
+  beforeEach(() => {
+    document.body.innerHTML = `<div id="summary"></div>`;
+    resetState();
+  });
+
+  test("renders settlement suggestions", () => {
+    people.push("Alice", "Bob");
+    transactions.push({ payer: 0, cost: 30, splits: [1, 1] });
+    calculateSummary();
+    expect(document.getElementById("summary").innerHTML).toContain(
+      "Bob pays Alice $15.00",
+    );
   });
 });
 

@@ -46,6 +46,48 @@ export function computeSummary(people, transactions) {
   return { paid, owes, nets };
 }
 
+/**
+ * Convert net balances into a minimal list of settlements.
+ *
+ * People with positive net values are owed money and those with negative net
+ * values owe money. The resulting list describes how debts can be settled with
+ * the fewest direct payments.
+ *
+ * @param {string[]} people - List of participant names.
+ * @param {Array<{payer:number,cost:number,splits:number[],items?:Array<{item?:string,cost:number,splits:number[]}>}>} transactions -
+ *   Transactions describing who paid and how the cost is split.
+ * @returns {Array<{from:number,to:number,amount:number}>} Settlement transfer
+ *   suggestions.
+ */
+export function computeSettlements(people, transactions) {
+  const { nets } = computeSummary(people, transactions);
+  /** @type {Array<{index:number,amount:number}>} */
+  const creditors = [];
+  /** @type {Array<{index:number,amount:number}>} */
+  const debtors = [];
+  nets.forEach((n, i) => {
+    if (n > 0) creditors.push({ index: i, amount: n });
+    else if (n < 0) debtors.push({ index: i, amount: -n });
+  });
+  creditors.sort((a, b) => b.amount - a.amount);
+  debtors.sort((a, b) => b.amount - a.amount);
+
+  const settlements = [];
+  let ci = 0;
+  let di = 0;
+  while (ci < creditors.length && di < debtors.length) {
+    const credit = creditors[ci];
+    const debt = debtors[di];
+    const amt = Math.min(credit.amount, debt.amount);
+    settlements.push({ from: debt.index, to: credit.index, amount: amt });
+    credit.amount -= amt;
+    debt.amount -= amt;
+    if (credit.amount <= 1e-8) ci++;
+    if (debt.amount <= 1e-8) di++;
+  }
+  return settlements;
+}
+
 /** @type {string[]} */
 export const people = [];
 /**
