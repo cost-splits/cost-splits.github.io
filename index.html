@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Cost Split Calculator</title>
     <link rel="stylesheet" href="styles.css" />
-    <link rel="icon" href="assets/icon-mini.png" type="image/png">
+    <link rel="icon" href="assets/icon-mini.png" type="image/png" />
   </head>
 
   <body>
@@ -13,7 +13,7 @@
 
     <h2>1. People</h2>
     <div id="people-section">
-      <label for="person-name">Person Name</label>
+      <label for="person-name" class="hidden">Person Name</label>
       <input type="text" id="person-name" placeholder="Name" />
       <button id="save-people" type="button">Add Person</button>
       <ul id="people-list"></ul>
@@ -45,7 +45,7 @@
       />
       <button id="download-json" type="button">Download JSON File</button>
     </div>
-    <label for="state-json-input">State JSON</label>
+    <label for="state-json-input" class="hidden">State JSON</label>
     <textarea
       id="state-json-input"
       rows="8"
