@@ -11,8 +11,9 @@
 
     <h2>1. People</h2>
     <div id="people-section">
+      <label for="person-name">Person Name</label>
       <input type="text" id="person-name" placeholder="Name" />
-      <button id="save-people">Add Person</button>
+      <button id="save-people" type="button">Add Person</button>
       <ul id="people-list"></ul>
     </div>
 
@@ -32,6 +33,7 @@
 
     <h2>5. Save/Load State</h2>
     <div class="flex-row">
+      <label for="state-json-display">Current state JSON</label>
       <input
         id="state-json-display"
         type="text"
@@ -39,8 +41,9 @@
         class="readonly-field"
         placeholder="Current state JSON"
       />
-      <button id="download-json">Download JSON File</button>
+      <button id="download-json" type="button">Download JSON File</button>
     </div>
+    <label for="state-json-input">State JSON</label>
     <textarea
       id="state-json-input"
       rows="8"
@@ -48,8 +51,9 @@
       placeholder="State JSON"
     ></textarea>
     <br />
-    <button id="load-json">Load from JSON</button>
-    <button id="load-json-file">Load from JSON File</button>
+    <button id="load-json" type="button">Load from JSON</button>
+    <button id="load-json-file" type="button">Load from JSON File</button>
+    <label for="state-json-file" class="hidden">State JSON File</label>
     <input
       type="file"
       id="state-json-file"
@@ -59,6 +63,7 @@
 
     <h2>6. Share</h2>
     <div class="flex-row">
+      <label for="share-url-display">Shareable URL</label>
       <input
         id="share-url-display"
         type="text"
