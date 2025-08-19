@@ -1,29 +1,44 @@
 # Cost Split Calculator
 
-A minimal front-end application for splitting costs between people. The state of
-the calculator can now be shared via URL parameters.
+Cost Split Calculator is a minimal front-end tool for dividing expenses among
+groups. Try the live demo at
+[cost-splits.github.io](https://cost-splits.github.io).
 
-## Responsive Design
+![Cost Split Calculator screenshot](assets/icon-banner.png)
 
-The interface uses relative units and viewport-based font sizing so it remains
-readable on devices from mobile phones to large desktop monitors. Tables stay
-horizontally scrollable instead of collapsing, and form controls stack at narrow
-widths to keep the layout touch-friendly.
+## Features
 
-## Itemized Transactions
+- Responsive design that works on mobile and desktop
+- Itemized transactions with proportional tax and tip
+- Shareable URLs encoding the current calculator state
 
-Transactions may include optional item rows to handle receipts where each item
-is split differently. Enter the total cost as usual, then itemize the
-transaction to add items with their own split weights. The calculator scales
-each item's cost so that the sum matches the transaction's total, distributing
-any tax or tip proportionally before applying the item-level splits. Item rows
-can be expanded or collapsed with the ▶/▼ controls, and the split table
-separates name and cost columns for easier editing.
+## Getting Started
 
-## Sharing
+Clone the repository and install development dependencies.
 
-The current state is reflected in a read-only field in the Share section. Copy
-this link to share with others. The `state` parameter contains a
-[LZ-String](https://pieroxy.net/blog/pages/lz-string/index.html) compressed JSON
-representation of the calculator's state. When visiting a link containing this
-parameter, the page will automatically decompress and load that state.
+```bash
+git clone https://github.com/cost-splits/cost-splits.github.io.git
+cd cost-splits.github.io
+npm install
+```
+
+Serve `index.html` with any static server or open the file directly in a
+browser.
+
+## Usage
+
+1. Add participants and transactions.
+2. Use the ▶/▼ controls to itemize a transaction when needed.
+3. Copy the link in the **Share** section to send your split to others.
+
+## Testing
+
+| Command          | Description                |
+| ---------------- | -------------------------- |
+| `npm run lint`   | Lint the codebase          |
+| `npm run format` | Format files with Prettier |
+| `npm test`       | Run unit tests             |
+
+## License
+
+This project is licensed under the [Apache License 2.0](LICENSE).
