@@ -5,8 +5,8 @@ import {
   createTransactionHeaderRow,
   createTransactionRow,
   createAddTransactionRow,
-} from "./render.js";
-import { resetState, people, transactions } from "./state.js";
+} from "../src/render.js";
+import { resetState, people, transactions } from "../src/state.js";
 
 describe("transaction table helpers", () => {
   beforeEach(() => {

@@ -8,7 +8,7 @@ import {
   people,
   transactions,
   setAfterChange,
-} from "./state.js";
+} from "../src/state.js";
 import {
   addPerson,
   renamePerson,
@@ -16,7 +16,7 @@ import {
   renderSplitTable,
   editSplit,
   calculateSummary,
-} from "./render.js";
+} from "../src/render.js";
 import {
   updateCurrentStateJson,
   updateShareableUrl,
@@ -24,7 +24,7 @@ import {
   loadStateFromJsonFile,
   loadStateFromUrl,
   downloadJson,
-} from "./share.js";
+} from "../src/share.js";
 import lz from "lz-string";
 import { jest } from "@jest/globals";
 
