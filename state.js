@@ -64,9 +64,21 @@ export const collapsedSplit = new Set();
 export const collapsedDetails = new Set();
 
 let afterChangeHandler = () => {};
+/**
+ * Register a callback to run after state changes occur.
+ *
+ * @param {() => void} fn - Function to invoke whenever state is updated.
+ * @returns {void}
+ */
 export function setAfterChange(fn) {
   afterChangeHandler = fn;
 }
+
+/**
+ * Invoke the registered after-change callback.
+ *
+ * @returns {void}
+ */
 export function afterChange() {
   afterChangeHandler();
 }
@@ -95,6 +107,14 @@ export function isValidNumber(value, allowEmpty = false) {
   return /^\d+(\.\d+)?$/.test(value);
 }
 
+/**
+ * Reset all state containers and notify listeners of the change.
+ *
+ * Clears people, transactions and collapsed tracking sets, then triggers the
+ * after-change callback.
+ *
+ * @returns {void}
+ */
 export function resetState() {
   people.length = 0;
   transactions.length = 0;
