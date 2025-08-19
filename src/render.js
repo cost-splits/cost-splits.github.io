@@ -9,6 +9,11 @@ import {
   computeSummary,
   computeSettlements,
 } from "./state.js";
+import {
+  loadPoolFromLocalStorage,
+  deletePoolFromLocalStorage,
+  LOCAL_STORAGE_KEY,
+} from "./share.js";
 
 const COST_FORMAT_MSG =
   "Cost must be digits with optional decimal point and up to two decimals (e.g., 12 or 3.50).";
@@ -54,6 +59,73 @@ function clearError(el) {
   if (error && error.classList.contains("error")) {
     error.remove();
   }
+}
+
+// ---- SAVED POOLS ----
+
+/**
+ * Render a table of saved pools with load and delete actions.
+ *
+ * @returns {void}
+ */
+function renderSavedPoolsTable() {
+  const table = document.getElementById("saved-pools-table");
+  if (!table || typeof localStorage === "undefined") return;
+  table.innerHTML = "";
+
+  const thead = document.createElement("thead");
+  const headerRow = document.createElement("tr");
+  ["Pool", "People", "Transactions", "Actions"].forEach((h) => {
+    const th = document.createElement("th");
+    th.textContent = h;
+    headerRow.appendChild(th);
+  });
+  thead.appendChild(headerRow);
+  table.appendChild(thead);
+
+  const tbody = document.createElement("tbody");
+  let pools;
+  try {
+    const raw = localStorage.getItem(LOCAL_STORAGE_KEY);
+    pools = raw ? JSON.parse(raw) : {};
+  } catch (e) {
+    pools = {};
+  }
+
+  Object.entries(pools).forEach(([name, data]) => {
+    const row = document.createElement("tr");
+    const nameCell = document.createElement("td");
+    nameCell.textContent = name;
+    row.appendChild(nameCell);
+
+    const peopleCell = document.createElement("td");
+    peopleCell.textContent = Array.isArray(data.people)
+      ? data.people.length
+      : 0;
+    row.appendChild(peopleCell);
+
+    const txCell = document.createElement("td");
+    txCell.textContent = Array.isArray(data.transactions)
+      ? data.transactions.length
+      : 0;
+    row.appendChild(txCell);
+
+    const actionsCell = document.createElement("td");
+    const deleteBtn = document.createElement("button");
+    deleteBtn.textContent = "Delete";
+    deleteBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      deletePoolFromLocalStorage(name);
+      renderSavedPoolsTable();
+    });
+    actionsCell.appendChild(deleteBtn);
+    row.appendChild(actionsCell);
+
+    row.addEventListener("click", () => loadPoolFromLocalStorage(name));
+    tbody.appendChild(row);
+  });
+
+  table.appendChild(tbody);
 }
 
 // ---- PEOPLE ----
@@ -850,4 +922,5 @@ export {
   toggleDetailItems,
   renderSplitDetails,
   calculateSummary,
+  renderSavedPoolsTable,
 };

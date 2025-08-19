@@ -16,6 +16,7 @@ import {
   renderSplitTable,
   editSplit,
   calculateSummary,
+  renderSavedPoolsTable,
 } from "../src/render.js";
 import {
   updateCurrentStateJson,
@@ -26,7 +27,6 @@ import {
   savePoolToLocalStorage,
   loadPoolFromLocalStorage,
   listSavedPools,
-  renderSavedPoolsTable,
   downloadJson,
 } from "../src/share.js";
 import lz from "lz-string";

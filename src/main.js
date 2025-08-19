@@ -5,7 +5,11 @@ import {
   people,
   transactions,
 } from "./state.js";
-import { calculateSummary, addPerson } from "./render.js";
+import {
+  calculateSummary,
+  addPerson,
+  renderSavedPoolsTable,
+} from "./render.js";
 import {
   updateCurrentStateJson,
   updateShareableUrl,
@@ -14,7 +18,6 @@ import {
   loadStateFromJsonFile,
   downloadJson,
   savePoolToLocalStorage,
-  renderSavedPoolsTable,
 } from "./share.js";
 
 setAfterChange(() => {
