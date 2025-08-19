@@ -39,11 +39,6 @@ browser.
 | `npm run format` | Format files with Prettier |
 | `npm test`       | Run unit tests             |
 
-## Contributing
-
-Contributions are welcome! Please see [AGENTS.md](AGENTS.md) for detailed
-guidelines.
-
 ## License
 
-This project is licensed under the [ISC License](LICENSE).
+This project is licensed under the [Apache License 2.0](LICENSE).
