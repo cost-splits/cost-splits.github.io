@@ -51,7 +51,8 @@ h2 {
 }
 
 input,
-select {
+select,
+textarea {
   margin: calc(var(--spacing) / 4);
   padding: calc(var(--spacing) / 2);
   border: 1px solid var(--border-color);
