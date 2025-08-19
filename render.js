@@ -10,6 +10,52 @@ import {
   computeSettlements,
 } from "./state.js";
 
+const COST_FORMAT_MSG =
+  "Cost must be digits with optional decimal point and up to two decimals (e.g., 12 or 3.50).";
+const NUMBER_FORMAT_MSG =
+  "Number must be digits with optional decimals (e.g., 3 or 0.75).";
+
+/**
+ * Display an error indicator next to an invalid field.
+ *
+ * @param {HTMLElement} el - Element to mark as invalid.
+ * @param {string} message - Message describing the error.
+ */
+function showError(el, message) {
+  el.classList.add("invalid-cell");
+  let error = el.nextElementSibling;
+  if (!error || !error.classList.contains("error")) {
+    error = document.createElement("span");
+    error.className = "error";
+    error.textContent = "❗";
+    el.insertAdjacentElement("afterend", error);
+  }
+  error.setAttribute("data-error", message);
+  error.setAttribute("aria-label", message);
+  error.setAttribute("role", "alert");
+  error.setAttribute("tabindex", "0");
+  el.addEventListener(
+    "input",
+    () => {
+      clearError(el);
+    },
+    { once: true },
+  );
+}
+
+/**
+ * Remove error indicator from a field if present.
+ *
+ * @param {HTMLElement} el - Element to clear of errors.
+ */
+function clearError(el) {
+  el.classList.remove("invalid-cell");
+  const error = el.nextElementSibling;
+  if (error && error.classList.contains("error")) {
+    error.remove();
+  }
+}
+
 // ---- PEOPLE ----
 
 /**
@@ -19,10 +65,10 @@ function addPerson() {
   const input = document.getElementById("person-name");
   const name = input.value.trim();
   if (!name || people.includes(name)) {
-    input.classList.add("invalid-cell");
+    showError(input, "Name must be unique and non-empty.");
     return;
   }
-  input.classList.remove("invalid-cell");
+  clearError(input);
   people.push(name);
   transactions.forEach((t) => {
     t.splits.push(0);
@@ -117,10 +163,12 @@ function renderPeople() {
     const li = document.createElement("li");
     const input = document.createElement("input");
     input.value = p;
-    input.oninput = () => input.classList.remove("invalid-cell");
+    input.oninput = () => clearError(input);
     input.onblur = () => {
       if (!renamePerson(i, input.value)) {
-        input.classList.add("invalid-cell");
+        showError(input, "Name must be unique and non-empty.");
+      } else {
+        clearError(input);
       }
     };
     input.onkeydown = (e) => {
@@ -250,6 +298,7 @@ function renderTransactionTable() {
   addCostInput.id = "new-t-cost";
   addCostInput.placeholder = "Cost";
   addCostInput.setAttribute("aria-label", "New transaction cost");
+  addCostInput.oninput = () => clearError(addCostInput);
   addCostWrapper.appendChild(addPrefix);
   addCostWrapper.appendChild(addCostInput);
   addCostCell.appendChild(addCostWrapper);
@@ -274,10 +323,10 @@ function addTransaction() {
   const payer = parseInt(document.getElementById("new-t-payer").value);
   const costVal = costInput.value.trim();
   if (!isValidDollar(costVal)) {
-    costInput.classList.add("invalid-cell");
+    showError(costInput, COST_FORMAT_MSG);
     return;
   }
-  costInput.classList.remove("invalid-cell");
+  clearError(costInput);
   const name = nameInput.value.trim();
   const cost = parseFloat(costVal);
   transactions.push({
@@ -304,10 +353,10 @@ function addTransaction() {
 function editTransaction(i, field, value, el) {
   if (field === "cost") {
     if (!isValidDollar(value)) {
-      el.classList.add("invalid-cell");
+      showError(el, COST_FORMAT_MSG);
       return;
     }
-    el.classList.remove("invalid-cell");
+    clearError(el);
     transactions[i].cost = parseFloat(value);
     el.value = transactions[i].cost.toFixed(2);
   } else if (field === "payer") {
@@ -463,10 +512,10 @@ function renderSplitTable() {
  */
 function editSplit(ti, pi, value, el) {
   if (!isValidNumber(value, true)) {
-    el.classList.add("invalid-cell");
+    showError(el, NUMBER_FORMAT_MSG);
     return;
   }
-  el.classList.remove("invalid-cell");
+  clearError(el);
   transactions[ti].splits[pi] = value ? parseFloat(value) : 0;
   el.value = value;
   afterChange();
@@ -543,10 +592,10 @@ function editItem(ti, ii, field, value, el) {
   const item = transactions[ti].items[ii];
   if (field === "cost") {
     if (!isValidDollar(value)) {
-      el.classList.add("invalid-cell");
+      showError(el, COST_FORMAT_MSG);
       return;
     }
-    el.classList.remove("invalid-cell");
+    clearError(el);
     item.cost = parseFloat(value);
     el.value = item.cost.toFixed(2);
   } else if (field === "item") {
@@ -567,10 +616,10 @@ function editItem(ti, ii, field, value, el) {
  */
 function editItemSplit(ti, ii, pi, value, el) {
   if (!isValidNumber(value, true)) {
-    el.classList.add("invalid-cell");
+    showError(el, NUMBER_FORMAT_MSG);
     return;
   }
-  el.classList.remove("invalid-cell");
+  clearError(el);
   transactions[ti].items[ii].splits[pi] = value ? parseFloat(value) : 0;
   afterChange();
   renderSplitDetails();
