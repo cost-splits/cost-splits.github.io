@@ -83,14 +83,51 @@ function deletePerson(index) {
 }
 
 /**
- * Render the list of people with delete controls.
+ * Rename an existing person.
+ *
+ * @param {number} index - Index of the person to rename.
+ * @param {string} newName - Proposed new name.
+ * @returns {boolean} True if rename succeeds.
+ */
+function renamePerson(index, newName) {
+  const name = newName.trim();
+  const oldName = people[index];
+  if (name === oldName) {
+    return true;
+  }
+  if (!name || people.includes(name)) {
+    return false;
+  }
+  people[index] = name;
+  renderPeople();
+  renderTransactionTable();
+  renderSplitTable();
+  afterChange();
+  return true;
+}
+
+/**
+ * Render the list of people with editable names and delete controls.
  */
 function renderPeople() {
   const list = document.getElementById("people-list");
   list.innerHTML = "";
   people.forEach((p, i) => {
     const li = document.createElement("li");
-    li.textContent = p;
+    const input = document.createElement("input");
+    input.value = p;
+    input.oninput = () => input.classList.remove("invalid-cell");
+    input.onblur = () => {
+      if (!renamePerson(i, input.value)) {
+        input.classList.add("invalid-cell");
+      }
+    };
+    input.onkeydown = (e) => {
+      if (e.key === "Enter") {
+        input.blur();
+      }
+    };
+    li.appendChild(input);
     const del = document.createElement("span");
     del.textContent = "❌";
     del.className = "delete-btn";
@@ -687,6 +724,7 @@ function calculateSummary() {
 export {
   addPerson,
   deletePerson,
+  renamePerson,
   renderPeople,
   renderTransactionTable,
   addTransaction,
