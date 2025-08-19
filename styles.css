@@ -1,37 +1,44 @@
+html {
+  font-size: clamp(14px, 2vw, 16px);
+}
+
 body {
   font-family: Arial, sans-serif;
-  margin: 20px;
+  max-width: 60rem;
+  margin: 0 auto;
+  padding: 1.25rem;
 }
 
 h2 {
-  margin-top: 30px;
+  margin-top: 1.875rem;
 }
 
 input,
 select {
-  margin: 2px;
+  margin: 0.125rem;
 }
 
 button {
-  margin: 5px 0;
-  padding: 4px 8px;
+  margin: 0.3125rem 0;
+  padding: 0.5rem 1rem;
 }
 
 table,
 th,
 td {
-  border: 1px solid black;
+  border: 0.0625rem solid black;
   border-collapse: collapse;
-  padding: 5px;
+  padding: 0.3125rem;
 }
 
 table {
-  margin-top: 10px;
+  margin-top: 0.625rem;
+  width: 100%;
 }
 
 #transaction-table {
   table-layout: auto;
-  width: auto;
+  width: 100%;
 }
 
 th {
@@ -49,12 +56,12 @@ td:first-child {
 .delete-btn {
   cursor: pointer;
   color: red;
-  margin-left: 5px;
+  margin-left: 0.3125rem;
 }
 
 .collapse-btn {
   cursor: pointer;
-  margin-right: 5px;
+  margin-right: 0.3125rem;
   font-weight: bold;
 }
 
@@ -69,7 +76,7 @@ td:first-child {
 .error {
   color: red;
   font-weight: bold;
-  margin-left: 4px;
+  margin-left: 0.25rem;
   cursor: help;
   position: relative;
   display: inline-block;
@@ -83,8 +90,8 @@ td:first-child {
   bottom: 125%;
   background-color: #fce4e4;
   color: #a40000;
-  padding: 4px 8px;
-  border-radius: 4px;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
   white-space: nowrap;
   opacity: 0;
   pointer-events: none;
@@ -104,14 +111,25 @@ td:first-child {
 }
 
 .dollar-field .prefix {
-  margin-right: 2px;
+  margin-right: 0.125rem;
+}
+
+.dollar-field input {
+  width: 6rem;
+  max-width: 100%;
+}
+
+input[data-action="editSplit"],
+input[data-action="editItemSplit"] {
+  width: 4rem;
+  max-width: 100%;
 }
 
 .flex-row {
   display: flex;
   align-items: center;
-  gap: 5px;
-  margin: 5px 0;
+  gap: 0.3125rem;
+  margin: 0.3125rem 0;
 }
 
 .readonly-field {
@@ -126,9 +144,35 @@ td:first-child {
 }
 
 .indent-cell {
-  padding-left: 20px;
+  padding-left: 1.25rem;
 }
 
 .text-center {
   text-align: center;
+}
+
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+}
+
+@media (max-width: 600px) {
+  .flex-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  body {
+    padding: 0.5rem;
+  }
+
+  button {
+    padding: 0.25rem 0.5rem;
+  }
+
+  table,
+  th,
+  td {
+    padding: 0.25rem;
+  }
 }
