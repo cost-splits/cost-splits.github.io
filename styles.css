@@ -110,6 +110,17 @@ td:first-child {
   margin-right: 0.125rem;
 }
 
+.dollar-field input {
+  width: 6rem;
+  max-width: 100%;
+}
+
+input[data-action="editSplit"],
+input[data-action="editItemSplit"] {
+  width: 4rem;
+  max-width: 100%;
+}
+
 .flex-row {
   display: flex;
   align-items: center;
