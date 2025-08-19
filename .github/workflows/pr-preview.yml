@@ -5,21 +5,25 @@ on:
     types: [opened, reopened, synchronize, closed]
 
 jobs:
-  deploy-preview:
+  pr-preview:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      # Deploy preview when PR is open or updated
-      - name: Deploy PR Preview
-        uses: rossjrw/pr-preview-action@v1
+      # Deploy PR preview
+      - name: Deploy Preview
         if: github.event.action != 'closed'
-        with:
-          source-dir: ./ # root of your repo (adjust if your HTML lives in a subfolder)
-
-      # Remove preview when PR is closed
-      - name: Remove PR Preview
         uses: rossjrw/pr-preview-action@v1
+        with:
+          source-dir: ./ # root of your repo (adjust if files are in /site etc.)
+          preview-branch: gh-pages
+          preview-repo: cost-splits/previews
+
+      # Remove preview when PR closes
+      - name: Remove Preview
         if: github.event.action == 'closed'
+        uses: rossjrw/pr-preview-action@v1
         with:
           source-dir: ./
+          preview-branch: gh-pages
+          preview-repo: cost-splits/previews
