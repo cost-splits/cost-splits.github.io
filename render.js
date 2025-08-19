@@ -10,6 +10,11 @@ import {
   computeSettlements,
 } from "./state.js";
 
+const COST_FORMAT_MSG =
+  "Cost must be digits with optional decimal point and up to two decimals (e.g., 12 or 3.50).";
+const NUMBER_FORMAT_MSG =
+  "Number must be digits with optional decimals (e.g., 3 or 0.75).";
+
 /**
  * Display an error indicator next to an invalid field.
  *
@@ -318,7 +323,7 @@ function addTransaction() {
   const payer = parseInt(document.getElementById("new-t-payer").value);
   const costVal = costInput.value.trim();
   if (!isValidDollar(costVal)) {
-    showError(costInput, "Enter a valid cost.");
+    showError(costInput, COST_FORMAT_MSG);
     return;
   }
   clearError(costInput);
@@ -348,7 +353,7 @@ function addTransaction() {
 function editTransaction(i, field, value, el) {
   if (field === "cost") {
     if (!isValidDollar(value)) {
-      showError(el, "Enter a valid cost.");
+      showError(el, COST_FORMAT_MSG);
       return;
     }
     clearError(el);
@@ -507,7 +512,7 @@ function renderSplitTable() {
  */
 function editSplit(ti, pi, value, el) {
   if (!isValidNumber(value, true)) {
-    showError(el, "Enter a valid number.");
+    showError(el, NUMBER_FORMAT_MSG);
     return;
   }
   clearError(el);
@@ -587,7 +592,7 @@ function editItem(ti, ii, field, value, el) {
   const item = transactions[ti].items[ii];
   if (field === "cost") {
     if (!isValidDollar(value)) {
-      showError(el, "Enter a valid cost.");
+      showError(el, COST_FORMAT_MSG);
       return;
     }
     clearError(el);
@@ -611,7 +616,7 @@ function editItem(ti, ii, field, value, el) {
  */
 function editItemSplit(ti, ii, pi, value, el) {
   if (!isValidNumber(value, true)) {
-    showError(el, "Enter a valid number.");
+    showError(el, NUMBER_FORMAT_MSG);
     return;
   }
   clearError(el);
