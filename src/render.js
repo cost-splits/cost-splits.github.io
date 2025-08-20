@@ -915,7 +915,15 @@ function calculateSummary() {
   html += `<tr><td><b>Total</b></td>
         <td><b>$${totalPaid.toFixed(2)}</b></td>
         <td><b>$${totalOwes.toFixed(2)}</b></td>
-        <td><b>$${totalNet.toFixed(2)}</b></td></tr>`;
+        <td><b>${
+          (totalNet > 0
+            ? "+"
+            : totalNet < 0 || Object.is(totalNet, -0)
+              ? "−"
+              : "") +
+          "$" +
+          Math.abs(totalNet).toFixed(2)
+        }</b></td></tr>`;
   html += "</table>";
   if (settlements.length > 0) {
     html += "<h3>Suggested Settlements</h3><ul>";

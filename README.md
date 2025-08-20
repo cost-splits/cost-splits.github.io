@@ -20,6 +20,8 @@ groups. Try the live demo at
   a quick **New Pool** reset
 - Compact people list layout with clearly marked delete actions
 - Split sections show helpful messages when empty and flag unsaved pool changes
+- Summary totals prefix minus signs before dollar amounts for consistent
+  formatting
 
 ## Getting Started
 
