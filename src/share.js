@@ -89,21 +89,34 @@ function validateState(state) {
 
 /**
  * Write the current state to the display input as JSON.
+ *
+ * Clears the display if no pool data exists.
  */
 function updateCurrentStateJson() {
   const display = document.getElementById("state-json-display");
+  if (!display) return;
+  if (!pool && people.length === 0 && transactions.length === 0) {
+    display.value = "";
+    return;
+  }
   const state = { pool, people, transactions };
-  if (display) display.value = JSON.stringify(state);
+  display.value = JSON.stringify(state);
 }
 
 /**
  * Update the share URL field with a link to the current state.
- * Uses the current page URL (including file:// URLs) as the base.
- * The state JSON is compressed with LZString to shorten the URL.
+ *
+ * Clears the field if there is no state to share. Otherwise uses the
+ * current page URL (including file:// URLs) as the base and appends a
+ * compressed representation of the state using LZString.
  */
 function updateShareableUrl() {
   const display = document.getElementById("share-url-display");
   if (!display || typeof window === "undefined") return;
+  if (!pool && people.length === 0 && transactions.length === 0) {
+    display.value = "";
+    return;
+  }
   const base = window.location.href.split(/[?#]/)[0];
   const json = JSON.stringify({ pool, people, transactions });
   const compressed = lz.compressToEncodedURIComponent(json);

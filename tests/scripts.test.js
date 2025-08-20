@@ -433,16 +433,20 @@ describe("local storage helpers", () => {
     localStorage.clear();
   });
 
-  test("startNewPool resets state and clears pool name", () => {
+  test("startNewPool resets state and clears display fields", () => {
     people.push("Old");
     transactions.push({ payer: 0, cost: 1, splits: [1] });
     setPool("existing");
     document.getElementById("pool-name").value = "existing";
+    document.getElementById("state-json-display").value = "old";
+    document.getElementById("share-url-display").value = "old";
     startNewPool();
     expect(people).toEqual([]);
     expect(transactions).toEqual([]);
     expect(pool).toBe("");
     expect(document.getElementById("pool-name").value).toBe("");
+    expect(document.getElementById("state-json-display").value).toBe("");
+    expect(document.getElementById("share-url-display").value).toBe("");
   });
 
   test("save and load pool round trip", () => {

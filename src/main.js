@@ -51,6 +51,7 @@ setAfterChange(() => {
 });
 
 // initial load
+startNewPool();
 loadStateFromUrl();
 renderSavedPoolsTable();
 const theme = initTheme();
