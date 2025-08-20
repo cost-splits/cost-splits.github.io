@@ -23,22 +23,22 @@ import {
 import { initTheme, toggleTheme } from "./theme.js";
 
 /**
- * Update the theme toggle button icon and accessible label.
+ * Update the theme toggle icon and accessible label.
  *
  * @param {"light"|"dark"} theme - Current theme.
  * @returns {void}
  */
 function updateThemeToggle(theme) {
-  const btn = document.getElementById("theme-toggle");
-  if (!btn) return;
+  const icon = document.getElementById("theme-toggle");
+  if (!icon) return;
   if (theme === "dark") {
-    btn.textContent = "☀️";
-    btn.setAttribute("aria-label", "Switch to light mode");
-    btn.title = "Switch to light mode";
+    icon.textContent = "☀️";
+    icon.setAttribute("aria-label", "Switch to light mode");
+    icon.title = "Switch to light mode";
   } else {
-    btn.textContent = "🌙";
-    btn.setAttribute("aria-label", "Switch to dark mode");
-    btn.title = "Switch to dark mode";
+    icon.textContent = "🌙";
+    icon.setAttribute("aria-label", "Switch to dark mode");
+    icon.title = "Switch to dark mode";
   }
 }
 
@@ -94,12 +94,26 @@ document.getElementById("new-pool").addEventListener("click", () => {
   renderSavedPoolsTable();
 });
 
-const themeToggleBtn = document.getElementById("theme-toggle");
-if (themeToggleBtn)
-  themeToggleBtn.addEventListener("click", () => {
-    const newTheme = toggleTheme();
-    updateThemeToggle(newTheme);
+/**
+ * Toggle theme and update the icon.
+ *
+ * @returns {void}
+ */
+function onThemeToggle() {
+  const newTheme = toggleTheme();
+  updateThemeToggle(newTheme);
+}
+
+const themeToggleEl = document.getElementById("theme-toggle");
+if (themeToggleEl) {
+  themeToggleEl.addEventListener("click", onThemeToggle);
+  themeToggleEl.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      onThemeToggle();
+    }
   });
+}
 
 export * from "./state.js";
 export * from "./render.js";

@@ -197,6 +197,17 @@ input[data-action="editItemSplit"] {
   margin: calc(var(--spacing) / 2) 0;
 }
 
+#theme-toggle {
+  cursor: pointer;
+  margin-left: auto;
+  font-size: 1.5rem;
+}
+
+#theme-toggle:focus {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
 .readonly-field {
   flex: 1;
   white-space: nowrap;
