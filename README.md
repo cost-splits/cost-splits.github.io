@@ -23,6 +23,7 @@ groups. Try the live demo at
 - Split sections show helpful messages when empty and flag unsaved pool changes
 - Summary totals prefix minus signs before dollar amounts for consistent
   formatting
+- Footer with credits linking to Daniel, Codex, and the GitHub source code
 
 ## Getting Started
 

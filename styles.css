@@ -294,6 +294,18 @@ input[data-action="editItemSplit"] {
   overflow-x: auto;
 }
 
+footer {
+  margin-top: calc(var(--spacing) * 4);
+  text-align: center;
+}
+
+.github-icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  vertical-align: middle;
+  margin-left: calc(var(--spacing) / 2);
+}
+
 @media (max-width: 600px) {
   .flex-row {
     flex-direction: column;
