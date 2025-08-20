@@ -119,6 +119,7 @@ function renderSavedPoolsTable() {
       deletePoolFromLocalStorage(name);
       renderSavedPoolsTable();
     });
+    deleteBtn.classList.add("danger-btn");
     actionsCell.appendChild(deleteBtn);
     row.appendChild(actionsCell);
 
@@ -295,7 +296,8 @@ function createTransactionRow(t, i) {
   const nameCell = document.createElement("td");
   const nameInput = document.createElement("input");
   nameInput.type = "text";
-  nameInput.value = t.name || `Transaction ${i + 1}`;
+  nameInput.value = t.name || "";
+  nameInput.placeholder = `Transaction ${i + 1}`;
   nameInput.id = `transaction-name-${i}`;
   nameInput.setAttribute("aria-label", `Transaction ${i + 1} name`);
   nameInput.addEventListener("change", (e) =>
@@ -344,6 +346,7 @@ function createTransactionRow(t, i) {
   const delBtn = document.createElement("button");
   delBtn.textContent = "Delete";
   delBtn.addEventListener("click", () => deleteTransaction(i));
+  delBtn.classList.add("danger-btn");
   actionCell.appendChild(delBtn);
   row.appendChild(actionCell);
 
@@ -362,7 +365,7 @@ function createAddTransactionRow() {
   const addNameInput = document.createElement("input");
   addNameInput.type = "text";
   addNameInput.id = "new-t-name";
-  addNameInput.placeholder = "Name (optional)";
+  addNameInput.placeholder = `Transaction ${transactions.length + 1}`;
   addNameInput.setAttribute("aria-label", "New transaction name");
   addNameCell.appendChild(addNameInput);
   addRow.appendChild(addNameCell);
@@ -497,7 +500,16 @@ function deleteTransaction(i) {
 function renderSplitTable() {
   const splitDiv = document.getElementById("split-table");
   splitDiv.innerHTML = "";
-  if (transactions.length === 0 || people.length === 0) return;
+  if (people.length === 0) {
+    splitDiv.textContent = "Add people to begin splitting costs.";
+    renderSplitDetails();
+    return;
+  }
+  if (transactions.length === 0) {
+    splitDiv.textContent = "No transactions yet.";
+    renderSplitDetails();
+    return;
+  }
 
   const table = document.createElement("table");
   let header = "<tr><th>Name</th><th>Cost</th>";
@@ -509,6 +521,7 @@ function renderSplitTable() {
     const hasItems = Array.isArray(t.items);
     const collapsed = collapsedSplit.has(ti);
     const row = document.createElement("tr");
+    if (hasItems) row.classList.add("unused-row");
     const tName = t.name || `Transaction ${ti + 1}`;
     const arrow = hasItems ? (collapsed ? "▶" : "▼") : "";
     let cells = `<td>${
@@ -537,7 +550,7 @@ function renderSplitTable() {
       t.items.forEach((it, ii) => {
         const iRow = document.createElement("tr");
         const itemNameId = `item-name-${ti}-${ii}`;
-        let cell = `<td class="indent-cell"><input id="${itemNameId}" type="text" value="${it.item || ""}" data-action="editItem" data-ti="${ti}" data-ii="${ii}" data-field="item" aria-label="Item ${ii + 1} name for ${tName}"></td>`;
+        let cell = `<td class="indent-cell"><input id="${itemNameId}" type="text" value="${it.item || ""}" placeholder="Item ${ii + 1}" data-action="editItem" data-ti="${ti}" data-ii="${ii}" data-field="item" aria-label="Item ${ii + 1} name for ${tName}"></td>`;
         const itemCostId = `item-cost-${ti}-${ii}`;
         cell += `<td><div class="dollar-field"><span class="prefix">$</span><input id="${itemCostId}" type="text" value="${it.cost.toFixed(2)}" data-action="editItem" data-ti="${ti}" data-ii="${ii}" data-field="cost" aria-label="Item ${ii + 1} cost for ${tName}"></div></td>`;
         people.forEach((p, pi) => {
@@ -640,7 +653,7 @@ function itemizeTransaction(ti) {
   const t = transactions[ti];
   t.items = [
     {
-      item: "Item 1",
+      item: "",
       cost: t.cost,
       splits: t.splits.slice(),
     },
@@ -762,7 +775,13 @@ function toggleDetailItems(ti) {
 function renderSplitDetails() {
   const div = document.getElementById("split-details");
   div.innerHTML = "";
-  if (transactions.length === 0 || people.length === 0) return;
+  if (people.length === 0) {
+    return;
+  }
+  if (transactions.length === 0) {
+    div.textContent = "No split details yet.";
+    return;
+  }
 
   const table = document.createElement("table");
   const colSpan = people.length + 1;
@@ -873,24 +892,38 @@ function calculateSummary() {
     totalNet += net;
 
     const intensity = Math.abs(net) / maxAbs;
-    let bg = "white";
-    if (net > 0) bg = `rgba(0,255,0,${0.2 + 0.6 * intensity})`;
-    else if (net < 0) bg = `rgba(255,0,0,${0.2 + 0.6 * intensity})`;
+    let style = "";
+    if (net > 0) {
+      style = `background:rgba(0,255,0,${0.2 + 0.6 * intensity})`;
+    } else if (net < 0) {
+      style = `background:rgba(255,0,0,${0.2 + 0.6 * intensity})`;
+    }
 
     const netStr =
       (net > 0 ? "+" : net < 0 ? "−" : "") + "$" + Math.abs(net).toFixed(2);
+    const netCell = style
+      ? `<td style="${style}">${netStr}</td>`
+      : `<td>${netStr}</td>`;
     html += `<tr>
           <td>${p}</td>
           <td>$${paid[i].toFixed(2)}</td>
           <td>$${owes[i].toFixed(2)}</td>
-          <td style="background:${bg}">${netStr}</td>
+          ${netCell}
         </tr>`;
   });
 
   html += `<tr><td><b>Total</b></td>
         <td><b>$${totalPaid.toFixed(2)}</b></td>
         <td><b>$${totalOwes.toFixed(2)}</b></td>
-        <td><b>$${totalNet.toFixed(2)}</b></td></tr>`;
+        <td><b>${
+          (totalNet > 0
+            ? "+"
+            : totalNet < 0 || Object.is(totalNet, -0)
+              ? "−"
+              : "") +
+          "$" +
+          Math.abs(totalNet).toFixed(2)
+        }</b></td></tr>`;
   html += "</table>";
   if (settlements.length > 0) {
     html += "<h3>Suggested Settlements</h3><ul>";

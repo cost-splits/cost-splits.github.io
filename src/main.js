@@ -19,6 +19,7 @@ import {
   downloadJson,
   savePoolToLocalStorage,
   startNewPool,
+  updatePoolSaveStatus,
 } from "./share.js";
 import { initTheme, toggleTheme } from "./theme.js";
 
@@ -32,11 +33,11 @@ function updateThemeToggle(theme) {
   const icon = document.getElementById("theme-toggle");
   if (!icon) return;
   if (theme === "dark") {
-    icon.textContent = "☀️";
+    icon.textContent = "🌙";
     icon.setAttribute("aria-label", "Switch to light mode");
     icon.title = "Switch to light mode";
   } else {
-    icon.textContent = "🌙";
+    icon.textContent = "☀️";
     icon.setAttribute("aria-label", "Switch to dark mode");
     icon.title = "Switch to dark mode";
   }
@@ -46,6 +47,7 @@ setAfterChange(() => {
   updateCurrentStateJson();
   updateShareableUrl();
   calculateSummary();
+  updatePoolSaveStatus();
 });
 
 // initial load
@@ -59,6 +61,11 @@ document
   .getElementById("pool-name")
   .addEventListener("input", (e) => setPool(e.target.value));
 document.getElementById("save-people").addEventListener("click", addPerson);
+document.getElementById("person-name").addEventListener("keydown", (e) => {
+  if (e.key === "Enter") {
+    addPerson();
+  }
+});
 document
   .getElementById("download-json")
   .addEventListener("click", downloadJson);

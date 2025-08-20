@@ -111,6 +111,37 @@ function updateShareableUrl() {
 }
 
 /**
+ * Indicate whether the current pool state has been saved.
+ */
+function updatePoolSaveStatus() {
+  const indicator = document.getElementById("pool-unsaved");
+  if (!indicator) return;
+  if (!pool) {
+    indicator.textContent = "";
+    return;
+  }
+  let saved = false;
+  if (typeof localStorage !== "undefined") {
+    try {
+      const raw = localStorage.getItem(LOCAL_STORAGE_KEY);
+      if (raw) {
+        const pools = JSON.parse(raw);
+        const existing = pools && pools[pool];
+        if (existing) {
+          saved =
+            JSON.stringify(existing.people) === JSON.stringify(people) &&
+            JSON.stringify(existing.transactions) ===
+              JSON.stringify(transactions);
+        }
+      }
+    } catch (e) {
+      // ignore
+    }
+  }
+  indicator.textContent = saved ? "" : "Unsaved";
+}
+
+/**
  * Replace the current state with a loaded state and refresh the UI.
  *
  * @param {object} state - Parsed state object.
@@ -145,6 +176,12 @@ function applyLoadedState(state) {
     document.getElementById("split-table")
   ) {
     renderSplitTable();
+  }
+  if (
+    typeof renderSplitDetails === "function" &&
+    document.getElementById("split-details")
+  ) {
+    renderSplitDetails();
   }
 
   const summaryEl = document.getElementById("summary");
@@ -230,6 +267,7 @@ function savePoolToLocalStorage(name, { people: p, transactions: t }) {
   } catch (e) {
     // Fail silently; local storage may be unavailable or full.
   }
+  updatePoolSaveStatus();
 }
 
 /**
@@ -326,6 +364,7 @@ export {
   loadStateFromJsonFile,
   loadStateFromUrl,
   savePoolToLocalStorage,
+  updatePoolSaveStatus,
   loadPoolFromLocalStorage,
   listSavedPools,
   deletePoolFromLocalStorage,
