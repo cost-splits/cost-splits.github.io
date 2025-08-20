@@ -119,6 +119,7 @@ function renderSavedPoolsTable() {
       deletePoolFromLocalStorage(name);
       renderSavedPoolsTable();
     });
+    deleteBtn.classList.add("danger-btn");
     actionsCell.appendChild(deleteBtn);
     row.appendChild(actionsCell);
 
@@ -344,6 +345,7 @@ function createTransactionRow(t, i) {
   const delBtn = document.createElement("button");
   delBtn.textContent = "Delete";
   delBtn.addEventListener("click", () => deleteTransaction(i));
+  delBtn.classList.add("danger-btn");
   actionCell.appendChild(delBtn);
   row.appendChild(actionCell);
 
@@ -537,7 +539,7 @@ function renderSplitTable() {
       t.items.forEach((it, ii) => {
         const iRow = document.createElement("tr");
         const itemNameId = `item-name-${ti}-${ii}`;
-        let cell = `<td class="indent-cell"><input id="${itemNameId}" type="text" value="${it.item || ""}" data-action="editItem" data-ti="${ti}" data-ii="${ii}" data-field="item" aria-label="Item ${ii + 1} name for ${tName}"></td>`;
+        let cell = `<td class="indent-cell"><input id="${itemNameId}" type="text" value="${it.item || ""}" placeholder="Item ${ii + 1}" data-action="editItem" data-ti="${ti}" data-ii="${ii}" data-field="item" aria-label="Item ${ii + 1} name for ${tName}"></td>`;
         const itemCostId = `item-cost-${ti}-${ii}`;
         cell += `<td><div class="dollar-field"><span class="prefix">$</span><input id="${itemCostId}" type="text" value="${it.cost.toFixed(2)}" data-action="editItem" data-ti="${ti}" data-ii="${ii}" data-field="cost" aria-label="Item ${ii + 1} cost for ${tName}"></div></td>`;
         people.forEach((p, pi) => {
@@ -640,7 +642,7 @@ function itemizeTransaction(ti) {
   const t = transactions[ti];
   t.items = [
     {
-      item: "Item 1",
+      item: "",
       cost: t.cost,
       splits: t.splits.slice(),
     },

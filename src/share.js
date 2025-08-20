@@ -146,6 +146,12 @@ function applyLoadedState(state) {
   ) {
     renderSplitTable();
   }
+  if (
+    typeof renderSplitDetails === "function" &&
+    document.getElementById("split-details")
+  ) {
+    renderSplitDetails();
+  }
 
   const summaryEl = document.getElementById("summary");
   if (summaryEl) summaryEl.innerHTML = "";

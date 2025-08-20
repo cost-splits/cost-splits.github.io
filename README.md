@@ -16,6 +16,7 @@ groups. Try the live demo at
 - Save and load named pools using browser local storage with a table of saved
   pools for quick loading or deletion, highlighting the active pool and offering
   a quick **New Pool** reset
+- Compact people list layout with clearly marked delete actions
 
 ## Getting Started
 

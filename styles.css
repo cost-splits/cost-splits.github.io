@@ -40,6 +40,7 @@ body {
   max-width: 60rem;
   margin: 0 auto;
   padding: calc(var(--spacing) * 2.5);
+  padding-bottom: calc(var(--spacing) * 6);
   background-color: var(--background-color);
   color: var(--text-color);
 }
@@ -70,6 +71,10 @@ button {
   transition: filter 0.2s;
 }
 
+button + button {
+  margin-left: var(--spacing);
+}
+
 button:hover,
 button:focus {
   filter: brightness(0.9);
@@ -96,9 +101,14 @@ tbody tr:nth-child(even) {
   color: #fff;
 }
 
-#saved-pools-table tr.active-pool button {
+#saved-pools-table tr.active-pool button:not(.danger-btn) {
   background-color: #fff;
   color: var(--primary-color);
+}
+
+#saved-pools-table tr.active-pool button.danger-btn {
+  background-color: var(--danger-color);
+  color: #fff;
 }
 
 #transaction-table {
@@ -124,10 +134,29 @@ td:first-child {
   margin-left: calc(var(--spacing) / 2);
 }
 
+.danger-btn {
+  background-color: var(--danger-color);
+  color: #fff;
+}
+
 .collapse-btn {
   cursor: pointer;
   margin-right: calc(var(--spacing) / 2);
   font-weight: bold;
+}
+
+#people-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(var(--spacing) / 2);
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+#people-list li {
+  display: flex;
+  align-items: center;
 }
 
 .unused-row {
