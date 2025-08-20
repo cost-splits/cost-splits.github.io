@@ -499,7 +499,16 @@ function deleteTransaction(i) {
 function renderSplitTable() {
   const splitDiv = document.getElementById("split-table");
   splitDiv.innerHTML = "";
-  if (transactions.length === 0 || people.length === 0) return;
+  if (people.length === 0) {
+    splitDiv.textContent = "Add people to begin splitting costs.";
+    renderSplitDetails();
+    return;
+  }
+  if (transactions.length === 0) {
+    splitDiv.textContent = "No transactions yet.";
+    renderSplitDetails();
+    return;
+  }
 
   const table = document.createElement("table");
   let header = "<tr><th>Name</th><th>Cost</th>";
@@ -511,6 +520,7 @@ function renderSplitTable() {
     const hasItems = Array.isArray(t.items);
     const collapsed = collapsedSplit.has(ti);
     const row = document.createElement("tr");
+    if (hasItems) row.classList.add("unused-row");
     const tName = t.name || `Transaction ${ti + 1}`;
     const arrow = hasItems ? (collapsed ? "▶" : "▼") : "";
     let cells = `<td>${
@@ -764,7 +774,13 @@ function toggleDetailItems(ti) {
 function renderSplitDetails() {
   const div = document.getElementById("split-details");
   div.innerHTML = "";
-  if (transactions.length === 0 || people.length === 0) return;
+  if (people.length === 0) {
+    return;
+  }
+  if (transactions.length === 0) {
+    div.textContent = "No split details yet.";
+    return;
+  }
 
   const table = document.createElement("table");
   const colSpan = people.length + 1;
@@ -875,17 +891,23 @@ function calculateSummary() {
     totalNet += net;
 
     const intensity = Math.abs(net) / maxAbs;
-    let bg = "white";
-    if (net > 0) bg = `rgba(0,255,0,${0.2 + 0.6 * intensity})`;
-    else if (net < 0) bg = `rgba(255,0,0,${0.2 + 0.6 * intensity})`;
+    let style = "";
+    if (net > 0) {
+      style = `background:rgba(0,255,0,${0.2 + 0.6 * intensity})`;
+    } else if (net < 0) {
+      style = `background:rgba(255,0,0,${0.2 + 0.6 * intensity})`;
+    }
 
     const netStr =
       (net > 0 ? "+" : net < 0 ? "−" : "") + "$" + Math.abs(net).toFixed(2);
+    const netCell = style
+      ? `<td style="${style}">${netStr}</td>`
+      : `<td>${netStr}</td>`;
     html += `<tr>
           <td>${p}</td>
           <td>$${paid[i].toFixed(2)}</td>
           <td>$${owes[i].toFixed(2)}</td>
-          <td style="background:${bg}">${netStr}</td>
+          ${netCell}
         </tr>`;
   });
 

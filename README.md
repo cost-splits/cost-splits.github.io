@@ -17,6 +17,7 @@ groups. Try the live demo at
   pools for quick loading or deletion, highlighting the active pool and offering
   a quick **New Pool** reset
 - Compact people list layout with clearly marked delete actions
+- Split sections show helpful messages when empty and flag unsaved pool changes
 
 ## Getting Started
 

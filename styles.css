@@ -163,6 +163,10 @@ td:first-child {
   background-color: var(--warning-bg);
 }
 
+.unused-row input {
+  text-decoration: line-through;
+}
+
 .invalid-cell {
   background-color: var(--error-bg);
 }
@@ -197,6 +201,12 @@ td:first-child {
 .error:focus::after {
   opacity: 1;
   pointer-events: auto;
+}
+
+.unsaved-indicator {
+  color: var(--danger-color);
+  margin-left: var(--spacing);
+  font-size: 0.9em;
 }
 
 .dollar-field {
