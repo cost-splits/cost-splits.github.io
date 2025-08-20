@@ -11,6 +11,7 @@ groups. Try the live demo at
 - Responsive design that works on mobile and desktop
 - Light and dark themes with a sun/moon toggle that remembers your choice
 - Itemized transactions with proportional tax and tip
+- Non-itemized split fields are disabled when a transaction is itemized
 - Shareable URLs encoding the current calculator state
 - Optional session pool name to label each set of transactions
 - Save and load named pools using browser local storage with a table of saved
