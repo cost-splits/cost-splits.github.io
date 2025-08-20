@@ -49,6 +49,19 @@ h2 {
   margin-top: calc(var(--spacing) * 4);
 }
 
+a {
+  color: var(--primary-color);
+}
+
+a:visited {
+  color: var(--primary-color);
+}
+
+a:hover,
+a:focus {
+  text-decoration: underline;
+}
+
 input,
 select,
 textarea {
@@ -292,6 +305,24 @@ input[data-action="editItemSplit"] {
 .table-container {
   width: 100%;
   overflow-x: auto;
+}
+
+footer {
+  margin-top: calc(var(--spacing) * 4);
+  text-align: center;
+  background-color: var(--muted-bg);
+  padding: calc(var(--spacing) * 2) 0;
+}
+
+.github-icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  vertical-align: middle;
+  margin-left: calc(var(--spacing) / 2);
+}
+
+:root[data-theme="dark"] .github-icon {
+  filter: invert(1);
 }
 
 @media (max-width: 600px) {
