@@ -243,11 +243,20 @@ input[data-action="editItemSplit"] {
   cursor: pointer;
   margin-left: auto;
   font-size: 1.5rem;
+  padding: calc(var(--spacing) / 2);
+  border-radius: 0.25rem;
+  background-color: #121212;
+  color: #fff;
 }
 
 #theme-toggle:focus {
   outline: 2px solid var(--primary-color);
   outline-offset: 2px;
+}
+
+:root[data-theme="dark"] #theme-toggle {
+  background-color: #fff;
+  color: #000;
 }
 
 .readonly-field {

@@ -33,11 +33,11 @@ function updateThemeToggle(theme) {
   const icon = document.getElementById("theme-toggle");
   if (!icon) return;
   if (theme === "dark") {
-    icon.textContent = "☀️";
+    icon.textContent = "🌙";
     icon.setAttribute("aria-label", "Switch to light mode");
     icon.title = "Switch to light mode";
   } else {
-    icon.textContent = "🌙";
+    icon.textContent = "☀️";
     icon.setAttribute("aria-label", "Switch to dark mode");
     icon.title = "Switch to dark mode";
   }

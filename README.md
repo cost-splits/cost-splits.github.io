@@ -9,7 +9,8 @@ groups. Try the live demo at
 ## Features
 
 - Responsive design that works on mobile and desktop
-- Light and dark themes with a sun/moon toggle that remembers your choice
+- Light and dark themes with a toggle that shows the current theme and remembers
+  your choice
 - Itemized transactions with proportional tax and tip
 - Non-itemized split fields are disabled when a transaction is itemized
 - Unnamed transactions display numbered placeholders like "Transaction 4"
