@@ -8,25 +8,40 @@ groups. Try the live demo at
 
 ## Features
 
-- Responsive design that works on mobile and desktop
-- Light and dark themes with a toggle that shows the current theme and remembers
-  your choice
-- Itemized transactions with proportional tax and tip
-- Non-itemized split fields are disabled when a transaction is itemized
-- Unnamed transactions display numbered placeholders like "Transaction 4"
-- Shareable URLs encoding the current calculator state
-- Optional session pool name to label each set of transactions
-- Save and load named pools using browser local storage with a table of saved
-  pools for quick loading or deletion, highlighting the active pool and offering
-  a quick **New Pool** reset
-- Compact people list layout with clearly marked delete actions
-- Split sections show helpful messages when empty and flag unsaved pool changes
-- Summary totals prefix minus signs before dollar amounts for consistent
-  formatting
+- Responsive layout for phones and desktops
+- Light and dark themes with a persistent toggle
+- Itemized and non-itemized transactions with proportional tax and tip
+- Shareable URLs and optional named session pools stored locally
+- Compact participant list with clear totals
 
-## Getting Started
+## Usage
 
-Clone the repository and install development dependencies.
+1. In the **People** section, add the names of all participants.
+2. In the **Transactions** section, add transactions with a name, payee, and
+   cost.
+3. In the **Cost Splits** section, choose how each expense is divided:
+   - **Even** – split equally among participants.
+     [Example](https://cost-splits.github.io/?state=N4IgDg9hA2IFwgKIA8CGBbM0CmcAEAIgJYB2J2ATiADTjYRbbwDaIAgtEQMZO0BCEAEY0QAYVQUYIALq0ALhVQkAzqi5yiEFS1AkMTBMTKURXCMrnwA7AA4AdABYAzLTCoAnibgAGWsqxEcsosAIzUYSHSAL7RQA)
+   - **Fractional** – specify each person's portion as a decimal.
+     [Example](https://cost-splits.github.io/?state=N4IgDg9hA2IFwgKIA8CGBbM0CmcAEAYgE6oDGALgJYQB2qsANONhFtvANogCCNdITAEKoiRAJ4CQAYWgjUIALpNyJGgGcyVWms6g66dgkQ4KRSqUrkJTUhDXl4ARgBMAZgB0ANgDsTMKjFsIicmNSxLHTgOAAZ3AFYGWNdE92cFAF8MoA)
+   - **Shares** – assign share counts to weight the split.
+     [Example](https://cost-splits.github.io/?state=N4IgDg9hA2IFwgKIA8CGBbM0CmcAEAgmKgE4Au62AdmSADTjYRbbwDaIBOy9IAQqgCWOAJ68AwgAsSggM4gAugzIlUVWagDGZQRHXtQVDKwQAlarQaaIs2nABMAFgDMAVgB0rhsRHYS8AEYGWSxBMnk4NiD7OmcFAF8EoA)
+   - **Itemized** – expand a transaction to assign specific items.
+     [Example](https://cost-splits.github.io/?state=N4IgDg9hA2IFwgKIA8CGBbM0CmcAEAMgK4B2AxgBYgA042EW28A2iACKomo1LQCWPAGJ8IXEAF1aAFwBOnAM6oyUkSXktQXdEwTFyVWmQjyp8ACwB2AHQXaYVAE9sM+AAZa8rHynq4zAIzUgf6SIN7Y6L7MoOHo8CAAQkQyAObOPEYm8P4AzFY5tiCe-D4sge6u4gC+1DFSEfEAyqjQqAAmGcamcP7+VgBMABweXqV+7uXVtWH1cQgACqgm3IZd2WZWAKz9IyVRFUHVR1VAA)
+4. Use the **State** section to download or load a JSON file and the **Share**
+   section to copy a link to the current state.
+
+## Examples
+
+- [Equal dinner split](https://cost-splits.github.io/?state=N4IgDg9hA2IFwgKIA8CGBbM0CmcAEAIgJYB2J2ATiADTjYRbbwDaIAgtEQMZO0BCEAEY0QAYVQUYIALq0ALhVQkAzqi5yiEFS1AkMTBMTKURXCMrnwA7AA4AdABYAzLTCoAnibgAGWsqxEcsosAIzUYSHSAL7RQA)
+- [Utility bill with fractional split](https://cost-splits.github.io/?state=N4IgDg9hA2IFwgKIA8CGBbM0CmcAEAYgE6oDGALgJYQB2qsANONhFtvANogCCNdITAEKoiRAJ4CQAYWgjUIALpNyJGgGcyVWms6g66dgkQ4KRSqUrkJTUhDXl4ARgBMAZgB0ANgDsTMKjFsIicmNSxLHTgOAAZ3AFYGWNdE92cFAF8MoA)
+- [Apartment costs with uneven shares](https://cost-splits.github.io/?state=N4IgDg9hA2IFwgKIA8CGBbM0CmcAEAgmKgE4Au62AdmSADTjYRbbwDaIBOy9IAQqgCWOAJ68AwgAsSggM4gAugzIlUVWagDGZQRHXtQVDKwQAlarQaaIs2nABMAFgDMAVgB0rhsRHYS8AEYGWSxBMnk4NiD7OmcFAF8EoA)
+- [Itemized lunch with proportional tax and tip](https://cost-splits.github.io/?state=N4IgDg9hA2IFwgKIA8CGBbM0CmcAEAMgK4B2AxgBYgA042EW28A2iACKomo1LQCWPAGJ8IXEAF1aAFwBOnAM6oyUkSXktQXdEwTFyVWmQjyp8ACwB2AHQXaYVAE9sM+AAZa8rHynq4zAIzUgf6SIN7Y6L7MoOHo8CAAQkQyAObOPEYm8P4AzFY5tiCe-D4sge6u4gC+1DFSEfEAyqjQqAAmGcamcP7+VgBMABweXqV+7uXVtWH1cQgACqgm3IZd2WZWAKz9IyVRFUHVR1VAA)
+- [Group trip with multiple expenses](https://cost-splits.github.io/?state=N4IgDg9hA2IFwgKIA8CGBbM0CmcAEAKgE4CWYIANONhFtvANogCCOylIAQtKiURwGFUAZ2wBPDgBFsANxIA7DomjQSEAC4gAulXVFU84agDG6tYcah5GegiEAjDsYjDNcAKwAOAHQBOd1RgqGLY-HAAzFTCWCTqwowAjBRJKclaAL4UVjbwIAASGtiwVM6u8ABsAEzh3gAsSeDBofAADFExcYkUlcm9CRlZINbotiCSCvLNJS5ulQk1np6BTWE9INGqnXAMqbs6ILHY6PHboIfouQBiUAAmTjPwCZ7u3gHrHSc7fX0DZ+pHuUkpHkAGt4tMynBKj5wkt3ptPm1UkiMr8hjkEAQSMYQdhOhC3PMXuUAOzLEJhWrtBFdJJItLpDJAA)
+
+## Development
+
+Clone the repository and install dependencies:
 
 ```bash
 git clone https://github.com/cost-splits/cost-splits.github.io.git
@@ -34,21 +49,10 @@ cd cost-splits.github.io
 npm install
 ```
 
-Serve `index.html` with any static server or open the file directly in a
-browser.
-
-## Usage
-
-Before adding participants, optionally enter a name for your pool of
-transactions using the field beneath the page title. Use the **New Pool** button
-to start over or the **Save Pool** button to store the pool locally. The table
-below highlights the current pool and lets you reload or delete saved pools.
-
-1. Add participants and transactions.
-2. Use the ▶/▼ controls to itemize a transaction when needed.
-3. Copy the link in the **Share** section to send your split to others.
-
-## Testing
+Open `index.html` directly in your browser or serve the folder with any static
+web server to iterate on changes. The project uses plain HTML, CSS, and
+JavaScript, so no build step is required. Node is only needed for linting,
+formatting, and testing.
 
 | Command          | Description                |
 | ---------------- | -------------------------- |
