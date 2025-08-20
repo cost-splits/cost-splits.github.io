@@ -162,6 +162,12 @@ td:first-child {
 .unused-row input {
   background-color: var(--muted-bg);
   color: var(--border-color);
+  text-decoration: line-through;
+}
+
+:root[data-theme="dark"] .unused-row input {
+  background-color: #2a2a2a;
+  color: #888;
 }
 
 .invalid-cell {
