@@ -9,8 +9,8 @@ groups. Try the live demo at
 ## Features
 
 - Responsive layout for phones and desktops
-- Light blue theme with complementary accents, soft backgrounds, and a
-  persistent light/dark toggle
+- Light blue theme with complementary accents and soft backgrounds for a
+  consistent look
 - Itemized and non-itemized transactions with proportional tax and tip
 - Shareable URLs and optional named session pools stored locally
 - Compact participant list with clear totals
