@@ -14,15 +14,7 @@ jobs:
       # Deploy preview when PR is open or updated
       - name: Deploy PR Preview
         uses: rossjrw/pr-preview-action@v1
-        if: >
-          ( ( contains(join(github.event.pull_request.labels.*.name, ','),
-          'preview') &&
-              (github.event.action == 'opened' || github.event.action ==
-          'reopened' || github.event.action == 'synchronize')
-            )
-            ||
-            (github.event.action == 'labeled' && github.event.label.name ==
-          'preview') )
+        if: github.event.action != 'closed'
         with:
           source-dir: ./ # root of your repo (adjust if your HTML lives in a subfolder)
           deploy-repository: "cost-splits/previews"
@@ -32,13 +24,7 @@ jobs:
       # Remove preview when PR is closed
       - name: Remove PR Preview
         uses: rossjrw/pr-preview-action@v1
-        if: >
-          ( (github.event.action == 'unlabeled' && github.event.label.name ==
-          'preview')
-            ||
-            (github.event.action == 'closed' &&
-              contains(join(github.event.pull_request.labels.*.name, ','),
-          'preview')) )
+        if: github.event.action == 'closed'
         with:
           source-dir: ./
           deploy-repository: "cost-splits/previews"
