@@ -121,13 +121,8 @@ describe("calculateSummary settlements", () => {
     people.push("Alice", "Bob");
     transactions.push({ payer: 0, cost: 30, splits: [1, 1] });
     calculateSummary();
-    const settlementTable = document.querySelectorAll("#summary table")[1];
-    const cells = settlementTable
-      .querySelectorAll("tr")[1]
-      .querySelectorAll("td");
-    expect(cells[0].textContent).toBe("Bob");
-    expect(cells[1].textContent).toBe("Alice");
-    expect(cells[2].textContent).toBe("$15.00");
+    const item = document.querySelector("#summary ul li");
+    expect(item.textContent).toBe("Bob → Alice: $15.00");
   });
 });
 

@@ -871,7 +871,7 @@ function renderSplitDetails() {
 // ---- SUMMARY ----
 /**
  * Render a summary table of totals paid, owed and net for each person and a
- * table of suggested settlements.
+ * list of suggested settlements.
  */
 function calculateSummary() {
   const summaryEl = document.getElementById("summary");
@@ -928,13 +928,13 @@ function calculateSummary() {
   html += "</table>";
   if (settlements.length > 0) {
     html += "<h3>Suggested Settlements</h3>";
-    html += "<table><tr><th>Payer</th><th>Receiver</th><th>Amount</th></tr>";
+    html += "<ul>";
     settlements.forEach((s) => {
-      html += `<tr><td>${people[s.from]}</td><td>${people[s.to]}</td><td>$${s.amount.toFixed(
+      html += `<li>${people[s.from]} → ${people[s.to]}: $${s.amount.toFixed(
         2,
-      )}</td></tr>`;
+      )}</li>`;
     });
-    html += "</table>";
+    html += "</ul>";
   }
 
   summaryEl.innerHTML = html;
