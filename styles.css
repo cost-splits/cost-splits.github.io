@@ -1,6 +1,7 @@
 /* Theme variables */
 :root {
-  --primary-color: #2a7ae2;
+  --primary-color: #5bc0eb;
+  --accent-color: #ffb870;
   --border-color: #ccc;
   --background-color: #fff;
   --text-color: #222;
@@ -23,7 +24,8 @@
   --border-color: #555;
   --muted-bg: #1e1e1e;
   --alt-row-bg: #1a1a1a;
-  --primary-color: #569aff;
+  --primary-color: #5bc0eb;
+  --accent-color: #ffb870;
   --danger-color: #ff7b72;
   --warning-bg: #665c00;
   --error-bg: rgba(255, 123, 114, 0.2);
@@ -45,6 +47,10 @@ body {
   color: var(--text-color);
 }
 
+h1 {
+  color: var(--primary-color);
+}
+
 h2 {
   margin-top: calc(var(--spacing) * 4);
 }
@@ -59,6 +65,7 @@ a:visited {
 
 a:hover,
 a:focus {
+  color: var(--accent-color);
   text-decoration: underline;
 }
 
@@ -91,6 +98,11 @@ button + button {
 button:hover,
 button:focus {
   filter: brightness(0.9);
+}
+
+button:not(.danger-btn):hover,
+button:not(.danger-btn):focus {
+  background-color: var(--accent-color);
 }
 
 table {
@@ -258,6 +270,7 @@ input[data-action="editItemSplit"] {
   font-size: 1.5rem;
   padding: calc(var(--spacing) / 2);
   border-radius: 0.25rem;
+  background-color: var(--primary-color);
   color: #fff;
 }
 
@@ -268,6 +281,11 @@ input[data-action="editItemSplit"] {
 
 :root[data-theme="dark"] #theme-toggle {
   color: #000;
+}
+
+#theme-toggle:hover,
+#theme-toggle:focus {
+  background-color: var(--accent-color);
 }
 
 .readonly-field {
