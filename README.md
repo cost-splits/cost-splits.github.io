@@ -13,6 +13,7 @@ groups. Try the live demo at
 - Itemized and non-itemized transactions with proportional tax and tip
 - Shareable URLs and optional named session pools stored locally
 - Compact participant list with clear totals
+- Suggested settlements displayed in an easy-to-read table
 
 ## Usage
 
