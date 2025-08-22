@@ -14,6 +14,7 @@ import {
   loadPoolFromLocalStorage,
   deletePoolFromLocalStorage,
   LOCAL_STORAGE_KEY,
+  hasUnsavedChanges,
 } from "./share.js";
 
 const COST_FORMAT_MSG =
@@ -137,6 +138,12 @@ function renderSavedPoolsTable() {
       row.classList.add("active-pool");
     }
     row.addEventListener("click", () => {
+      if (
+        hasUnsavedChanges() &&
+        !confirm("You have unsaved changes. Continue?")
+      ) {
+        return;
+      }
       loadPoolFromLocalStorage(name);
       renderSavedPoolsTable();
     });
