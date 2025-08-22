@@ -9,6 +9,9 @@ import {
   computeSummary,
   computeSettlements,
   pool,
+  getTransactionsPaidBy,
+  getTransactionsInvolving,
+  getSettlementsFor,
 } from "./state.js";
 import {
   loadPoolFromLocalStorage,
@@ -1015,6 +1018,135 @@ function calculateSummary() {
   }
 }
 
+/**
+ * Build a simple table listing transactions.
+ *
+ * @param {typeof transactions} txns - Transactions to display.
+ * @returns {HTMLTableElement} Table element with transaction details.
+ */
+function buildTransactionsTable(txns) {
+  const table = document.createElement("table");
+  const thead = document.createElement("thead");
+  const headerRow = document.createElement("tr");
+  ["Name", "Paid By", "Cost"].forEach((h) => {
+    const th = document.createElement("th");
+    th.textContent = h;
+    headerRow.appendChild(th);
+  });
+  thead.appendChild(headerRow);
+  table.appendChild(thead);
+
+  const tbody = document.createElement("tbody");
+  txns.forEach((t) => {
+    const row = document.createElement("tr");
+
+    const nameCell = document.createElement("td");
+    nameCell.textContent = t.name || "";
+    row.appendChild(nameCell);
+
+    const payerCell = document.createElement("td");
+    payerCell.textContent = people[t.payer] || "";
+    row.appendChild(payerCell);
+
+    const costCell = document.createElement("td");
+    costCell.textContent = `$${t.cost.toFixed(2)}`;
+    row.appendChild(costCell);
+
+    tbody.appendChild(row);
+  });
+  table.appendChild(tbody);
+  return table;
+}
+
+/**
+ * Build a table describing settlement transfers.
+ *
+ * @param {Array<{from:number,to:number,amount:number}>} settlements - Suggested settlements.
+ * @returns {HTMLTableElement} Table element with settlement details.
+ */
+function buildSettlementTable(settlements) {
+  const table = document.createElement("table");
+  const thead = document.createElement("thead");
+  const headerRow = document.createElement("tr");
+  ["From", "To", "Amount"].forEach((h) => {
+    const th = document.createElement("th");
+    th.textContent = h;
+    headerRow.appendChild(th);
+  });
+  thead.appendChild(headerRow);
+  table.appendChild(thead);
+
+  const tbody = document.createElement("tbody");
+  settlements.forEach((s) => {
+    const row = document.createElement("tr");
+
+    const fromCell = document.createElement("td");
+    fromCell.textContent = people[s.from] || "";
+    row.appendChild(fromCell);
+
+    const toCell = document.createElement("td");
+    toCell.textContent = people[s.to] || "";
+    row.appendChild(toCell);
+
+    const amountCell = document.createElement("td");
+    amountCell.textContent = `$${s.amount.toFixed(2)}`;
+    row.appendChild(amountCell);
+
+    tbody.appendChild(row);
+  });
+  table.appendChild(tbody);
+  return table;
+}
+
+/**
+ * Create a titled section wrapping a table with project styling.
+ *
+ * @param {string} title - Section heading.
+ * @param {HTMLTableElement} table - Table to include in the section.
+ * @returns {HTMLElement} Section element containing the titled table.
+ */
+function buildTableSection(title, table) {
+  const section = document.createElement("section");
+  const heading = document.createElement("h3");
+  heading.textContent = title;
+  section.appendChild(heading);
+  const wrapper = document.createElement("div");
+  wrapper.className = "table-container";
+  wrapper.appendChild(table);
+  section.appendChild(wrapper);
+  return section;
+}
+
+/**
+ * Render a view of transactions and settlements for a specific person.
+ *
+ * Builds sections showing transactions they paid, all transactions they
+ * participated in, and settlement suggestions involving them.
+ *
+ * @param {number} index - Index of the person in the {@link people} array.
+ * @returns {HTMLElement} Container element with the person's view.
+ */
+function renderPersonView(index) {
+  const container = document.createElement("div");
+
+  const paidTx = getTransactionsPaidBy(index);
+  container.appendChild(
+    buildTableSection("Paid Transactions", buildTransactionsTable(paidTx)),
+  );
+
+  const sharedTx = getTransactionsInvolving(index);
+  container.appendChild(
+    buildTableSection("Shared Splits", buildTransactionsTable(sharedTx)),
+  );
+
+  const settlements = getSettlementsFor(index);
+  container.appendChild(
+    buildTableSection("Settlement Plan", buildSettlementTable(settlements)),
+  );
+
+  return container;
+}
+
 export {
   addPerson,
   deletePerson,
@@ -1040,4 +1172,5 @@ export {
   renderSplitDetails,
   calculateSummary,
   renderSavedPoolsTable,
+  renderPersonView,
 };
