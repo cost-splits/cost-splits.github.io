@@ -1,10 +1,14 @@
 /**
  * @jest-environment jsdom
  */
-import { renderPersonView } from "../src/render.js";
+import {
+  renderPersonView,
+  showPersonSummary,
+  calculateSummary,
+} from "../src/render.js";
 import { resetState, people, transactions } from "../src/state.js";
 
-describe("renderPersonView", () => {
+describe("person view helpers", () => {
   beforeEach(() => {
     resetState();
     people.push("A", "B");
@@ -14,7 +18,7 @@ describe("renderPersonView", () => {
     );
   });
 
-  test("builds sections for paid, shared and settlement", () => {
+  test("renderPersonView builds sections for paid, shared and settlement", () => {
     const view = renderPersonView(0);
     const tables = view.querySelectorAll("table");
     expect(tables.length).toBe(3);
@@ -39,5 +43,21 @@ describe("renderPersonView", () => {
       settlementRows[0].children[1].classList.contains("settlement-person"),
     ).toBe(false);
     expect(settlementRows[0].children[2].textContent).toBe("$5.00");
+  });
+
+  test("showPersonSummary appends view below summary and closes", () => {
+    document.body.innerHTML = '<div id="summary"></div>';
+    calculateSummary();
+    showPersonSummary(0);
+
+    const summaryTable = document.querySelector("#summary > table");
+    expect(summaryTable).not.toBeNull();
+
+    const personDiv = document.getElementById("person-summary");
+    expect(personDiv).not.toBeNull();
+    expect(personDiv.querySelectorAll("table").length).toBe(3);
+
+    personDiv.querySelector("button")?.click();
+    expect(document.getElementById("person-summary")).toBeNull();
   });
 });

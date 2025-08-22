@@ -1022,10 +1022,11 @@ function calculateSummary() {
 }
 
 /**
- * Show detailed information for a single person and hide the global summary.
+ * Show detailed information for a single person below the summary.
  *
- * Creates a temporary view with a back button that restores the original
- * summary table.
+ * Appends a person-specific view after the global summary table along with a
+ * Close button to remove it. Any previously displayed person view is replaced
+ * with the new selection.
  *
  * @param {number} index - Index of the person in the {@link people} array.
  * @returns {void}
@@ -1033,13 +1034,20 @@ function calculateSummary() {
 function showPersonSummary(index) {
   const summaryEl = document.getElementById("summary");
   if (!summaryEl) return;
-  summaryEl.innerHTML = "";
 
-  const backBtn = document.createElement("button");
-  backBtn.textContent = "Back to Summary";
-  backBtn.addEventListener("click", calculateSummary);
-  summaryEl.appendChild(backBtn);
-  summaryEl.appendChild(renderPersonView(index));
+  const existing = document.getElementById("person-summary");
+  if (existing) existing.remove();
+
+  const container = document.createElement("div");
+  container.id = "person-summary";
+
+  const closeBtn = document.createElement("button");
+  closeBtn.textContent = "Close";
+  closeBtn.addEventListener("click", () => container.remove());
+  container.appendChild(closeBtn);
+
+  container.appendChild(renderPersonView(index));
+  summaryEl.appendChild(container);
 }
 
 /**
@@ -1214,4 +1222,5 @@ export {
   calculateSummary,
   renderSavedPoolsTable,
   renderPersonView,
+  showPersonSummary,
 };
