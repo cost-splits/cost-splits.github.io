@@ -62,6 +62,16 @@ function clearError(el) {
   }
 }
 
+/**
+ * Determine zebra stripe class for table rows.
+ *
+ * @param {number} index - Zero-based index of a non-sub row.
+ * @returns {string} CSS class name representing the stripe color.
+ */
+function rowClass(index) {
+  return index % 2 === 0 ? "row-even" : "row-odd";
+}
+
 // ---- SAVED POOLS ----
 
 /**
@@ -533,10 +543,13 @@ function renderSplitTable() {
 
   const tbody = document.createElement("tbody");
 
+  let rowIdx = 0;
   transactions.forEach((t, ti) => {
     const hasItems = Array.isArray(t.items);
     const collapsed = collapsedSplit.has(ti);
     const row = document.createElement("tr");
+    const stripe = rowClass(rowIdx);
+    row.classList.add(stripe);
     if (hasItems) row.classList.add("unused-row");
     const tName = t.name || `Transaction ${ti + 1}`;
     const arrow = hasItems ? (collapsed ? "▶" : "▼") : "";
@@ -565,7 +578,7 @@ function renderSplitTable() {
     if (hasItems && !collapsed) {
       t.items.forEach((it, ii) => {
         const iRow = document.createElement("tr");
-        iRow.classList.add("sub-row");
+        iRow.classList.add("sub-row", stripe);
         const itemNameId = `item-name-${ti}-${ii}`;
         let cell = `<td class="indent-cell"><input id="${itemNameId}" type="text" value="${it.item || ""}" placeholder="Item ${ii + 1}" data-action="editItem" data-ti="${ti}" data-ii="${ii}" data-field="item" aria-label="Item ${ii + 1} name for ${tName}"></td>`;
         const itemCostId = `item-cost-${ti}-${ii}`;
@@ -582,6 +595,7 @@ function renderSplitTable() {
         tbody.appendChild(iRow);
       });
     }
+    rowIdx += 1;
   });
 
   table.onchange = (e) => {
@@ -813,12 +827,15 @@ function renderSplitDetails() {
   const tbody = document.createElement("tbody");
 
   let totals = Array(people.length).fill(0);
+  let rowIdx = 0;
 
   transactions.forEach((t, ti) => {
     const hasItems = Array.isArray(t.items) && t.items.length > 0;
     const collapsed = collapsedDetails.has(ti);
     const tName = t.name || `Transaction ${ti + 1}`;
     const row = document.createElement("tr");
+    const stripe = rowClass(rowIdx);
+    row.classList.add(stripe);
     const arrow = hasItems ? (collapsed ? "▶" : "▼") : "";
     let cells = `<td>${
       arrow
@@ -858,7 +875,7 @@ function renderSplitDetails() {
       const scale = itemsTotal > 0 ? t.cost / itemsTotal : 0;
       t.items.forEach((it, ii) => {
         const iRow = document.createElement("tr");
-        iRow.classList.add("sub-row");
+        iRow.classList.add("sub-row", stripe);
         const itemName = it.item || `Item ${ii + 1}`;
         let rowCells = `<td class="indent-cell">${itemName} - $${(it.cost * scale).toFixed(2)}</td>`;
         const splitSum = it.splits.reduce((a, b) => a + b, 0);
@@ -872,10 +889,12 @@ function renderSplitDetails() {
         tbody.appendChild(iRow);
       });
     }
+    rowIdx += 1;
   });
 
   // totals row
   const totalRow = document.createElement("tr");
+  totalRow.classList.add(rowClass(rowIdx));
   let cells = "<td><b>Total</b></td>";
   totals.forEach((val) => (cells += `<td><b>$${val.toFixed(2)}</b></td>`));
   totalRow.innerHTML = cells;
