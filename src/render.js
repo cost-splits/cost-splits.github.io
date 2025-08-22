@@ -254,7 +254,11 @@ function renderPeople() {
     li.classList.add("person-bubble");
     const input = document.createElement("input");
     input.value = p;
-    input.oninput = () => clearError(input);
+    input.size = Math.max(p.length, 1);
+    input.addEventListener("input", () => {
+      clearError(input);
+      input.size = Math.max(input.value.length, 1);
+    });
     input.onblur = () => {
       if (!renamePerson(i, input.value)) {
         showError(input, "Name must be unique and non-empty.");
