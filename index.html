@@ -11,16 +11,10 @@
   <body>
     <div class="flex-row">
       <h1>Cost Split Calculator</h1>
-      <span
-        id="theme-toggle"
-        role="button"
-        tabindex="0"
-        aria-label="Toggle theme"
-        >☀️</span
-      >
     </div>
 
-    <div id="pool-section">
+    <section id="pool-section" class="section-block">
+      <h2>Pool</h2>
       <label for="pool-name" class="hidden">Pool Name</label>
       <input type="text" id="pool-name" placeholder="Pool name" />
       <span id="pool-unsaved" class="unsaved-indicator"></span>
@@ -29,71 +23,79 @@
       <div class="table-container">
         <table id="saved-pools-table"></table>
       </div>
-    </div>
+    </section>
 
-    <h2>1. People</h2>
-    <div id="people-section">
+    <section id="people-section" class="section-block">
+      <h2>1. People</h2>
       <label for="person-name" class="hidden">Person Name</label>
       <input type="text" id="person-name" placeholder="Name" />
       <button id="save-people" type="button">Add Person</button>
       <ul id="people-list"></ul>
-    </div>
+    </section>
 
-    <h2>2. Transactions</h2>
-    <div id="transactions-section" class="table-container">
-      <table id="transaction-table"></table>
-    </div>
+    <section id="transactions-section" class="section-block">
+      <h2>2. Transactions</h2>
+      <div class="table-container">
+        <table id="transaction-table"></table>
+      </div>
+    </section>
 
-    <h2>3. Cost Splits</h2>
-    <div id="splits-section">
+    <section id="splits-section" class="section-block">
+      <h2>3. Cost Splits</h2>
       <div id="split-table" class="table-container"></div>
       <div id="split-details"></div>
-    </div>
+    </section>
 
-    <h2>4. Summary</h2>
-    <div id="summary" class="table-container"></div>
+    <section class="section-block">
+      <h2>4. Summary</h2>
+      <div id="summary" class="table-container"></div>
+    </section>
 
-    <h2>5. Save/Load State</h2>
-    <div class="flex-row">
-      <label for="state-json-display">Current state JSON</label>
+    <section class="section-block">
+      <h2>5. Save/Load State</h2>
+      <div class="flex-row">
+        <label for="state-json-display">Current state JSON</label>
+        <input
+          id="state-json-display"
+          type="text"
+          readonly
+          class="readonly-field"
+          placeholder="Current state JSON"
+        />
+        <button id="download-json" type="button">Download JSON File</button>
+      </div>
+      <label for="state-json-input" class="hidden">State JSON</label>
+      <textarea
+        id="state-json-input"
+        rows="8"
+        cols="50"
+        placeholder="State JSON"
+      ></textarea>
+      <br />
+      <button id="load-json" type="button">Load from JSON</button>
+      <button id="load-json-file" type="button">Load from JSON File</button>
+      <label for="state-json-file" class="hidden">State JSON File</label>
       <input
-        id="state-json-display"
-        type="text"
-        readonly
-        class="readonly-field"
-        placeholder="Current state JSON"
+        type="file"
+        id="state-json-file"
+        accept="application/json"
+        class="hidden"
       />
-      <button id="download-json" type="button">Download JSON File</button>
-    </div>
-    <label for="state-json-input" class="hidden">State JSON</label>
-    <textarea
-      id="state-json-input"
-      rows="8"
-      cols="50"
-      placeholder="State JSON"
-    ></textarea>
-    <br />
-    <button id="load-json" type="button">Load from JSON</button>
-    <button id="load-json-file" type="button">Load from JSON File</button>
-    <label for="state-json-file" class="hidden">State JSON File</label>
-    <input
-      type="file"
-      id="state-json-file"
-      accept="application/json"
-      class="hidden"
-    />
+    </section>
 
-    <h2>6. Share</h2>
-    <div class="flex-row">
-      <label for="share-url-display">Shareable URL</label>
-      <input
-        id="share-url-display"
-        type="text"
-        readonly
-        class="readonly-field"
-        placeholder="Shareable URL"
-      />
-    </div>
+    <section class="section-block">
+      <h2>6. Share</h2>
+      <div class="flex-row">
+        <label for="share-url-display">Shareable URL</label>
+        <input
+          id="share-url-display"
+          type="text"
+          readonly
+          class="readonly-field"
+          placeholder="Shareable URL"
+        />
+      </div>
+    </section>
 
     <footer>
       <p>
