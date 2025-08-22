@@ -9,6 +9,7 @@
   --section-bg: #dcefff;
   --thead-bg: #74c0f2;
   --alt-row-bg: #e4e9f1;
+  --sub-row-bg: #eef5ff;
   --danger-color: #d9534f;
   --warning-bg: #fff8c4;
   --error-bg: rgba(217, 83, 79, 0.2);
@@ -117,6 +118,11 @@ tbody tr {
 
 tbody tr:nth-child(even) {
   background-color: var(--alt-row-bg);
+}
+
+tbody tr.sub-row,
+tbody tr.sub-row:nth-child(even) {
+  background-color: var(--sub-row-bg);
 }
 
 #saved-pools-table tr.active-pool {

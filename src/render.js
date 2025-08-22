@@ -565,6 +565,7 @@ function renderSplitTable() {
     if (hasItems && !collapsed) {
       t.items.forEach((it, ii) => {
         const iRow = document.createElement("tr");
+        iRow.classList.add("sub-row");
         const itemNameId = `item-name-${ti}-${ii}`;
         let cell = `<td class="indent-cell"><input id="${itemNameId}" type="text" value="${it.item || ""}" placeholder="Item ${ii + 1}" data-action="editItem" data-ti="${ti}" data-ii="${ii}" data-field="item" aria-label="Item ${ii + 1} name for ${tName}"></td>`;
         const itemCostId = `item-cost-${ti}-${ii}`;
@@ -857,6 +858,7 @@ function renderSplitDetails() {
       const scale = itemsTotal > 0 ? t.cost / itemsTotal : 0;
       t.items.forEach((it, ii) => {
         const iRow = document.createElement("tr");
+        iRow.classList.add("sub-row");
         const itemName = it.item || `Item ${ii + 1}`;
         let rowCells = `<td class="indent-cell">${itemName} - $${(it.cost * scale).toFixed(2)}</td>`;
         const splitSum = it.splits.reduce((a, b) => a + b, 0);
