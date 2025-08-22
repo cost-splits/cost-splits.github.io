@@ -105,6 +105,9 @@ thead {
 th,
 td {
   padding: calc(var(--spacing) / 2);
+}
+
+tr {
   border-bottom: 1px solid var(--border-color);
 }
 
