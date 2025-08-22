@@ -31,8 +31,7 @@ groups. Try the live demo at
      [Example](https://cost-splits.github.io/?state=N4IgDg9hA2IFwgKIA8CGBbM0CmcAEAYgE6oDGALgJYQB2qsANONhFtvANogCCNdITAEKoiRAJ4CQAYWgjUIALpNyJGgGcyVWms6g66dgkQ4KRSqUrkJTUhDXl4ARgBMAZgB0ANgDsTMKjFsIicmNSxLHTgOAAZ3AFYGWNdE92cFAF8MoA)
    - **Shares** – assign share counts to weight the split.
      [Example](https://cost-splits.github.io/?state=N4IgDg9hA2IFwgKIA8CGBbM0CmcAEAgmKgE4Au62AdmSADTjYRbbwDaIBOy9IAQqgCWOAJ68AwgAsSggM4gAugzIlUVWagDGZQRHXtQVDKwQAlarQaaIs2nABMAFgDMAVgB0rhsRHYS8AEYGWSxBMnk4NiD7OmcFAF8EoA)
-   - **Itemized** – click the transaction name cell to expand and assign
-     specific items.
+   - **Itemized** – expand a transaction to assign specific items.
      [Example](https://cost-splits.github.io/?state=N4IgDg9hA2IFwgKIA8CGBbM0CmcAEAMgK4B2AxgBYgA042EW28A2iACKomo1LQCWPAGJ8IXEAF1aAFwBOnAM6oyUkSXktQXdEwTFyVWmQjyp8ACwB2AHQXaYVAE9sM+AAZa8rHynq4zAIzUgf6SIN7Y6L7MoOHo8CAAQkQyAObOPEYm8P4AzFY5tiCe-D4sge6u4gC+1DFSEfEAyqjQqAAmGcamcP7+VgBMABweXqV+7uXVtWH1cQgACqgm3IZd2WZWAKz9IyVRFUHVR1VAA)
 4. Use the **State** section to download or load a JSON file and the **Share**
    section to copy a link to the current state.
