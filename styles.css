@@ -96,6 +96,9 @@ table {
   width: 100%;
   border-collapse: collapse;
   background-color: var(--section-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 0.5rem;
+  overflow: hidden;
 }
 
 thead {
@@ -105,10 +108,7 @@ thead {
 th,
 td {
   padding: calc(var(--spacing) / 2);
-}
-
-tr {
-  border-bottom: 1px solid var(--border-color);
+  border: 1px solid var(--border-color);
 }
 
 tbody tr {
