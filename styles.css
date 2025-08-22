@@ -94,12 +94,17 @@ table {
   margin-top: calc(var(--spacing) * 1.25);
   width: 100%;
   border-collapse: collapse;
+  background-color: var(--section-bg);
 }
 
 th,
 td {
   padding: calc(var(--spacing) / 2);
   border-bottom: 1px solid var(--border-color);
+}
+
+tbody tr {
+  background-color: var(--section-bg);
 }
 
 tbody tr:nth-child(even) {

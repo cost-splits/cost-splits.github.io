@@ -12,6 +12,7 @@ groups. Try the live demo at
 - Clear sky-blue section bubbles with subtle contrast for easy scanning
 - Slightly darker gray page background with sky-blue bubbles, complementary
   orange buttons, and subtle shadows for a consistent look
+- Table rows tinted to match section bubbles for a cohesive appearance
 - Itemized and non-itemized transactions with proportional tax and tip
 - Shareable URLs and optional named session pools stored locally
 - Compact participant list with clear totals
