@@ -19,6 +19,7 @@ import {
   downloadJson,
   savePoolToLocalStorage,
   startNewPool,
+  hasUnsavedChanges,
   updatePoolSaveStatus,
 } from "./share.js";
 
@@ -75,6 +76,9 @@ document.getElementById("save-local").addEventListener("click", () => {
 });
 
 document.getElementById("new-pool").addEventListener("click", () => {
+  if (hasUnsavedChanges() && !confirm("You have unsaved changes. Continue?")) {
+    return;
+  }
   startNewPool();
   renderSavedPoolsTable();
 });

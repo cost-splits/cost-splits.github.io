@@ -124,6 +124,30 @@ function updateShareableUrl() {
 }
 
 /**
+ * Check whether the current pool state differs from the saved version.
+ *
+ * @returns {boolean} True if there are unsaved changes.
+ */
+function hasUnsavedChanges() {
+  if (!pool && people.length === 0 && transactions.length === 0) return false;
+  if (!pool) return true;
+  if (typeof localStorage === "undefined") return true;
+  try {
+    const raw = localStorage.getItem(LOCAL_STORAGE_KEY);
+    if (!raw) return true;
+    const pools = JSON.parse(raw);
+    const existing = pools && pools[pool];
+    if (!existing) return true;
+    return (
+      JSON.stringify(existing.people) !== JSON.stringify(people) ||
+      JSON.stringify(existing.transactions) !== JSON.stringify(transactions)
+    );
+  } catch (e) {
+    return true;
+  }
+}
+
+/**
  * Indicate whether the current pool state has been saved.
  */
 function updatePoolSaveStatus() {
@@ -133,25 +157,7 @@ function updatePoolSaveStatus() {
     indicator.textContent = "";
     return;
   }
-  let saved = false;
-  if (typeof localStorage !== "undefined") {
-    try {
-      const raw = localStorage.getItem(LOCAL_STORAGE_KEY);
-      if (raw) {
-        const pools = JSON.parse(raw);
-        const existing = pools && pools[pool];
-        if (existing) {
-          saved =
-            JSON.stringify(existing.people) === JSON.stringify(people) &&
-            JSON.stringify(existing.transactions) ===
-              JSON.stringify(transactions);
-        }
-      }
-    } catch (e) {
-      // ignore
-    }
-  }
-  indicator.textContent = saved ? "" : "Unsaved";
+  indicator.textContent = hasUnsavedChanges() ? "Unsaved" : "";
 }
 
 /**
@@ -377,6 +383,7 @@ export {
   loadStateFromJsonFile,
   loadStateFromUrl,
   savePoolToLocalStorage,
+  hasUnsavedChanges,
   updatePoolSaveStatus,
   loadPoolFromLocalStorage,
   listSavedPools,
