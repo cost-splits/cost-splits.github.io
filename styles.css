@@ -193,6 +193,28 @@ td:first-child {
   align-items: center;
 }
 
+.person-bubble {
+  background-color: var(--muted-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 9999px;
+  padding: 0 calc(var(--spacing) / 2);
+}
+
+.person-bubble input {
+  background: transparent;
+  border: none;
+  margin: 0;
+  padding: calc(var(--spacing) / 2) 0;
+}
+
+.person-bubble input:focus {
+  outline: none;
+}
+
+.person-bubble .delete-btn {
+  margin-left: calc(var(--spacing) / 4);
+}
+
 .unused-row input {
   background-color: var(--muted-bg);
   color: var(--border-color);
