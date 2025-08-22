@@ -258,9 +258,14 @@ function renderPeople() {
   list.innerHTML = "";
   people.forEach((p, i) => {
     const li = document.createElement("li");
+    li.classList.add("person-bubble");
     const input = document.createElement("input");
     input.value = p;
-    input.oninput = () => clearError(input);
+    input.size = Math.max(p.length, 1);
+    input.addEventListener("input", () => {
+      clearError(input);
+      input.size = Math.max(input.value.length, 1);
+    });
     input.onblur = () => {
       if (!renamePerson(i, input.value)) {
         showError(input, "Name must be unique and non-empty.");
@@ -595,7 +600,7 @@ function renderSplitTable() {
           const aria = `Split for ${p} in item ${ii + 1} of ${tName}`;
           cell += `<td><input id="${splitId}" type="text" value="${val2}" data-action="editItemSplit" data-ti="${ti}" data-ii="${ii}" data-pi="${pi}" aria-label="${aria}"></td>`;
         });
-        cell += `<td><span class="delete-btn" data-action="deleteItem" data-ti="${ti}" data-ii="${ii}">❌</span></td>`;
+        cell += `<td><button class="danger-btn" data-action="deleteItem" data-ti="${ti}" data-ii="${ii}">Delete</button></td>`;
         iRow.innerHTML = cell;
         tbody.appendChild(iRow);
       });
