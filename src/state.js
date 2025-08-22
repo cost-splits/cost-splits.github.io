@@ -178,3 +178,49 @@ export function resetState() {
   pool = "";
   afterChange();
 }
+
+/**
+ * Get all transactions paid by a specific person.
+ *
+ * @param {number} index - Index of the person in the {@link people} array.
+ * @returns {typeof transactions} A list of transactions where the person was the payer.
+ */
+export function getTransactionsPaidBy(index) {
+  return transactions.filter((t) => t.payer === index);
+}
+
+/**
+ * Get transactions that involve a specific person either as payer or participant.
+ *
+ * A transaction is considered involving the person if they paid for it or if they
+ * are included in the split of the transaction or any of its itemized sub-splits.
+ *
+ * @param {number} index - Index of the person in the {@link people} array.
+ * @returns {typeof transactions} A list of transactions involving the person.
+ */
+export function getTransactionsInvolving(index) {
+  return transactions.filter((t) => {
+    if (t.payer === index) return true;
+    if (t.splits[index] > 0) return true;
+    if (Array.isArray(t.items)) {
+      return t.items.some((it) => it.splits[index] > 0);
+    }
+    return false;
+  });
+}
+
+/**
+ * Compute settlement suggestions that involve a specific person.
+ *
+ * This uses {@link computeSettlements} to determine all settlements for the
+ * current state and then filters the result for settlements where the person is
+ * either the payer or the receiver.
+ *
+ * @param {number} index - Index of the person in the {@link people} array.
+ * @returns {Array<{from:number,to:number,amount:number}>} Settlements involving the person.
+ */
+export function getSettlementsFor(index) {
+  return computeSettlements(people, transactions).filter(
+    (s) => s.from === index || s.to === index,
+  );
+}
