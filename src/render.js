@@ -73,6 +73,29 @@ function rowClass(index) {
   return index % 2 === 0 ? "row-even" : "row-odd";
 }
 
+let highlightedPerson = null;
+
+/**
+ * Highlight cells associated with a person across the interface.
+ *
+ * @param {number|null} index - Person index to highlight, or null to clear.
+ * @param {boolean} [toggle=false] - Toggle highlight when true.
+ */
+function highlightPerson(index, toggle = false) {
+  highlightedPerson = toggle
+    ? highlightedPerson === index
+      ? null
+      : index
+    : index;
+  document
+    .querySelectorAll(".person-highlight")
+    .forEach((el) => el.classList.remove("person-highlight"));
+  if (highlightedPerson === null) return;
+  document
+    .querySelectorAll(`[data-person-index="${highlightedPerson}"]`)
+    .forEach((el) => el.classList.add("person-highlight"));
+}
+
 // ---- SAVED POOLS ----
 
 /**
@@ -259,6 +282,7 @@ function renderPeople() {
   people.forEach((p, i) => {
     const li = document.createElement("li");
     li.classList.add("person-bubble");
+    li.dataset.personIndex = i;
     const input = document.createElement("input");
     input.value = p;
     input.size = Math.max(p.length, 1);
@@ -286,6 +310,7 @@ function renderPeople() {
     li.appendChild(del);
     list.appendChild(li);
   });
+  highlightPerson(highlightedPerson);
 }
 
 // ---- TRANSACTIONS ----
@@ -343,6 +368,7 @@ function createTransactionRow(t, i) {
     editTransaction(i, "payer", e.target.value, e.target),
   );
   payerCell.appendChild(payerSelect);
+  payerCell.dataset.personIndex = t.payer;
   row.appendChild(payerCell);
 
   const costCell = document.createElement("td");
@@ -454,6 +480,7 @@ function renderTransactionTable() {
   table.appendChild(thead);
   table.appendChild(tbody);
   transactionDiv.appendChild(table);
+  highlightPerson(highlightedPerson);
 }
 
 /**
@@ -503,11 +530,13 @@ function editTransaction(i, field, value, el) {
     el.value = transactions[i].cost.toFixed(2);
   } else if (field === "payer") {
     transactions[i].payer = parseInt(value);
+    el.parentElement.dataset.personIndex = transactions[i].payer;
   } else if (field === "name") {
     transactions[i].name = value;
   }
   afterChange();
   renderSplitDetails();
+  highlightPerson(highlightedPerson);
 }
 
 /**
@@ -571,7 +600,8 @@ function renderSplitTable() {
       const disabled = hasItems ? "disabled" : "";
       const splitId = `split-${ti}-${pi}`;
       const ariaLabel = `Split for ${p} in ${tName}`;
-      cells += `<td><input id="${splitId}" type="text" value="${val}" ${disabled} data-action="editSplit" data-ti="${ti}" data-pi="${pi}" aria-label="${ariaLabel}"></td>`;
+      const hl = rawVal > 0 ? `data-person-index="${pi}"` : "";
+      cells += `<td ${hl}><input id="${splitId}" type="text" value="${val}" ${disabled} data-action="editSplit" data-ti="${ti}" data-pi="${pi}" aria-label="${ariaLabel}"></td>`;
     });
     if (hasItems) {
       cells += `<td><button data-action="unitemizeTransaction" data-ti="${ti}">Normal</button><button data-action="addItem" data-ti="${ti}">Add Item</button></td>`;
@@ -594,7 +624,8 @@ function renderSplitTable() {
           const val2 = raw ? String(raw) : "";
           const splitId = `item-split-${ti}-${ii}-${pi}`;
           const aria = `Split for ${p} in item ${ii + 1} of ${tName}`;
-          cell += `<td><input id="${splitId}" type="text" value="${val2}" data-action="editItemSplit" data-ti="${ti}" data-ii="${ii}" data-pi="${pi}" aria-label="${aria}"></td>`;
+          const hl = raw > 0 ? `data-person-index="${pi}"` : "";
+          cell += `<td ${hl}><input id="${splitId}" type="text" value="${val2}" data-action="editItemSplit" data-ti="${ti}" data-ii="${ii}" data-pi="${pi}" aria-label="${aria}"></td>`;
         });
         cell += `<td><button class="danger-btn" data-action="deleteItem" data-ti="${ti}" data-ii="${ii}">Delete</button></td>`;
         iRow.innerHTML = cell;
@@ -661,6 +692,7 @@ function renderSplitTable() {
   table.appendChild(tbody);
   splitDiv.appendChild(table);
   renderSplitDetails();
+  highlightPerson(highlightedPerson);
 }
 
 /**
@@ -679,8 +711,11 @@ function editSplit(ti, pi, value, el) {
   clearError(el);
   transactions[ti].splits[pi] = value ? parseFloat(value) : 0;
   el.value = value;
+  el.parentElement.dataset.personIndex =
+    transactions[ti].splits[pi] > 0 ? String(pi) : "";
   afterChange();
   renderSplitDetails();
+  highlightPerson(highlightedPerson);
 }
 
 /**
@@ -782,8 +817,11 @@ function editItemSplit(ti, ii, pi, value, el) {
   }
   clearError(el);
   transactions[ti].items[ii].splits[pi] = value ? parseFloat(value) : 0;
+  el.parentElement.dataset.personIndex =
+    transactions[ti].items[ii].splits[pi] > 0 ? String(pi) : "";
   afterChange();
   renderSplitDetails();
+  highlightPerson(highlightedPerson);
 }
 
 /**
@@ -870,7 +908,8 @@ function renderSplitDetails() {
     }
     personTotals.forEach((portion, pi) => {
       totals[pi] += portion;
-      cells += `<td>$${portion.toFixed(2)}</td>`;
+      const hl = portion > 0 ? `data-person-index="${pi}"` : "";
+      cells += `<td ${hl}>$${portion.toFixed(2)}</td>`;
     });
     row.innerHTML = cells;
     tbody.appendChild(row);
@@ -888,7 +927,8 @@ function renderSplitDetails() {
           let portion = 0;
           if (splitSum > 0)
             portion = (it.splits[pi] / splitSum) * it.cost * scale;
-          rowCells += `<td>$${portion.toFixed(2)}</td>`;
+          const hl = portion > 0 ? `data-person-index="${pi}"` : "";
+          rowCells += `<td ${hl}>$${portion.toFixed(2)}</td>`;
         });
         iRow.innerHTML = rowCells;
         tbody.appendChild(iRow);
@@ -901,7 +941,10 @@ function renderSplitDetails() {
   const totalRow = document.createElement("tr");
   totalRow.classList.add(rowClass(rowIdx));
   let cells = "<td><b>Total</b></td>";
-  totals.forEach((val) => (cells += `<td><b>$${val.toFixed(2)}</b></td>`));
+  totals.forEach((val, pi) => {
+    const hl = val > 0 ? `data-person-index="${pi}"` : "";
+    cells += `<td ${hl}><b>$${val.toFixed(2)}</b></td>`;
+  });
   totalRow.innerHTML = cells;
   tbody.appendChild(totalRow);
 
@@ -914,6 +957,7 @@ function renderSplitDetails() {
 
   table.appendChild(tbody);
   div.appendChild(table);
+  highlightPerson(highlightedPerson);
 }
 
 // ---- SUMMARY ----
@@ -958,8 +1002,12 @@ function calculateSummary() {
     }
 
     const row = document.createElement("tr");
+    row.dataset.personIndex = i;
     const personCell = document.createElement("td");
     personCell.textContent = p;
+    personCell.dataset.personIndex = i;
+    personCell.style.cursor = "pointer";
+    personCell.addEventListener("click", () => highlightPerson(i, true));
     row.appendChild(personCell);
 
     const paidCell = document.createElement("td");
@@ -1013,6 +1061,7 @@ function calculateSummary() {
     });
     summaryEl.appendChild(ul);
   }
+  highlightPerson(highlightedPerson);
 }
 
 export {

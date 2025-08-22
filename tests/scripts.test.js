@@ -16,6 +16,8 @@ import {
   renamePerson,
   renderPeople,
   renderSplitTable,
+  renderTransactionTable,
+  renderSplitDetails,
   editSplit,
   calculateSummary,
   renderSavedPoolsTable,
@@ -124,6 +126,36 @@ describe("calculateSummary settlements", () => {
     expect(document.getElementById("summary").innerHTML).toContain(
       "Bob pays Alice $15.00",
     );
+  });
+});
+
+describe("highlighting contributions", () => {
+  beforeEach(() => {
+    document.body.innerHTML = `
+      <div id="summary"></div>
+      <input id="person-name" />
+      <ul id="people-list"></ul>
+      <table id="transaction-table"></table>
+      <div id="split-table"></div>
+      <div id="split-details"></div>
+    `;
+    resetState();
+  });
+
+  test("clicking summary name highlights related cells", () => {
+    people.push("Alice", "Bob");
+    transactions.push({ payer: 0, cost: 20, splits: [1, 1] });
+    renderPeople();
+    renderTransactionTable();
+    renderSplitTable();
+    renderSplitDetails();
+    calculateSummary();
+    const cell = document.querySelector("#summary tbody tr td");
+    cell.click();
+    const highlighted = document.querySelector(
+      '#transaction-table td[data-person-index="0"].person-highlight',
+    );
+    expect(highlighted).not.toBeNull();
   });
 });
 

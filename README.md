@@ -18,6 +18,7 @@ groups. Try the live demo at
 - Shareable URLs and optional named session pools stored locally
 - Warns before discarding unsaved changes when switching pools
 - Compact participant list with clear totals
+- Click a name in the summary to highlight that person's contributions
 - External footer links open in new tabs with security safeguards
 
 ## Usage

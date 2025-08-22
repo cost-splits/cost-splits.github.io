@@ -235,6 +235,10 @@ td[data-action="toggleDetailItems"] {
   background-color: var(--error-bg);
 }
 
+.person-highlight {
+  background-color: var(--warning-bg);
+}
+
 .error {
   color: var(--danger-color);
   font-weight: bold;
