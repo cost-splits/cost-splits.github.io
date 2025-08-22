@@ -1,12 +1,12 @@
 /* Theme variables */
 :root {
   --primary-color: #5bc0eb;
-  --accent-color: #ffb870;
+  --accent-color: #ff9f1c;
   --border-color: #ccc;
-  --background-color: #f5f7fa;
+  --background-color: #f0f2f5;
   --text-color: #222;
   --muted-bg: #e8edf3;
-  --section-bg: #eef2f7;
+  --section-bg: #e6f4ff;
   --alt-row-bg: #f0f3f7;
   --danger-color: #d9534f;
   --warning-bg: #fff8c4;
@@ -69,12 +69,15 @@ textarea {
 button {
   margin: calc(var(--spacing) / 2) 0;
   padding: var(--spacing) calc(var(--spacing) * 2);
-  background-color: var(--primary-color);
+  background-color: var(--accent-color);
   color: #fff;
   border: none;
   border-radius: 0.25rem;
   cursor: pointer;
-  transition: filter 0.2s;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  transition:
+    filter 0.2s,
+    box-shadow 0.2s;
 }
 
 button + button {
@@ -84,11 +87,7 @@ button + button {
 button:hover,
 button:focus {
   filter: brightness(0.9);
-}
-
-button:not(.danger-btn):hover,
-button:not(.danger-btn):focus {
-  background-color: var(--accent-color);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 table {
@@ -243,7 +242,7 @@ input[data-action="editItemSplit"] {
   padding: calc(var(--spacing) * 2);
   border-radius: 0.5rem;
   margin: calc(var(--spacing) * 2) 0;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .section-block h2 {

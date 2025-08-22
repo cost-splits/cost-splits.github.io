@@ -10,8 +10,8 @@ groups. Try the live demo at
 
 - Responsive layout for phones and desktops
 - Clear section bubbles with subtle contrast for easy scanning
-- Light blue theme with complementary accents and soft backgrounds for a
-  consistent look
+- Gentle gray page background with light blue section bubbles, complementary
+  orange buttons, and subtle shadows for a consistent look
 - Itemized and non-itemized transactions with proportional tax and tip
 - Shareable URLs and optional named session pools stored locally
 - Compact participant list with clear totals
