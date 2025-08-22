@@ -105,6 +105,9 @@ thead {
 th,
 td {
   padding: calc(var(--spacing) / 2);
+}
+
+tr {
   border-bottom: 1px solid var(--border-color);
 }
 
@@ -113,6 +116,14 @@ tbody tr {
 }
 
 tbody tr:nth-child(even) {
+  background-color: var(--alt-row-bg);
+}
+
+tbody tr.row-even {
+  background-color: var(--section-bg);
+}
+
+tbody tr.row-odd {
   background-color: var(--alt-row-bg);
 }
 

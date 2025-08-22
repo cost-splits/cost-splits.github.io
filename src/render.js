@@ -62,6 +62,16 @@ function clearError(el) {
   }
 }
 
+/**
+ * Determine zebra stripe class for table rows.
+ *
+ * @param {number} index - Zero-based index of a non-sub row.
+ * @returns {string} CSS class name representing the stripe color.
+ */
+function rowClass(index) {
+  return index % 2 === 0 ? "row-even" : "row-odd";
+}
+
 // ---- SAVED POOLS ----
 
 /**
@@ -416,14 +426,26 @@ function createAddTransactionRow() {
 function renderTransactionTable() {
   const table = document.getElementById("transaction-table");
   table.innerHTML = "";
+  const thead = document.createElement("thead");
+  const tbody = document.createElement("tbody");
+
   if (people.length === 0) {
-    table.innerHTML = "<tr><td>Please add people first</td></tr>";
+    const row = document.createElement("tr");
+    const cell = document.createElement("td");
+    cell.textContent = "Please add people first";
+    row.appendChild(cell);
+    tbody.appendChild(row);
+    table.appendChild(thead);
+    table.appendChild(tbody);
     return;
   }
 
-  table.appendChild(createTransactionHeaderRow());
-  transactions.forEach((t, i) => table.appendChild(createTransactionRow(t, i)));
-  table.appendChild(createAddTransactionRow());
+  thead.appendChild(createTransactionHeaderRow());
+  transactions.forEach((t, i) => tbody.appendChild(createTransactionRow(t, i)));
+  tbody.appendChild(createAddTransactionRow());
+
+  table.appendChild(thead);
+  table.appendChild(tbody);
 }
 
 /**
@@ -512,15 +534,22 @@ function renderSplitTable() {
   }
 
   const table = document.createElement("table");
+  const thead = document.createElement("thead");
   let header = "<tr><th>Name</th><th>Cost</th>";
   people.forEach((p) => (header += `<th>${p}</th>`));
   header += "<th>Action</th></tr>";
-  table.innerHTML = header;
+  thead.innerHTML = header;
+  table.appendChild(thead);
 
+  const tbody = document.createElement("tbody");
+
+  let rowIdx = 0;
   transactions.forEach((t, ti) => {
     const hasItems = Array.isArray(t.items);
     const collapsed = collapsedSplit.has(ti);
     const row = document.createElement("tr");
+    const stripe = rowClass(rowIdx);
+    row.classList.add(stripe);
     if (hasItems) row.classList.add("unused-row");
     const tName = t.name || `Transaction ${ti + 1}`;
     const arrow = hasItems ? (collapsed ? "▶" : "▼") : "";
@@ -544,11 +573,12 @@ function renderSplitTable() {
       cells += `<td><button data-action="itemizeTransaction" data-ti="${ti}">Itemize</button></td>`;
     }
     row.innerHTML = cells;
-    table.appendChild(row);
+    tbody.appendChild(row);
 
     if (hasItems && !collapsed) {
       t.items.forEach((it, ii) => {
         const iRow = document.createElement("tr");
+        iRow.classList.add("sub-row", stripe);
         const itemNameId = `item-name-${ti}-${ii}`;
         let cell = `<td class="indent-cell"><input id="${itemNameId}" type="text" value="${it.item || ""}" placeholder="Item ${ii + 1}" data-action="editItem" data-ti="${ti}" data-ii="${ii}" data-field="item" aria-label="Item ${ii + 1} name for ${tName}"></td>`;
         const itemCostId = `item-cost-${ti}-${ii}`;
@@ -562,9 +592,10 @@ function renderSplitTable() {
         });
         cell += `<td><span class="delete-btn" data-action="deleteItem" data-ti="${ti}" data-ii="${ii}">❌</span></td>`;
         iRow.innerHTML = cell;
-        table.appendChild(iRow);
+        tbody.appendChild(iRow);
       });
     }
+    rowIdx += 1;
   });
 
   table.onchange = (e) => {
@@ -620,6 +651,7 @@ function renderSplitTable() {
     }
   };
 
+  table.appendChild(tbody);
   splitDiv.appendChild(table);
   renderSplitDetails();
 }
@@ -783,20 +815,27 @@ function renderSplitDetails() {
   }
 
   const table = document.createElement("table");
+  const thead = document.createElement("thead");
   const colSpan = people.length + 1;
   let header = `<tr><th colspan="${colSpan}" class="text-center">Split Details</th></tr>`;
   header += "<tr><th>Transaction</th>";
   people.forEach((p) => (header += `<th>${p}</th>`));
   header += "</tr>";
-  table.innerHTML = header;
+  thead.innerHTML = header;
+  table.appendChild(thead);
+
+  const tbody = document.createElement("tbody");
 
   let totals = Array(people.length).fill(0);
+  let rowIdx = 0;
 
   transactions.forEach((t, ti) => {
     const hasItems = Array.isArray(t.items) && t.items.length > 0;
     const collapsed = collapsedDetails.has(ti);
     const tName = t.name || `Transaction ${ti + 1}`;
     const row = document.createElement("tr");
+    const stripe = rowClass(rowIdx);
+    row.classList.add(stripe);
     const arrow = hasItems ? (collapsed ? "▶" : "▼") : "";
     let cells = `<td>${
       arrow
@@ -829,13 +868,14 @@ function renderSplitDetails() {
       cells += `<td>$${portion.toFixed(2)}</td>`;
     });
     row.innerHTML = cells;
-    table.appendChild(row);
+    tbody.appendChild(row);
 
     if (hasItems && !collapsed) {
       const itemsTotal = t.items.reduce((sum, it) => sum + it.cost, 0);
       const scale = itemsTotal > 0 ? t.cost / itemsTotal : 0;
       t.items.forEach((it, ii) => {
         const iRow = document.createElement("tr");
+        iRow.classList.add("sub-row", stripe);
         const itemName = it.item || `Item ${ii + 1}`;
         let rowCells = `<td class="indent-cell">${itemName} - $${(it.cost * scale).toFixed(2)}</td>`;
         const splitSum = it.splits.reduce((a, b) => a + b, 0);
@@ -846,17 +886,19 @@ function renderSplitDetails() {
           rowCells += `<td>$${portion.toFixed(2)}</td>`;
         });
         iRow.innerHTML = rowCells;
-        table.appendChild(iRow);
+        tbody.appendChild(iRow);
       });
     }
+    rowIdx += 1;
   });
 
   // totals row
   const totalRow = document.createElement("tr");
+  totalRow.classList.add(rowClass(rowIdx));
   let cells = "<td><b>Total</b></td>";
   totals.forEach((val) => (cells += `<td><b>$${val.toFixed(2)}</b></td>`));
   totalRow.innerHTML = cells;
-  table.appendChild(totalRow);
+  tbody.appendChild(totalRow);
 
   table.onclick = (e) => {
     if (e.target.dataset.action === "toggleDetailItems") {
@@ -864,6 +906,7 @@ function renderSplitDetails() {
     }
   };
 
+  table.appendChild(tbody);
   div.appendChild(table);
 }
 
@@ -878,8 +921,18 @@ function calculateSummary() {
   const settlements = computeSettlements(people, transactions);
   const maxAbs = Math.max(...nets.map((n) => Math.abs(n)), 1);
 
-  let html =
-    "<table><tr><th>Person</th><th>Total Paid</th><th>Total Cost</th><th>Total Owed</th></tr>";
+  const table = document.createElement("table");
+  const thead = document.createElement("thead");
+  const headerRow = document.createElement("tr");
+  ["Person", "Total Paid", "Total Cost", "Total Owed"].forEach((h) => {
+    const th = document.createElement("th");
+    th.textContent = h;
+    headerRow.appendChild(th);
+  });
+  thead.appendChild(headerRow);
+  table.appendChild(thead);
+
+  const tbody = document.createElement("tbody");
   let totalPaid = 0,
     totalOwes = 0,
     totalNet = 0;
@@ -891,27 +944,37 @@ function calculateSummary() {
     totalNet += net;
 
     const intensity = Math.abs(net) / maxAbs;
-    let style = "";
+    let background = "";
     if (net > 0) {
-      style = `background:rgba(0,255,0,${0.2 + 0.6 * intensity})`;
+      background = `rgba(0,255,0,${0.2 + 0.6 * intensity})`;
     } else if (net < 0) {
-      style = `background:rgba(255,0,0,${0.2 + 0.6 * intensity})`;
+      background = `rgba(255,0,0,${0.2 + 0.6 * intensity})`;
     }
 
-    const netStr =
+    const row = document.createElement("tr");
+    const personCell = document.createElement("td");
+    personCell.textContent = p;
+    row.appendChild(personCell);
+
+    const paidCell = document.createElement("td");
+    paidCell.textContent = `$${paid[i].toFixed(2)}`;
+    row.appendChild(paidCell);
+
+    const owesCell = document.createElement("td");
+    owesCell.textContent = `$${owes[i].toFixed(2)}`;
+    row.appendChild(owesCell);
+
+    const netCell = document.createElement("td");
+    netCell.textContent =
       (net > 0 ? "+" : net < 0 ? "−" : "") + "$" + Math.abs(net).toFixed(2);
-    const netCell = style
-      ? `<td style="${style}">${netStr}</td>`
-      : `<td>${netStr}</td>`;
-    html += `<tr>
-          <td>${p}</td>
-          <td>$${paid[i].toFixed(2)}</td>
-          <td>$${owes[i].toFixed(2)}</td>
-          ${netCell}
-        </tr>`;
+    if (background) netCell.style.background = background;
+    row.appendChild(netCell);
+
+    tbody.appendChild(row);
   });
 
-  html += `<tr><td><b>Total</b></td>
+  const totalRow = document.createElement("tr");
+  totalRow.innerHTML = `<td><b>Total</b></td>
         <td><b>$${totalPaid.toFixed(2)}</b></td>
         <td><b>$${totalOwes.toFixed(2)}</b></td>
         <td><b>${
@@ -922,19 +985,28 @@ function calculateSummary() {
               : "") +
           "$" +
           Math.abs(totalNet).toFixed(2)
-        }</b></td></tr>`;
-  html += "</table>";
-  if (settlements.length > 0) {
-    html += "<h3>Suggested Settlements</h3><ul>";
-    settlements.forEach((s) => {
-      html += `<li>${people[s.from]} pays ${people[s.to]} $${s.amount.toFixed(
-        2,
-      )}</li>`;
-    });
-    html += "</ul>";
-  }
+        }</b></td>`;
+  tbody.appendChild(totalRow);
 
-  summaryEl.innerHTML = html;
+  table.appendChild(tbody);
+
+  summaryEl.innerHTML = "";
+  summaryEl.appendChild(table);
+
+  if (settlements.length > 0) {
+    const h3 = document.createElement("h3");
+    h3.textContent = "Suggested Settlements";
+    summaryEl.appendChild(h3);
+    const ul = document.createElement("ul");
+    settlements.forEach((s) => {
+      const li = document.createElement("li");
+      li.textContent = `${people[s.from]} pays ${people[s.to]} $${s.amount.toFixed(
+        2,
+      )}`;
+      ul.appendChild(li);
+    });
+    summaryEl.appendChild(ul);
+  }
 }
 
 export {
