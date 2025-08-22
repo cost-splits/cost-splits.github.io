@@ -17,6 +17,7 @@ groups. Try the live demo at
 - Itemized and non-itemized transactions with proportional tax and tip
 - Shareable URLs and optional named session pools stored locally
 - Compact participant list with clear totals
+- External footer links open in new tabs with security safeguards
 
 ## Usage
 
