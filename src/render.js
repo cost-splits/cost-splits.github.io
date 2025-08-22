@@ -1038,16 +1038,34 @@ function showPersonSummary(index) {
   const existing = document.getElementById("person-summary");
   if (existing) existing.remove();
 
+  summaryEl
+    .querySelectorAll("tbody tr")
+    .forEach((r) => r.classList.remove("person-highlight"));
+
   const container = document.createElement("div");
   container.id = "person-summary";
 
+  const heading = document.createElement("h3");
+  heading.textContent = `${people[index]} summary`;
+  container.appendChild(heading);
+
   const closeBtn = document.createElement("button");
   closeBtn.textContent = "Close";
-  closeBtn.addEventListener("click", () => container.remove());
+  closeBtn.addEventListener("click", () => {
+    container.remove();
+    summaryEl
+      .querySelectorAll("tbody tr")
+      .forEach((r) => r.classList.remove("person-highlight"));
+  });
   container.appendChild(closeBtn);
 
   container.appendChild(renderPersonView(index));
   summaryEl.appendChild(container);
+
+  const rows = summaryEl.querySelectorAll("tbody tr");
+  if (rows[index]) {
+    rows[index].classList.add("person-highlight");
+  }
 }
 
 /**
@@ -1055,9 +1073,10 @@ function showPersonSummary(index) {
  *
  * @param {typeof transactions} txns - Transactions to display.
  * @param {number} [personIndex] - Person index to show individual shares for.
+ * @param {number} [highlightIndex] - Person index whose payer cells should be highlighted.
  * @returns {HTMLTableElement} Table element with transaction details.
  */
-function buildTransactionsTable(txns, personIndex) {
+function buildTransactionsTable(txns, personIndex, highlightIndex) {
   const table = document.createElement("table");
   const thead = document.createElement("thead");
   const headerRow = document.createElement("tr");
@@ -1080,12 +1099,16 @@ function buildTransactionsTable(txns, personIndex) {
 
     const payerCell = document.createElement("td");
     payerCell.textContent = people[t.payer] || "";
+    if (typeof highlightIndex === "number" && t.payer === highlightIndex) {
+      payerCell.classList.add("person-highlight");
+    }
     row.appendChild(payerCell);
 
     const costCell = document.createElement("td");
     let cost = t.cost;
     if (typeof personIndex === "number") {
       cost = getShareForTransaction(t, personIndex);
+      costCell.classList.add("person-highlight");
     }
     costCell.textContent = `$${cost.toFixed(2)}`;
     row.appendChild(costCell);
@@ -1174,24 +1197,49 @@ function buildTableSection(title, table) {
  */
 function renderPersonView(index) {
   const container = document.createElement("div");
+  const name = people[index] || "";
 
   const paidTx = getTransactionsPaidBy(index);
-  container.appendChild(
-    buildTableSection("Paid Transactions", buildTransactionsTable(paidTx)),
-  );
+  if (paidTx.length > 0) {
+    container.appendChild(
+      buildTableSection(
+        "Paid Transactions",
+        buildTransactionsTable(paidTx, undefined, index),
+      ),
+    );
+  } else {
+    const p = document.createElement("p");
+    p.textContent = `${name} didn't pay for any transactions.`;
+    container.appendChild(p);
+  }
 
   const sharedTx = getTransactionsInvolving(index);
-  container.appendChild(
-    buildTableSection("Shared Splits", buildTransactionsTable(sharedTx, index)),
-  );
+  if (sharedTx.length > 0) {
+    container.appendChild(
+      buildTableSection(
+        "Shared Splits",
+        buildTransactionsTable(sharedTx, index, index),
+      ),
+    );
+  } else {
+    const p = document.createElement("p");
+    p.textContent = `${name} wasn't involved in any cost splits.`;
+    container.appendChild(p);
+  }
 
   const settlements = getSettlementsFor(index);
-  container.appendChild(
-    buildTableSection(
-      "Settlement Plan",
-      buildSettlementTable(settlements, index),
-    ),
-  );
+  if (settlements.length > 0) {
+    container.appendChild(
+      buildTableSection(
+        "Settlement Plan",
+        buildSettlementTable(settlements, index),
+      ),
+    );
+  } else {
+    const p = document.createElement("p");
+    p.textContent = `${name} has no settlements.`;
+    container.appendChild(p);
+  }
 
   return container;
 }

@@ -19,8 +19,10 @@ groups. Try the live demo at
 - Warns before discarding unsaved changes when switching pools
 - Compact participant list with clear totals
 - External footer links open in new tabs with security safeguards
-- Click a name in the summary to expand their transactions, personal shares, and
-  a highlighted settlement plan beneath the table
+- Click a name in the summary to expand an "[Name] summary" showing their
+  transactions, personal shares, and a highlighted settlement plan beneath the
+  table. If they haven't paid or split any costs, a note appears instead of an
+  empty section.
 
 ## Usage
 
@@ -37,8 +39,10 @@ groups. Try the live demo at
    - **Itemized** – expand a transaction to assign specific items.
      [Example](https://cost-splits.github.io/?state=N4IgDg9hA2IFwgKIA8CGBbM0CmcAEAMgK4B2AxgBYgA042EW28A2iACKomo1LQCWPAGJ8IXEAF1aAFwBOnAM6oyUkSXktQXdEwTFyVWmQjyp8ACwB2AHQXaYVAE9sM+AAZa8rHynq4zAIzUgf6SIN7Y6L7MoOHo8CAAQkQyAObOPEYm8P4AzFY5tiCe-D4sge6u4gC+1DFSEfEAyqjQqAAmGcamcP7+VgBMABweXqV+7uXVtWH1cQgACqgm3IZd2WZWAKz9IyVRFUHVR1VAA)
 4. In the **View Summary** section, review totals. Click a person's name to see
-   their transactions, what they owe for shared splits, and a highlighted
-   settlement plan beneath the summary. Use **Close** to hide the personal view.
+   their "[Name] summary" with transactions they paid, what they owe for shared
+   splits, and a highlighted settlement plan beneath the summary. Any section
+   with no data will show a friendly note instead. Use **Close** to hide the
+   personal view.
 5. Use the **State** section to download or load a JSON file and the **Share**
    section to copy a link to the current state.
 

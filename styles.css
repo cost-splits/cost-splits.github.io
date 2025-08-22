@@ -167,7 +167,9 @@ td:first-child {
   text-decoration: underline;
 }
 
-.settlement-person {
+.settlement-person,
+td.person-highlight,
+tr.person-highlight > td {
   background-color: var(--warning-bg);
 }
 

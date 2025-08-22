@@ -18,7 +18,7 @@ describe("person view helpers", () => {
     );
   });
 
-  test("renderPersonView builds sections for paid, shared and settlement", () => {
+  test("renderPersonView builds sections and highlights person", () => {
     const view = renderPersonView(0);
     const tables = view.querySelectorAll("table");
     expect(tables.length).toBe(3);
@@ -26,11 +26,26 @@ describe("person view helpers", () => {
     const paidRows = tables[0].querySelectorAll("tbody tr");
     expect(paidRows.length).toBe(1);
     expect(paidRows[0].children[0].textContent).toBe("T1");
+    expect(paidRows[0].children[1].classList.contains("person-highlight")).toBe(
+      true,
+    );
 
     const sharedRows = tables[1].querySelectorAll("tbody tr");
     expect(sharedRows.length).toBe(2);
     expect(sharedRows[0].children[2].textContent).toBe("$5.00");
     expect(sharedRows[1].children[2].textContent).toBe("$10.00");
+    expect(
+      sharedRows[0].children[1].classList.contains("person-highlight"),
+    ).toBe(true);
+    expect(
+      sharedRows[1].children[1].classList.contains("person-highlight"),
+    ).toBe(false);
+    expect(
+      sharedRows[0].children[2].classList.contains("person-highlight"),
+    ).toBe(true);
+    expect(
+      sharedRows[1].children[2].classList.contains("person-highlight"),
+    ).toBe(true);
 
     const settlementRows = tables[2].querySelectorAll("tbody tr");
     expect(settlementRows.length).toBe(1);
@@ -45,6 +60,16 @@ describe("person view helpers", () => {
     expect(settlementRows[0].children[2].textContent).toBe("$5.00");
   });
 
+  test("renderPersonView handles missing transactions and splits", () => {
+    resetState();
+    people.push("A");
+    const view = renderPersonView(0);
+    expect(view.querySelector("table")).toBeNull();
+    expect(view.textContent).toContain("A didn't pay for any transactions.");
+    expect(view.textContent).toContain("A wasn't involved in any cost splits.");
+    expect(view.textContent).toContain("A has no settlements.");
+  });
+
   test("showPersonSummary appends view below summary and closes", () => {
     document.body.innerHTML = '<div id="summary"></div>';
     calculateSummary();
@@ -53,11 +78,21 @@ describe("person view helpers", () => {
     const summaryTable = document.querySelector("#summary > table");
     expect(summaryTable).not.toBeNull();
 
+    const highlighted = summaryTable
+      ?.querySelectorAll("tbody tr")[0]
+      .classList.contains("person-highlight");
+    expect(highlighted).toBe(true);
+
     const personDiv = document.getElementById("person-summary");
     expect(personDiv).not.toBeNull();
+    expect(personDiv.querySelector("h3")?.textContent).toBe("A summary");
     expect(personDiv.querySelectorAll("table").length).toBe(3);
 
     personDiv.querySelector("button")?.click();
     expect(document.getElementById("person-summary")).toBeNull();
+    const cleared = summaryTable
+      ?.querySelectorAll("tbody tr")[0]
+      .classList.contains("person-highlight");
+    expect(cleared).toBe(false);
   });
 });
