@@ -148,6 +148,18 @@ function hasUnsavedChanges() {
 }
 
 /**
+ * Display a temporary tooltip indicating a copy action succeeded.
+ *
+ * @param {string} id - Element ID of the tooltip to reveal.
+ */
+function showCopyTooltip(id) {
+  const tip = document.getElementById(id);
+  if (!tip) return;
+  tip.classList.remove("hidden");
+  setTimeout(() => tip.classList.add("hidden"), 1500);
+}
+
+/**
  * Copy the current state JSON to the clipboard.
  *
  * Gracefully does nothing if the clipboard API is unavailable.
@@ -159,6 +171,7 @@ async function copyCurrentStateJson() {
   if (!el || typeof navigator === "undefined" || !navigator.clipboard) return;
   try {
     await navigator.clipboard.writeText(el.value);
+    showCopyTooltip("copy-json-tooltip");
   } catch (e) {
     // ignore copy failures
   }
@@ -176,6 +189,7 @@ async function copyShareableUrl() {
   if (!el || typeof navigator === "undefined" || !navigator.clipboard) return;
   try {
     await navigator.clipboard.writeText(el.value);
+    showCopyTooltip("copy-share-tooltip");
   } catch (e) {
     j; // ignore copy failures
   }

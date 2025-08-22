@@ -372,6 +372,7 @@ describe("sharing", () => {
     document.body.innerHTML = `
       <input id="pool-name" />
       <input id="state-json-display" />
+      <span id="copy-json-tooltip" class="hidden"></span>
       <textarea id="state-json-input"></textarea>
       <input id="state-json-file" type="file" />
       <div id="summary"></div>
@@ -381,6 +382,7 @@ describe("sharing", () => {
       <div id="split-table"></div>
       <div id="split-details"></div>
       <input id="share-url-display" />
+      <span id="copy-share-tooltip" class="hidden"></span>
     `;
     resetState();
     window.history.replaceState({}, "", "/");
@@ -417,18 +419,30 @@ describe("sharing", () => {
     expect(transactions).toEqual([{ payer: 0, cost: 5, splits: [1] }]);
   });
 
-  test("copyCurrentStateJson writes value to clipboard", async () => {
+  test("copyCurrentStateJson writes value and shows tooltip", async () => {
     const el = document.getElementById("state-json-display");
+    const tip = document.getElementById("copy-json-tooltip");
     el.value = "example";
+    jest.useFakeTimers();
     await copyCurrentStateJson();
     expect(navigator.clipboard.writeText).toHaveBeenCalledWith("example");
+    expect(tip.classList.contains("hidden")).toBe(false);
+    jest.runAllTimers();
+    expect(tip.classList.contains("hidden")).toBe(true);
+    jest.useRealTimers();
   });
 
-  test("copyShareableUrl writes value to clipboard", async () => {
+  test("copyShareableUrl writes value and shows tooltip", async () => {
     const el = document.getElementById("share-url-display");
+    const tip = document.getElementById("copy-share-tooltip");
     el.value = "url";
+    jest.useFakeTimers();
     await copyShareableUrl();
     expect(navigator.clipboard.writeText).toHaveBeenCalledWith("url");
+    expect(tip.classList.contains("hidden")).toBe(false);
+    jest.runAllTimers();
+    expect(tip.classList.contains("hidden")).toBe(true);
+    jest.useRealTimers();
   });
 });
 
