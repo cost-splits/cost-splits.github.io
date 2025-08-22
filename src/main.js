@@ -21,6 +21,8 @@ import {
   startNewPool,
   hasUnsavedChanges,
   updatePoolSaveStatus,
+  copyCurrentStateJson,
+  copyShareableUrl,
 } from "./share.js";
 
 setAfterChange(() => {
@@ -48,6 +50,12 @@ document.getElementById("person-name").addEventListener("keydown", (e) => {
 document
   .getElementById("download-json")
   .addEventListener("click", downloadJson);
+document
+  .getElementById("copy-json")
+  .addEventListener("click", copyCurrentStateJson);
+document
+  .getElementById("copy-share")
+  .addEventListener("click", copyShareableUrl);
 document.getElementById("load-json").addEventListener("click", () => {
   loadStateFromJson();
   renderSavedPoolsTable();

@@ -31,6 +31,8 @@ import {
   listSavedPools,
   startNewPool,
   downloadJson,
+  copyCurrentStateJson,
+  copyShareableUrl,
 } from "../src/share.js";
 import lz from "lz-string";
 import { jest } from "@jest/globals";
@@ -382,6 +384,9 @@ describe("sharing", () => {
     `;
     resetState();
     window.history.replaceState({}, "", "/");
+    Object.assign(navigator, {
+      clipboard: { writeText: jest.fn().mockResolvedValue(undefined) },
+    });
   });
 
   test("updateShareableUrl builds URL with state", () => {
@@ -410,6 +415,20 @@ describe("sharing", () => {
     loadStateFromUrl();
     expect(people).toEqual(["Bob"]);
     expect(transactions).toEqual([{ payer: 0, cost: 5, splits: [1] }]);
+  });
+
+  test("copyCurrentStateJson writes value to clipboard", async () => {
+    const el = document.getElementById("state-json-display");
+    el.value = "example";
+    await copyCurrentStateJson();
+    expect(navigator.clipboard.writeText).toHaveBeenCalledWith("example");
+  });
+
+  test("copyShareableUrl writes value to clipboard", async () => {
+    const el = document.getElementById("share-url-display");
+    el.value = "url";
+    await copyShareableUrl();
+    expect(navigator.clipboard.writeText).toHaveBeenCalledWith("url");
   });
 });
 

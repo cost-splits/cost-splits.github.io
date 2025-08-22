@@ -148,6 +148,40 @@ function hasUnsavedChanges() {
 }
 
 /**
+ * Copy the current state JSON to the clipboard.
+ *
+ * Gracefully does nothing if the clipboard API is unavailable.
+ *
+ * @returns {Promise<void>} Resolves once the text is copied.
+ */
+async function copyCurrentStateJson() {
+  const el = document.getElementById("state-json-display");
+  if (!el || typeof navigator === "undefined" || !navigator.clipboard) return;
+  try {
+    await navigator.clipboard.writeText(el.value);
+  } catch (e) {
+    // ignore copy failures
+  }
+}
+
+/**
+ * Copy the shareable URL to the clipboard.
+ *
+ * Gracefully does nothing if the clipboard API is unavailable.
+ *
+ * @returns {Promise<void>} Resolves once the text is copied.
+ */
+async function copyShareableUrl() {
+  const el = document.getElementById("share-url-display");
+  if (!el || typeof navigator === "undefined" || !navigator.clipboard) return;
+  try {
+    await navigator.clipboard.writeText(el.value);
+  } catch (e) {
+    j; // ignore copy failures
+  }
+}
+
+/**
  * Indicate whether the current pool state has been saved.
  */
 function updatePoolSaveStatus() {
@@ -390,6 +424,8 @@ export {
   deletePoolFromLocalStorage,
   startNewPool,
   downloadJson,
+  copyCurrentStateJson,
+  copyShareableUrl,
   validateState,
   applyLoadedState,
 };

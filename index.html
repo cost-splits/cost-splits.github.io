@@ -55,13 +55,23 @@
       <h2>5. Save/Load State</h2>
       <div class="flex-row">
         <label for="state-json-display">Current state JSON</label>
-        <input
-          id="state-json-display"
-          type="text"
-          readonly
-          class="readonly-field"
-          placeholder="Current state JSON"
-        />
+        <div class="copy-wrapper">
+          <input
+            id="state-json-display"
+            type="text"
+            readonly
+            class="readonly-field"
+            placeholder="Current state JSON"
+          />
+          <button
+            id="copy-json"
+            type="button"
+            class="copy-btn"
+            aria-label="Copy current state JSON"
+          >
+            📋
+          </button>
+        </div>
         <button id="download-json" type="button">Download JSON File</button>
       </div>
       <label for="state-json-input" class="hidden">State JSON</label>
@@ -87,13 +97,23 @@
       <h2>6. Share</h2>
       <div class="flex-row">
         <label for="share-url-display">Shareable URL</label>
-        <input
-          id="share-url-display"
-          type="text"
-          readonly
-          class="readonly-field"
-          placeholder="Shareable URL"
-        />
+        <div class="copy-wrapper">
+          <input
+            id="share-url-display"
+            type="text"
+            readonly
+            class="readonly-field"
+            placeholder="Shareable URL"
+          />
+          <button
+            id="copy-share"
+            type="button"
+            class="copy-btn"
+            aria-label="Copy shareable URL"
+          >
+            📋
+          </button>
+        </div>
       </div>
     </section>
 
