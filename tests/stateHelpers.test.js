@@ -8,6 +8,7 @@ import {
   getTransactionsPaidBy,
   getTransactionsInvolving,
   getSettlementsFor,
+  getShareForTransaction,
 } from "../src/state.js";
 
 describe("state helper filters", () => {
@@ -51,5 +52,22 @@ describe("state helper filters", () => {
   test("getSettlementsFor filters settlement list", () => {
     transactions.push({ payer: 0, cost: 30, splits: [1, 1, 0] });
     expect(getSettlementsFor(1)).toEqual([{ from: 1, to: 0, amount: 15 }]);
+  });
+
+  test("getShareForTransaction handles simple and itemized splits", () => {
+    const simple = { payer: 0, cost: 30, splits: [1, 1, 2] };
+    expect(getShareForTransaction(simple, 1)).toBeCloseTo(7.5);
+
+    const itemized = {
+      payer: 0,
+      cost: 10,
+      splits: [1, 1],
+      items: [
+        { cost: 2, splits: [1, 0] },
+        { cost: 3, splits: [0, 1] },
+        { cost: 5, splits: [1, 1] },
+      ],
+    };
+    expect(getShareForTransaction(itemized, 1)).toBeCloseTo(5.5);
   });
 });

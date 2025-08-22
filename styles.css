@@ -167,6 +167,10 @@ td:first-child {
   text-decoration: underline;
 }
 
+.settlement-person {
+  background-color: var(--warning-bg);
+}
+
 .delete-btn {
   cursor: pointer;
   color: var(--danger-color);

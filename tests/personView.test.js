@@ -25,11 +25,19 @@ describe("renderPersonView", () => {
 
     const sharedRows = tables[1].querySelectorAll("tbody tr");
     expect(sharedRows.length).toBe(2);
+    expect(sharedRows[0].children[2].textContent).toBe("$5.00");
+    expect(sharedRows[1].children[2].textContent).toBe("$10.00");
 
     const settlementRows = tables[2].querySelectorAll("tbody tr");
     expect(settlementRows.length).toBe(1);
     expect(settlementRows[0].children[0].textContent).toBe("A");
     expect(settlementRows[0].children[1].textContent).toBe("B");
+    expect(
+      settlementRows[0].children[0].classList.contains("settlement-person"),
+    ).toBe(true);
+    expect(
+      settlementRows[0].children[1].classList.contains("settlement-person"),
+    ).toBe(false);
     expect(settlementRows[0].children[2].textContent).toBe("$5.00");
   });
 });
