@@ -174,9 +174,17 @@ td:first-child {
 }
 
 .collapse-btn {
-  cursor: pointer;
   margin-right: calc(var(--spacing) / 2);
   font-weight: bold;
+  display: inline-block;
+  width: 1em;
+  text-align: center;
+  font-size: 0.9em;
+}
+
+td[data-action="toggleSplitItems"],
+td[data-action="toggleDetailItems"] {
+  cursor: pointer;
 }
 
 #people-list {
