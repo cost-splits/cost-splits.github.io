@@ -1,12 +1,12 @@
 /* Theme variables */
 :root {
-  --primary-color: #5bc0eb;
+  --primary-color: #4a9ad9;
   --accent-color: #ff9f1c;
   --border-color: #ccc;
-  --background-color: #f0f2f5;
+  --background-color: #e4e9f1;
   --text-color: #222;
   --muted-bg: #e8edf3;
-  --section-bg: #e6f4ff;
+  --section-bg: #dcefff;
   --alt-row-bg: #f0f3f7;
   --danger-color: #d9534f;
   --warning-bg: #fff8c4;
