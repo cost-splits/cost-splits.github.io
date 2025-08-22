@@ -7,7 +7,8 @@
   --text-color: #222;
   --muted-bg: #e8edf3;
   --section-bg: #dcefff;
-  --alt-row-bg: #f0f3f7;
+  --thead-bg: #74c0f2;
+  --alt-row-bg: #e4e9f1;
   --danger-color: #d9534f;
   --warning-bg: #fff8c4;
   --error-bg: rgba(217, 83, 79, 0.2);
@@ -95,6 +96,10 @@ table {
   width: 100%;
   border-collapse: collapse;
   background-color: var(--section-bg);
+}
+
+thead {
+  background-color: var(--thead-bg);
 }
 
 th,

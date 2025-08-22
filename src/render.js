@@ -779,7 +779,6 @@ function renderSplitDetails() {
     return;
   }
   if (transactions.length === 0) {
-    div.textContent = "No split details yet.";
     return;
   }
 
