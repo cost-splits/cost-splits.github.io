@@ -162,6 +162,11 @@ td:first-child {
   text-align: left;
 }
 
+.person-link {
+  cursor: pointer;
+  text-decoration: underline;
+}
+
 .delete-btn {
   cursor: pointer;
   color: var(--danger-color);

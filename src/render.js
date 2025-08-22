@@ -963,6 +963,8 @@ function calculateSummary() {
     const row = document.createElement("tr");
     const personCell = document.createElement("td");
     personCell.textContent = p;
+    personCell.classList.add("person-link");
+    personCell.addEventListener("click", () => showPersonSummary(i));
     row.appendChild(personCell);
 
     const paidCell = document.createElement("td");
@@ -1016,6 +1018,27 @@ function calculateSummary() {
     });
     summaryEl.appendChild(ul);
   }
+}
+
+/**
+ * Show detailed information for a single person and hide the global summary.
+ *
+ * Creates a temporary view with a back button that restores the original
+ * summary table.
+ *
+ * @param {number} index - Index of the person in the {@link people} array.
+ * @returns {void}
+ */
+function showPersonSummary(index) {
+  const summaryEl = document.getElementById("summary");
+  if (!summaryEl) return;
+  summaryEl.innerHTML = "";
+
+  const backBtn = document.createElement("button");
+  backBtn.textContent = "Back to Summary";
+  backBtn.addEventListener("click", calculateSummary);
+  summaryEl.appendChild(backBtn);
+  summaryEl.appendChild(renderPersonView(index));
 }
 
 /**
