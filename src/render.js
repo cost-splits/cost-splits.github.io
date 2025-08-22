@@ -552,12 +552,10 @@ function renderSplitTable() {
     row.classList.add(stripe);
     if (hasItems) row.classList.add("unused-row");
     const tName = t.name || `Transaction ${ti + 1}`;
-    const arrow = hasItems ? (collapsed ? "▶" : "▼") : "";
-    let cells = `<td>${
-      arrow
-        ? `<span class="collapse-btn" data-action="toggleSplitItems" data-ti="${ti}">${arrow}</span>`
-        : ""
-    }${tName}</td>`;
+    const arrow = hasItems ? (collapsed ? "▸" : "▾") : "";
+    let cells = `<td ${
+      arrow ? `data-action="toggleSplitItems" data-ti="${ti}"` : ""
+    }>${arrow ? `<span class="collapse-btn">${arrow}</span>` : ""}${tName}</td>`;
     cells += `<td>$${t.cost.toFixed(2)}</td>`;
     people.forEach((p, pi) => {
       const rawVal = t.splits[pi];
@@ -628,7 +626,8 @@ function renderSplitTable() {
   };
 
   table.onclick = (e) => {
-    const t = e.target;
+    const t = e.target.closest("[data-action]");
+    if (!t) return;
     const ti = parseInt(t.dataset.ti);
     switch (t.dataset.action) {
       case "toggleSplitItems":
@@ -836,12 +835,10 @@ function renderSplitDetails() {
     const row = document.createElement("tr");
     const stripe = rowClass(rowIdx);
     row.classList.add(stripe);
-    const arrow = hasItems ? (collapsed ? "▶" : "▼") : "";
-    let cells = `<td>${
-      arrow
-        ? `<span class="collapse-btn" data-action="toggleDetailItems" data-ti="${ti}">${arrow}</span>`
-        : ""
-    }${tName} - $${t.cost.toFixed(2)}</td>`;
+    const arrow = hasItems ? (collapsed ? "▸" : "▾") : "";
+    let cells = `<td ${
+      arrow ? `data-action="toggleDetailItems" data-ti="${ti}"` : ""
+    }>${arrow ? `<span class="collapse-btn">${arrow}</span>` : ""}${tName} - $${t.cost.toFixed(2)}</td>`;
     const personTotals = Array(people.length).fill(0);
     if (hasItems) {
       const itemsTotal = t.items.reduce((sum, it) => sum + it.cost, 0);
@@ -901,8 +898,9 @@ function renderSplitDetails() {
   tbody.appendChild(totalRow);
 
   table.onclick = (e) => {
-    if (e.target.dataset.action === "toggleDetailItems") {
-      toggleDetailItems(parseInt(e.target.dataset.ti));
+    const target = e.target.closest("[data-action]");
+    if (target && target.dataset.action === "toggleDetailItems") {
+      toggleDetailItems(parseInt(target.dataset.ti));
     }
   };
 
