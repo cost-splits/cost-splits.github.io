@@ -436,21 +436,16 @@ function createAddTransactionRow() {
  * Render the transaction table with all existing transactions and input row.
  */
 function renderTransactionTable() {
-  const table = document.getElementById("transaction-table");
-  table.innerHTML = "";
-  const thead = document.createElement("thead");
-  const tbody = document.createElement("tbody");
+  const transactionDiv = document.getElementById("transaction-table");
+  transactionDiv.innerHTML = "";
 
   if (people.length === 0) {
-    const row = document.createElement("tr");
-    const cell = document.createElement("td");
-    cell.textContent = "Please add people first";
-    row.appendChild(cell);
-    tbody.appendChild(row);
-    table.appendChild(thead);
-    table.appendChild(tbody);
+    transactionDiv.textContent = "Add people before adding transactions.";
     return;
   }
+  const table = document.createElement("table");
+  const thead = document.createElement("thead");
+  const tbody = document.createElement("tbody");
 
   thead.appendChild(createTransactionHeaderRow());
   transactions.forEach((t, i) => tbody.appendChild(createTransactionRow(t, i)));
@@ -458,6 +453,7 @@ function renderTransactionTable() {
 
   table.appendChild(thead);
   table.appendChild(tbody);
+  transactionDiv.appendChild(table);
 }
 
 /**
