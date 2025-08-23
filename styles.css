@@ -152,14 +152,32 @@ tbody tr.row-odd {
 
 #saved-pools-table .reorder-buttons {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
-  width: 1.5rem;
+  justify-content: center;
+  gap: calc(var(--spacing) / 4);
+  width: auto;
 }
 
 #saved-pools-table .reorder-buttons button {
+  margin: 0;
   padding: 0;
+  background: none;
+  color: inherit;
+  border: none;
   line-height: 1;
+  box-shadow: none;
+}
+
+#saved-pools-table tr.active-pool .reorder-buttons button {
+  background: none;
+  color: inherit;
+}
+
+#saved-pools-table .reorder-buttons button:hover,
+#saved-pools-table .reorder-buttons button:focus {
+  filter: none;
+  box-shadow: none;
 }
 
 #transaction-table {
@@ -176,6 +194,10 @@ td {
 }
 
 td:first-child {
+  text-align: left;
+}
+
+#saved-pools-table td:nth-child(2) {
   text-align: left;
 }
 
