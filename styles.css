@@ -64,6 +64,35 @@ h1 {
   color: #fff;
 }
 
+.tab-nav {
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing);
+  margin-bottom: calc(var(--spacing) * 2);
+}
+
+.tab-button {
+  margin: 0;
+  padding: var(--spacing) calc(var(--spacing) * 2);
+  background-color: var(--primary-color);
+  color: #fff;
+  border: none;
+  border-radius: 0.25rem 0.25rem 0 0;
+  cursor: pointer;
+  text-decoration: none;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.tab-button:hover,
+.tab-button:focus {
+  filter: brightness(0.9);
+  text-decoration: none;
+}
+
+.tab-button.active {
+  background-color: var(--accent-color);
+}
+
 h2 {
   margin-top: calc(var(--spacing) * 4);
 }

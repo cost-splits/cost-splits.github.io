@@ -14,86 +14,131 @@
       <h1>Cost Split Calculator</h1>
     </header>
 
-    <section id="pool-section" class="section-block">
-      <h2>Save/Load Local Pools</h2>
-      <label for="pool-name" class="hidden">Pool Name</label>
-      <input type="text" id="pool-name" placeholder="Pool name" />
-      <span id="pool-unsaved" class="unsaved-indicator"></span>
-      <button id="new-pool" type="button">New Pool</button>
-      <button id="save-local" type="button">Save Pool</button>
-      <div class="table-container">
-        <table id="saved-pools-table"></table>
-      </div>
-    </section>
+    <nav class="tab-nav">
+      <button class="tab-button active" data-tab="calculator-tab">
+        Calculator
+      </button>
+      <button class="tab-button" data-tab="about-tab">About</button>
+      <a
+        class="tab-button"
+        href="https://github.com/cost-splits/cost-splits.github.io"
+        target="_blank"
+        rel="noopener noreferrer"
+        >Source</a
+      >
+    </nav>
 
-    <section id="people-section" class="section-block">
-      <h2>1. Add People</h2>
-      <label for="person-name" class="hidden">Person Name</label>
-      <input type="text" id="person-name" placeholder="Name" />
-      <button id="save-people" type="button">Add Person</button>
-      <ul id="people-list"></ul>
-    </section>
+    <main id="calculator-tab" class="tab-panel">
+      <section id="pool-section" class="section-block">
+        <h2>Save/Load Local Pools</h2>
+        <label for="pool-name" class="hidden">Pool Name</label>
+        <input type="text" id="pool-name" placeholder="Pool name" />
+        <span id="pool-unsaved" class="unsaved-indicator"></span>
+        <button id="new-pool" type="button">New Pool</button>
+        <button id="save-local" type="button">Save Pool</button>
+        <div class="table-container">
+          <table id="saved-pools-table"></table>
+        </div>
+      </section>
 
-    <section id="transactions-section" class="section-block">
-      <h2>2. Add Transactions</h2>
-      <div id="transaction-table" class="table-container"></div>
-    </section>
+      <section id="people-section" class="section-block">
+        <h2>1. Add People</h2>
+        <label for="person-name" class="hidden">Person Name</label>
+        <input type="text" id="person-name" placeholder="Name" />
+        <button id="save-people" type="button">Add Person</button>
+        <ul id="people-list"></ul>
+      </section>
 
-    <section id="splits-section" class="section-block">
-      <h2>3. Distribute Cost Splits</h2>
-      <div id="split-table" class="table-container"></div>
-      <div id="split-details"></div>
-    </section>
+      <section id="transactions-section" class="section-block">
+        <h2>2. Add Transactions</h2>
+        <div id="transaction-table" class="table-container"></div>
+      </section>
 
-    <section class="section-block">
-      <h2>4. View Summary</h2>
-      <div id="summary" class="table-container"></div>
-    </section>
+      <section id="splits-section" class="section-block">
+        <h2>3. Distribute Cost Splits</h2>
+        <div id="split-table" class="table-container"></div>
+        <div id="split-details"></div>
+      </section>
 
-    <section class="section-block">
-      <h2>5. Save/Load State</h2>
-      <div class="flex-row">
-        <label for="state-json-display">Current state JSON</label>
+      <section class="section-block">
+        <h2>4. View Summary</h2>
+        <div id="summary" class="table-container"></div>
+      </section>
+
+      <section class="section-block">
+        <h2>5. Save/Load State</h2>
+        <div class="flex-row">
+          <label for="state-json-display">Current state JSON</label>
+          <input
+            id="state-json-display"
+            type="text"
+            readonly
+            class="readonly-field"
+            placeholder="Current state JSON"
+          />
+          <button id="download-json" type="button">Download JSON File</button>
+        </div>
+        <label for="state-json-input" class="hidden">State JSON</label>
+        <textarea
+          id="state-json-input"
+          rows="8"
+          cols="50"
+          placeholder="State JSON"
+        ></textarea>
+        <br />
+        <button id="load-json" type="button">Load from JSON</button>
+        <button id="load-json-file" type="button">Load from JSON File</button>
+        <label for="state-json-file" class="hidden">State JSON File</label>
         <input
-          id="state-json-display"
-          type="text"
-          readonly
-          class="readonly-field"
-          placeholder="Current state JSON"
+          type="file"
+          id="state-json-file"
+          accept="application/json"
+          class="hidden"
         />
-        <button id="download-json" type="button">Download JSON File</button>
-      </div>
-      <label for="state-json-input" class="hidden">State JSON</label>
-      <textarea
-        id="state-json-input"
-        rows="8"
-        cols="50"
-        placeholder="State JSON"
-      ></textarea>
-      <br />
-      <button id="load-json" type="button">Load from JSON</button>
-      <button id="load-json-file" type="button">Load from JSON File</button>
-      <label for="state-json-file" class="hidden">State JSON File</label>
-      <input
-        type="file"
-        id="state-json-file"
-        accept="application/json"
-        class="hidden"
-      />
-    </section>
+      </section>
 
-    <section class="section-block">
-      <h2>6. Share</h2>
-      <div class="flex-row">
-        <label for="share-url-display">Shareable URL</label>
-        <input
-          id="share-url-display"
-          type="text"
-          readonly
-          class="readonly-field"
-          placeholder="Shareable URL"
-        />
-      </div>
+      <section class="section-block">
+        <h2>6. Share</h2>
+        <div class="flex-row">
+          <label for="share-url-display">Shareable URL</label>
+          <input
+            id="share-url-display"
+            type="text"
+            readonly
+            class="readonly-field"
+            placeholder="Shareable URL"
+          />
+        </div>
+      </section>
+    </main>
+
+    <section id="about-tab" class="tab-panel hidden section-block">
+      <h2>About Cost Splits</h2>
+      <p>
+        Cost Splits is a simple, free, and open-source web application that
+        makes it easy to share expenses with friends, family, or groups.
+      </p>
+      <p>
+        Unlike many expense-tracking tools, Cost Splits does not require an
+        account, sign-up, or even a database. All calculations happen directly
+        in your browser, and your data is never sent to a server. This means:
+      </p>
+      <ul>
+        <li>Private by design – your information stays on your device.</li>
+        <li>
+          No logins or signups – just open the page and start splitting costs.
+        </li>
+        <li>Always free – hosted openly on GitHub Pages.</li>
+        <li>
+          Transparent and open-source – check out the code on
+          <a
+            href="https://github.com/cost-splits/cost-splits.github.io"
+            target="_blank"
+            rel="noopener noreferrer"
+            >GitHub</a
+          >.
+        </li>
+      </ul>
     </section>
 
     <footer>
