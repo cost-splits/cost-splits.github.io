@@ -565,9 +565,8 @@ function renderSplitTable() {
     if (hasItems) row.classList.add("unused-row");
     const tName = t.name || `Transaction ${ti + 1}`;
     const arrow = hasItems ? (collapsed ? "▸" : "▾") : "";
-    let cells = `<td ${
-      arrow ? `data-action="toggleSplitItems" data-ti="${ti}"` : ""
-    }>${arrow ? `<span class="collapse-btn">${arrow}</span>` : ""}${tName}</td>`;
+    let cells = `<td ${arrow ? `data-action="toggleSplitItems" data-ti="${ti}"` : ""
+      }>${arrow ? `<span class="collapse-btn">${arrow}</span>` : ""}${tName}</td>`;
     cells += `<td>$${t.cost.toFixed(2)}</td>`;
     people.forEach((p, pi) => {
       const rawVal = t.splits[pi];
@@ -848,9 +847,8 @@ function renderSplitDetails() {
     const stripe = rowClass(rowIdx);
     row.classList.add(stripe);
     const arrow = hasItems ? (collapsed ? "▸" : "▾") : "";
-    let cells = `<td ${
-      arrow ? `data-action="toggleDetailItems" data-ti="${ti}"` : ""
-    }>${arrow ? `<span class="collapse-btn">${arrow}</span>` : ""}${tName} - $${t.cost.toFixed(2)}</td>`;
+    let cells = `<td ${arrow ? `data-action="toggleDetailItems" data-ti="${ti}"` : ""
+      }>${arrow ? `<span class="collapse-btn">${arrow}</span>` : ""}${tName} - $${t.cost.toFixed(2)}</td>`;
     const personTotals = Array(people.length).fill(0);
     if (hasItems) {
       const itemsTotal = t.items.reduce((sum, it) => sum + it.cost, 0);
@@ -990,15 +988,14 @@ function calculateSummary() {
   totalRow.innerHTML = `<td><b>Total</b></td>
         <td><b>$${totalPaid.toFixed(2)}</b></td>
         <td><b>$${totalOwes.toFixed(2)}</b></td>
-        <td><b>${
-          (totalNet > 0
-            ? "+"
-            : totalNet < 0 || Object.is(totalNet, -0)
-              ? "−"
-              : "") +
-          "$" +
-          Math.abs(totalNet).toFixed(2)
-        }</b></td>`;
+        <td><b>${(totalNet > 0
+      ? "+"
+      : totalNet < 0 || Object.is(totalNet, -0)
+        ? "−"
+        : "") +
+    "$" +
+    Math.abs(totalNet).toFixed(2)
+    }</b></td>`;
   tbody.appendChild(totalRow);
 
   table.appendChild(tbody);
@@ -1067,9 +1064,10 @@ function showPersonSummary(index) {
   container.id = "person-summary";
 
   const heading = document.createElement("h3");
-  heading.textContent = `${people[index]} summary`;
-  container.appendChild(heading);
-
+  heading.style.display = "flex";
+  heading.style.justifyContent = "space-between";
+  heading.style.alignItems = "center";
+  heading.textContent = `${people[index]}'s summary`;
   const closeBtn = document.createElement("button");
   closeBtn.textContent = "Close";
   closeBtn.addEventListener("click", () => {
@@ -1081,7 +1079,8 @@ function showPersonSummary(index) {
       .forEach((r) => r.classList.remove("person-highlight"));
     clearPersonHighlights();
   });
-  container.appendChild(closeBtn);
+  heading.appendChild(closeBtn);
+  container.appendChild(heading);
 
   container.appendChild(renderPersonView(index));
 
