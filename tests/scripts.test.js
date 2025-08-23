@@ -29,6 +29,7 @@ import {
   savePoolToLocalStorage,
   loadPoolFromLocalStorage,
   listSavedPools,
+  reorderSavedPools,
   startNewPool,
   downloadJson,
 } from "../src/share.js";
@@ -462,7 +463,15 @@ describe("local storage helpers", () => {
   test("listSavedPools returns stored names", () => {
     savePoolToLocalStorage("a", { people: [], transactions: [] });
     savePoolToLocalStorage("b", { people: [], transactions: [] });
-    expect(listSavedPools().sort()).toEqual(["a", "b"]);
+    expect(listSavedPools()).toEqual(["a", "b"]);
+  });
+
+  test("reorderSavedPools reorders saved names", () => {
+    savePoolToLocalStorage("a", { people: [], transactions: [] });
+    savePoolToLocalStorage("b", { people: [], transactions: [] });
+    savePoolToLocalStorage("c", { people: [], transactions: [] });
+    reorderSavedPools(2, 0);
+    expect(listSavedPools()).toEqual(["c", "a", "b"]);
   });
 
   test("renderSavedPoolsTable populates DOM, highlights and deletes pool", () => {

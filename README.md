@@ -16,6 +16,7 @@ groups. Try the live demo at
 - Tables outlined with subtle borders and rounded corners for a softer look
 - Itemized and non-itemized transactions with proportional tax and tip
 - Shareable URLs and optional named session pools stored locally
+- Drag handles to reorder saved pools
 - Warns before discarding unsaved changes when switching pools
 - Compact participant list with clear totals
 - External footer links open in new tabs with security safeguards

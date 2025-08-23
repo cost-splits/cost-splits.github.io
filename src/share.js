@@ -23,6 +23,80 @@ if (!lz) {
 }
 
 export const LOCAL_STORAGE_KEY = "costSplitPools";
+const LOCAL_STORAGE_ORDER_KEY = `${LOCAL_STORAGE_KEY}Order`;
+
+/**
+ * Retrieve the persisted order of saved pools.
+ *
+ * Ensures that every key in `pools` appears exactly once in the returned
+ * array. Missing names are appended to the end and extraneous names are
+ * removed.
+ *
+ * @param {object} pools - Map of pool names to data.
+ * @returns {string[]} Ordered list of pool names.
+ */
+function getPoolOrder(pools) {
+  if (typeof localStorage === "undefined") {
+    return Object.keys(pools || {});
+  }
+  try {
+    const raw = localStorage.getItem(LOCAL_STORAGE_ORDER_KEY);
+    let order = raw ? JSON.parse(raw) : [];
+    if (!Array.isArray(order)) order = [];
+    Object.keys(pools || {}).forEach((name) => {
+      if (!order.includes(name)) order.push(name);
+    });
+    order = order.filter((name) =>
+      Object.prototype.hasOwnProperty.call(pools, name),
+    );
+    return order;
+  } catch (e) {
+    return Object.keys(pools || {});
+  }
+}
+
+/**
+ * Persist pool ordering to local storage.
+ *
+ * @param {string[]} order - Array of pool names in desired order.
+ */
+function setPoolOrder(order) {
+  if (typeof localStorage === "undefined") return;
+  try {
+    localStorage.setItem(LOCAL_STORAGE_ORDER_KEY, JSON.stringify(order));
+  } catch (e) {
+    // Ignore write errors
+  }
+}
+
+/**
+ * Move a pool from one index to another within the saved order.
+ *
+ * @param {number} fromIndex - Original index of the pool.
+ * @param {number} toIndex - Target index for the pool.
+ */
+function reorderSavedPools(fromIndex, toIndex) {
+  if (typeof localStorage === "undefined" || fromIndex === toIndex) return;
+  try {
+    const raw = localStorage.getItem(LOCAL_STORAGE_KEY);
+    if (!raw) return;
+    const pools = JSON.parse(raw);
+    const order = getPoolOrder(pools);
+    if (
+      fromIndex < 0 ||
+      fromIndex >= order.length ||
+      toIndex < 0 ||
+      toIndex >= order.length
+    ) {
+      return;
+    }
+    const [moved] = order.splice(fromIndex, 1);
+    order.splice(toIndex, 0, moved);
+    setPoolOrder(order);
+  } catch (e) {
+    // Fail silently
+  }
+}
 
 // ---- SAVE/LOAD STATE ----
 // Validate the structure and types of the loaded state
@@ -283,6 +357,11 @@ function savePoolToLocalStorage(name, { people: p, transactions: t }) {
     const pools = raw ? JSON.parse(raw) : {};
     pools[name] = { people: p, transactions: t };
     localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(pools));
+    const order = getPoolOrder(pools);
+    if (!order.includes(name)) {
+      order.push(name);
+      setPoolOrder(order);
+    }
   } catch (e) {
     // Fail silently; local storage may be unavailable or full.
   }
@@ -321,7 +400,7 @@ function listSavedPools() {
     const raw = localStorage.getItem(LOCAL_STORAGE_KEY);
     if (!raw) return [];
     const pools = JSON.parse(raw);
-    return pools && typeof pools === "object" ? Object.keys(pools) : [];
+    return getPoolOrder(pools);
   } catch (e) {
     return [];
   }
@@ -341,6 +420,12 @@ function deletePoolFromLocalStorage(name) {
     if (pools && typeof pools === "object" && name in pools) {
       delete pools[name];
       localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(pools));
+      const order = getPoolOrder(pools);
+      const idx = order.indexOf(name);
+      if (idx !== -1) {
+        order.splice(idx, 1);
+        setPoolOrder(order);
+      }
     }
   } catch (e) {
     // Fail silently
@@ -387,6 +472,7 @@ export {
   updatePoolSaveStatus,
   loadPoolFromLocalStorage,
   listSavedPools,
+  reorderSavedPools,
   deletePoolFromLocalStorage,
   startNewPool,
   downloadJson,

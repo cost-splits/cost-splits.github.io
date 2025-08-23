@@ -19,6 +19,8 @@ import {
   deletePoolFromLocalStorage,
   LOCAL_STORAGE_KEY,
   hasUnsavedChanges,
+  listSavedPools,
+  reorderSavedPools,
 } from "./share.js";
 
 const COST_FORMAT_MSG =
@@ -91,7 +93,7 @@ function renderSavedPoolsTable() {
 
   const thead = document.createElement("thead");
   const headerRow = document.createElement("tr");
-  ["Pool", "People", "Transactions", "Actions"].forEach((h) => {
+  ["", "Pool", "People", "Transactions", "Actions"].forEach((h) => {
     const th = document.createElement("th");
     th.textContent = h;
     headerRow.appendChild(th);
@@ -108,8 +110,21 @@ function renderSavedPoolsTable() {
     pools = {};
   }
 
-  Object.entries(pools).forEach(([name, data]) => {
+  const names = listSavedPools();
+  names.forEach((name, i) => {
+    const data = pools[name] || { people: [], transactions: [] };
     const row = document.createElement("tr");
+
+    const handle = document.createElement("td");
+    handle.className = "drag-handle";
+    handle.textContent = "⋮⋮";
+    handle.draggable = true;
+    handle.addEventListener("dragstart", (e) => {
+      e.dataTransfer.setData("text/plain", String(i));
+    });
+    handle.addEventListener("click", (e) => e.stopPropagation());
+    row.appendChild(handle);
+
     const nameCell = document.createElement("td");
     nameCell.textContent = name;
     row.appendChild(nameCell);
@@ -149,6 +164,14 @@ function renderSavedPoolsTable() {
         return;
       }
       loadPoolFromLocalStorage(name);
+      renderSavedPoolsTable();
+    });
+    row.addEventListener("dragover", (e) => e.preventDefault());
+    row.addEventListener("drop", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const from = Number(e.dataTransfer.getData("text/plain"));
+      reorderSavedPools(from, i);
       renderSavedPoolsTable();
     });
     tbody.appendChild(row);

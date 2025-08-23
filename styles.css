@@ -150,6 +150,12 @@ tbody tr.row-odd {
   color: #fff;
 }
 
+#saved-pools-table .drag-handle {
+  cursor: move;
+  text-align: center;
+  width: 1.5rem;
+}
+
 #transaction-table {
   table-layout: auto;
   width: 100%;
