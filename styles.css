@@ -150,10 +150,16 @@ tbody tr.row-odd {
   color: #fff;
 }
 
-#saved-pools-table .drag-handle {
-  cursor: move;
-  text-align: center;
+#saved-pools-table .reorder-buttons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   width: 1.5rem;
+}
+
+#saved-pools-table .reorder-buttons button {
+  padding: 0;
+  line-height: 1;
 }
 
 #transaction-table {

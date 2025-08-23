@@ -474,6 +474,17 @@ describe("local storage helpers", () => {
     expect(listSavedPools()).toEqual(["c", "a", "b"]);
   });
 
+  test("arrow buttons move saved pool rows", () => {
+    savePoolToLocalStorage("a", { people: [], transactions: [] });
+    savePoolToLocalStorage("b", { people: [], transactions: [] });
+    renderSavedPoolsTable();
+    const downBtn = document.querySelector(
+      "#saved-pools-table tbody tr:first-child .reorder-buttons button:last-child",
+    );
+    downBtn.click();
+    expect(listSavedPools()).toEqual(["b", "a"]);
+  });
+
   test("renderSavedPoolsTable populates DOM, highlights and deletes pool", () => {
     people.push("Ann");
     transactions.push({ payer: 0, cost: 5, splits: [1] });
@@ -489,7 +500,7 @@ describe("local storage helpers", () => {
       "#saved-pools-table tbody tr.active-pool",
     );
     expect(active).not.toBeNull();
-    const btn = active.querySelector("button");
+    const btn = active.querySelector("button.danger-btn");
     btn.click();
     expect(listSavedPools()).toEqual([]);
   });
