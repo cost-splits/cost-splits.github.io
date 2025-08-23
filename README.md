@@ -11,8 +11,8 @@ groups. Try the live demo at
 - Responsive layout for phones and desktops
 - Branded header with gradient background, clickable logo, and built-in
   navigation links
-- Header tabs include an About section and GitHub source link with the GitHub
-  icon
+- Header tabs include About and Tutorials sections plus a GitHub source link
+  with the GitHub icon
 - Clear sky-blue section bubbles with subtle contrast for easy scanning
 - Slightly darker gray page background with sky-blue bubbles, complementary
   orange buttons, and subtle shadows for a consistent look
