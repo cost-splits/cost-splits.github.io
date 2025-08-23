@@ -9,6 +9,10 @@ import {
   computeSummary,
   computeSettlements,
   pool,
+  getTransactionsPaidBy,
+  getTransactionsInvolving,
+  getSettlementsFor,
+  getShareForTransaction,
 } from "./state.js";
 import {
   loadPoolFromLocalStorage,
@@ -960,6 +964,8 @@ function calculateSummary() {
     const row = document.createElement("tr");
     const personCell = document.createElement("td");
     personCell.textContent = p;
+    personCell.classList.add("person-link");
+    personCell.addEventListener("click", () => showPersonSummary(i));
     row.appendChild(personCell);
 
     const paidCell = document.createElement("td");
@@ -980,6 +986,7 @@ function calculateSummary() {
   });
 
   const totalRow = document.createElement("tr");
+  totalRow.classList.add("total-row");
   totalRow.innerHTML = `<td><b>Total</b></td>
         <td><b>$${totalPaid.toFixed(2)}</b></td>
         <td><b>$${totalOwes.toFixed(2)}</b></td>
@@ -1015,6 +1022,302 @@ function calculateSummary() {
   }
 }
 
+/**
+ * Remove highlight classes from transaction and split sections.
+ *
+ * @returns {void}
+ */
+function clearPersonHighlights() {
+  document
+    .querySelectorAll("#transaction-table tbody tr.person-highlight")
+    .forEach((r) => r.classList.remove("person-highlight"));
+  document
+    .querySelectorAll("#split-table td.person-highlight")
+    .forEach((c) => c.classList.remove("person-highlight"));
+  document
+    .querySelectorAll("#split-details td.person-highlight")
+    .forEach((c) => c.classList.remove("person-highlight"));
+}
+
+/**
+ * Show detailed information for a single person below the summary.
+ *
+ * Appends a person-specific view after the global summary table along with a
+ * Close button to remove it. Any previously displayed person view is replaced
+ * with the new selection.
+ *
+ * @param {number} index - Index of the person in the {@link people} array.
+ * @returns {void}
+ */
+function showPersonSummary(index) {
+  const summaryEl = document.getElementById("summary");
+  if (!summaryEl) return;
+
+  const existing = document.getElementById("person-summary");
+  if (existing) existing.remove();
+  const existingSep = document.getElementById("person-summary-separator");
+  if (existingSep) existingSep.remove();
+
+  summaryEl
+    .querySelectorAll("tbody tr")
+    .forEach((r) => r.classList.remove("person-highlight"));
+  clearPersonHighlights();
+
+  const container = document.createElement("div");
+  container.id = "person-summary";
+
+  const heading = document.createElement("h3");
+  heading.style.display = "flex";
+  heading.style.justifyContent = "space-between";
+  heading.style.alignItems = "center";
+  heading.textContent = `${people[index]}'s summary`;
+  const closeBtn = document.createElement("button");
+  closeBtn.textContent = "Close";
+  closeBtn.addEventListener("click", () => {
+    container.remove();
+    const sep = document.getElementById("person-summary-separator");
+    if (sep) sep.remove();
+    summaryEl
+      .querySelectorAll("tbody tr")
+      .forEach((r) => r.classList.remove("person-highlight"));
+    clearPersonHighlights();
+  });
+  heading.appendChild(closeBtn);
+  container.appendChild(heading);
+
+  container.appendChild(renderPersonView(index));
+
+  const separator = document.createElement("hr");
+  separator.id = "person-summary-separator";
+  summaryEl.appendChild(separator);
+  summaryEl.appendChild(container);
+
+  const rows = summaryEl.querySelectorAll("tbody tr");
+  if (rows[index]) {
+    rows[index].classList.add("person-highlight");
+  }
+
+  const txRows = document.querySelectorAll("#transaction-table tbody tr");
+  txRows.forEach((row, ti) => {
+    if (ti >= transactions.length) return;
+    const t = transactions[ti];
+    if (t.payer === index) row.classList.add("person-highlight");
+  });
+
+  document
+    .querySelectorAll(`#split-table input[data-pi="${index}"]`)
+    .forEach((input) => {
+      const td = input.parentElement;
+      const val = parseFloat(input.value);
+      if (td && val > 0) td.classList.add("person-highlight");
+    });
+
+  const detailBody = document.querySelector("#split-details tbody");
+  if (detailBody) {
+    detailBody.querySelectorAll("tr").forEach((row) => {
+      const cell = row.children[index + 1];
+      if (cell) {
+        const num = parseFloat(cell.textContent.replace(/[^0-9.-]+/g, ""));
+        if (num > 0) cell.classList.add("person-highlight");
+      }
+    });
+  }
+}
+
+/**
+ * Build a simple table listing transactions.
+ *
+ * @param {typeof transactions} txns - Transactions to display.
+ * @param {number} [personIndex] - Person index to show individual shares for.
+ * @param {number} [highlightIndex] - Person index whose payer cells should be highlighted.
+ * @returns {HTMLTableElement} Table element with transaction details and a total row.
+ */
+function buildTransactionsTable(txns, personIndex, highlightIndex) {
+  const table = document.createElement("table");
+  const thead = document.createElement("thead");
+  const headerRow = document.createElement("tr");
+  const costHeader = typeof personIndex === "number" ? "Share" : "Cost";
+  ["Name", "Paid By", costHeader].forEach((h) => {
+    const th = document.createElement("th");
+    th.textContent = h;
+    headerRow.appendChild(th);
+  });
+  thead.appendChild(headerRow);
+  table.appendChild(thead);
+
+  const tbody = document.createElement("tbody");
+  let total = 0;
+  txns.forEach((t) => {
+    const row = document.createElement("tr");
+
+    const nameCell = document.createElement("td");
+    nameCell.textContent = t.name || "";
+    row.appendChild(nameCell);
+
+    const payerCell = document.createElement("td");
+    payerCell.textContent = people[t.payer] || "";
+    if (typeof highlightIndex === "number" && t.payer === highlightIndex) {
+      payerCell.classList.add("person-highlight");
+    }
+    row.appendChild(payerCell);
+
+    const costCell = document.createElement("td");
+    let cost = t.cost;
+    if (typeof personIndex === "number") {
+      cost = getShareForTransaction(t, personIndex);
+      costCell.classList.add("person-highlight");
+    }
+    costCell.textContent = `$${cost.toFixed(2)}`;
+    row.appendChild(costCell);
+    total += cost;
+
+    tbody.appendChild(row);
+  });
+
+  const totalRow = document.createElement("tr");
+  totalRow.classList.add("total-row");
+  totalRow.innerHTML =
+    "<td><b>Total</b></td><td></td><td><b>$" + total.toFixed(2) + "</b></td>";
+  tbody.appendChild(totalRow);
+
+  table.appendChild(tbody);
+  return table;
+}
+
+/**
+ * Build a table describing settlement transfers.
+ *
+ * @param {Array<{from:number,to:number,amount:number}>} settlements - Suggested settlements.
+ * @param {number} [personIndex] - Person index to highlight within the table.
+ * @returns {HTMLTableElement} Table element with settlement details and a total row.
+ */
+function buildSettlementTable(settlements, personIndex) {
+  const table = document.createElement("table");
+  const thead = document.createElement("thead");
+  const headerRow = document.createElement("tr");
+  ["From", "To", "Amount"].forEach((h) => {
+    const th = document.createElement("th");
+    th.textContent = h;
+    headerRow.appendChild(th);
+  });
+  thead.appendChild(headerRow);
+  table.appendChild(thead);
+
+  const tbody = document.createElement("tbody");
+  let total = 0;
+  settlements.forEach((s) => {
+    const row = document.createElement("tr");
+
+    const fromCell = document.createElement("td");
+    fromCell.textContent = people[s.from] || "";
+    if (typeof personIndex === "number" && s.from === personIndex) {
+      fromCell.classList.add("settlement-person");
+    }
+    row.appendChild(fromCell);
+
+    const toCell = document.createElement("td");
+    toCell.textContent = people[s.to] || "";
+    if (typeof personIndex === "number" && s.to === personIndex) {
+      toCell.classList.add("settlement-person");
+    }
+    row.appendChild(toCell);
+
+    const amountCell = document.createElement("td");
+    amountCell.textContent = `$${s.amount.toFixed(2)}`;
+    row.appendChild(amountCell);
+    total += s.amount;
+
+    tbody.appendChild(row);
+  });
+
+  const totalRow = document.createElement("tr");
+  totalRow.classList.add("total-row");
+  totalRow.innerHTML =
+    "<td><b>Total</b></td><td></td><td><b>$" + total.toFixed(2) + "</b></td>";
+  tbody.appendChild(totalRow);
+
+  table.appendChild(tbody);
+  return table;
+}
+
+/**
+ * Create a titled section wrapping a table with project styling.
+ *
+ * @param {string} title - Section heading.
+ * @param {HTMLTableElement} table - Table to include in the section.
+ * @returns {HTMLElement} Section element containing the titled table.
+ */
+function buildTableSection(title, table) {
+  const section = document.createElement("section");
+  const heading = document.createElement("h3");
+  heading.textContent = title;
+  section.appendChild(heading);
+  const wrapper = document.createElement("div");
+  wrapper.className = "table-container";
+  wrapper.appendChild(table);
+  section.appendChild(wrapper);
+  return section;
+}
+
+/**
+ * Render a view of transactions and settlements for a specific person.
+ *
+ * Builds sections showing transactions they paid, all transactions they
+ * participated in with their individual share, and settlement suggestions
+ * involving them.
+ *
+ * @param {number} index - Index of the person in the {@link people} array.
+ * @returns {HTMLElement} Container element with the person's view.
+ */
+function renderPersonView(index) {
+  const container = document.createElement("div");
+  const name = people[index] || "";
+
+  const paidTx = getTransactionsPaidBy(index);
+  if (paidTx.length > 0) {
+    container.appendChild(
+      buildTableSection(
+        "Paid Transactions",
+        buildTransactionsTable(paidTx, undefined, index),
+      ),
+    );
+  } else {
+    const p = document.createElement("p");
+    p.textContent = `${name} didn't pay for any transactions.`;
+    container.appendChild(p);
+  }
+
+  const sharedTx = getTransactionsInvolving(index);
+  if (sharedTx.length > 0) {
+    container.appendChild(
+      buildTableSection(
+        "Shared Splits",
+        buildTransactionsTable(sharedTx, index, index),
+      ),
+    );
+  } else {
+    const p = document.createElement("p");
+    p.textContent = `${name} wasn't involved in any cost splits.`;
+    container.appendChild(p);
+  }
+
+  const settlements = getSettlementsFor(index);
+  if (settlements.length > 0) {
+    container.appendChild(
+      buildTableSection(
+        "Settlement Plan",
+        buildSettlementTable(settlements, index),
+      ),
+    );
+  } else {
+    const p = document.createElement("p");
+    p.textContent = `${name} has no settlements.`;
+    container.appendChild(p);
+  }
+
+  return container;
+}
+
 export {
   addPerson,
   deletePerson,
@@ -1040,4 +1343,6 @@ export {
   renderSplitDetails,
   calculateSummary,
   renderSavedPoolsTable,
+  renderPersonView,
+  showPersonSummary,
 };

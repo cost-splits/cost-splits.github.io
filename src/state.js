@@ -178,3 +178,84 @@ export function resetState() {
   pool = "";
   afterChange();
 }
+
+/**
+ * Get all transactions paid by a specific person.
+ *
+ * @param {number} index - Index of the person in the {@link people} array.
+ * @returns {typeof transactions} A list of transactions where the person was the payer.
+ */
+export function getTransactionsPaidBy(index) {
+  return transactions.filter((t) => t.payer === index);
+}
+
+/**
+ * Get transactions that involve a specific person either as payer or participant.
+ *
+ * A transaction is considered involving the person if they paid for it or if they
+ * are included in the split of the transaction or any of its itemized sub-splits.
+ *
+ * @param {number} index - Index of the person in the {@link people} array.
+ * @returns {typeof transactions} A list of transactions involving the person.
+ */
+export function getTransactionsInvolving(index) {
+  return transactions.filter((t) => {
+    if (t.payer === index) return true;
+    if (t.splits[index] > 0) return true;
+    if (Array.isArray(t.items)) {
+      return t.items.some((it) => it.splits[index] > 0);
+    }
+    return false;
+  });
+}
+
+/**
+ * Compute settlement suggestions that involve a specific person.
+ *
+ * This uses {@link computeSettlements} to determine all settlements for the
+ * current state and then filters the result for settlements where the person is
+ * either the payer or the receiver.
+ *
+ * @param {number} index - Index of the person in the {@link people} array.
+ * @returns {Array<{from:number,to:number,amount:number}>} Settlements involving the person.
+ */
+export function getSettlementsFor(index) {
+  return computeSettlements(people, transactions).filter(
+    (s) => s.from === index || s.to === index,
+  );
+}
+
+/**
+ * Determine how much a specific person owes for a given transaction.
+ *
+ * Calculates the individual's share based on the transaction's split or any
+ * itemized sub-splits. Returns 0 if the person is not included in the split.
+ *
+ * @param {{cost:number,splits:number[],items?:Array<{cost:number,splits:number[]}>}} transaction -
+ *   Transaction to evaluate.
+ * @param {number} index - Index of the person in the {@link people} array.
+ * @returns {number} Amount owed by the person for this transaction.
+ */
+export function getShareForTransaction(transaction, index) {
+  if (Array.isArray(transaction.items) && transaction.items.length > 0) {
+    const itemsTotal = transaction.items.reduce((sum, it) => sum + it.cost, 0);
+    if (itemsTotal > 0) {
+      const scale = transaction.cost / itemsTotal;
+      let share = 0;
+      transaction.items.forEach((it) => {
+        const eff = it.cost * scale;
+        const splitSum = it.splits.reduce((a, b) => a + b, 0);
+        if (splitSum > 0) {
+          share += (it.splits[index] / splitSum) * eff;
+        }
+      });
+      return share;
+    }
+  } else {
+    const splitSum = transaction.splits.reduce((a, b) => a + b, 0);
+    if (splitSum > 0) {
+      return (transaction.splits[index] / splitSum) * transaction.cost;
+    }
+  }
+  return 0;
+}
