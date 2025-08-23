@@ -157,9 +157,13 @@ tbody tr.row-odd {
   justify-content: center;
   gap: calc(var(--spacing) / 4);
   width: auto;
+  height: 100%;
 }
 
 #saved-pools-table .reorder-buttons button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   margin: 0;
   padding: 0;
   background: none;
@@ -191,6 +195,7 @@ th {
 
 td {
   text-align: right;
+  vertical-align: middle;
 }
 
 td:first-child {

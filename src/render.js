@@ -116,7 +116,8 @@ function renderSavedPoolsTable() {
     const row = document.createElement("tr");
 
     const orderCell = document.createElement("td");
-    orderCell.className = "reorder-buttons";
+    const buttonWrap = document.createElement("div");
+    buttonWrap.className = "reorder-buttons";
     const upBtn = document.createElement("button");
     upBtn.textContent = "▲";
     upBtn.addEventListener("click", (e) => {
@@ -135,8 +136,9 @@ function renderSavedPoolsTable() {
         renderSavedPoolsTable();
       }
     });
-    orderCell.appendChild(upBtn);
-    orderCell.appendChild(downBtn);
+    buttonWrap.appendChild(upBtn);
+    buttonWrap.appendChild(downBtn);
+    orderCell.appendChild(buttonWrap);
     row.appendChild(orderCell);
 
     const nameCell = document.createElement("td");
