@@ -1,4 +1,4 @@
-# Contribution Guide
+# AI Agent Contribution Guide
 
 ## Project Overview
 
@@ -11,9 +11,19 @@ purposes (linting, formatting, testing).
 
 ## Code Best Practices
 
+1. Prioritize separation of roles and consistent style
+2. Do not change state structure unless absolutely necessary
+3. Ensure functions are pure and side-effect free where possible
+4. Avoid deep nesting of functions and conditionals, especially with ternary
+   operators
+
+## Documentation
+
 1. Document all non-trivial functions with JSDoc format
-2. Prioritize separation of roles and consistent style
-3. Do not change state structure unless absolutely necessary
+2. Ensure any changes to key functionality is reflected in function descriptions
+3. Features list in README.md should contain only features that the average user
+   will care about
+4. Ensure that any new features are reflected in the user guide
 
 ## PR Checklist
 
