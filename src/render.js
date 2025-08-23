@@ -1022,6 +1022,23 @@ function calculateSummary() {
 }
 
 /**
+ * Remove highlight classes from transaction and split sections.
+ *
+ * @returns {void}
+ */
+function clearPersonHighlights() {
+  document
+    .querySelectorAll("#transaction-table tbody tr.person-highlight")
+    .forEach((r) => r.classList.remove("person-highlight"));
+  document
+    .querySelectorAll("#split-table td.person-highlight")
+    .forEach((c) => c.classList.remove("person-highlight"));
+  document
+    .querySelectorAll("#split-details td.person-highlight")
+    .forEach((c) => c.classList.remove("person-highlight"));
+}
+
+/**
  * Show detailed information for a single person below the summary.
  *
  * Appends a person-specific view after the global summary table along with a
@@ -1037,10 +1054,13 @@ function showPersonSummary(index) {
 
   const existing = document.getElementById("person-summary");
   if (existing) existing.remove();
+  const existingSep = document.getElementById("person-summary-separator");
+  if (existingSep) existingSep.remove();
 
   summaryEl
     .querySelectorAll("tbody tr")
     .forEach((r) => r.classList.remove("person-highlight"));
+  clearPersonHighlights();
 
   const container = document.createElement("div");
   container.id = "person-summary";
@@ -1053,18 +1073,55 @@ function showPersonSummary(index) {
   closeBtn.textContent = "Close";
   closeBtn.addEventListener("click", () => {
     container.remove();
+    const sep = document.getElementById("person-summary-separator");
+    if (sep) sep.remove();
     summaryEl
       .querySelectorAll("tbody tr")
       .forEach((r) => r.classList.remove("person-highlight"));
+    clearPersonHighlights();
   });
   container.appendChild(closeBtn);
 
   container.appendChild(renderPersonView(index));
+
+  const separator = document.createElement("hr");
+  separator.id = "person-summary-separator";
+  summaryEl.appendChild(separator);
   summaryEl.appendChild(container);
 
   const rows = summaryEl.querySelectorAll("tbody tr");
   if (rows[index]) {
     rows[index].classList.add("person-highlight");
+  }
+
+  const txRows = document.querySelectorAll("#transaction-table tbody tr");
+  txRows.forEach((row, ti) => {
+    if (ti >= transactions.length) return;
+    const t = transactions[ti];
+    const involved =
+      t.payer === index ||
+      t.splits[index] > 0 ||
+      (Array.isArray(t.items) && t.items.some((it) => it.splits[index] > 0));
+    if (involved) row.classList.add("person-highlight");
+  });
+
+  document
+    .querySelectorAll(`#split-table input[data-pi="${index}"]`)
+    .forEach((input) => {
+      const td = input.parentElement;
+      const val = parseFloat(input.value);
+      if (td && val > 0) td.classList.add("person-highlight");
+    });
+
+  const detailBody = document.querySelector("#split-details tbody");
+  if (detailBody) {
+    detailBody.querySelectorAll("tr").forEach((row) => {
+      const cell = row.children[index + 1];
+      if (cell) {
+        const num = parseFloat(cell.textContent.replace(/[^0-9.-]+/g, ""));
+        if (num > 0) cell.classList.add("person-highlight");
+      }
+    });
   }
 }
 

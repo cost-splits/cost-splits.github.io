@@ -5,6 +5,8 @@ import {
   renderPersonView,
   showPersonSummary,
   calculateSummary,
+  renderTransactionTable,
+  renderSplitTable,
 } from "../src/render.js";
 import { resetState, people, transactions } from "../src/state.js";
 
@@ -70,29 +72,65 @@ describe("person view helpers", () => {
     expect(view.textContent).toContain("A has no settlements.");
   });
 
-  test("showPersonSummary appends view below summary and closes", () => {
-    document.body.innerHTML = '<div id="summary"></div>';
+  test("showPersonSummary highlights related sections and closes", () => {
+    transactions.push({ name: "T3", payer: 1, cost: 5, splits: [0, 1] });
+    document.body.innerHTML =
+      '<div id="summary"></div><div id="transaction-table"></div><div id="split-table"></div><div id="split-details"></div>';
+    renderTransactionTable();
+    renderSplitTable();
     calculateSummary();
     showPersonSummary(0);
 
     const summaryTable = document.querySelector("#summary > table");
     expect(summaryTable).not.toBeNull();
+    expect(
+      summaryTable
+        ?.querySelectorAll("tbody tr")[0]
+        .classList.contains("person-highlight"),
+    ).toBe(true);
 
-    const highlighted = summaryTable
-      ?.querySelectorAll("tbody tr")[0]
-      .classList.contains("person-highlight");
-    expect(highlighted).toBe(true);
+    const txRows = document.querySelectorAll("#transaction-table tbody tr");
+    expect(txRows[0].classList.contains("person-highlight")).toBe(true);
+    expect(txRows[1].classList.contains("person-highlight")).toBe(true);
+    expect(txRows[2].classList.contains("person-highlight")).toBe(false);
 
-    const personDiv = document.getElementById("person-summary");
-    expect(personDiv).not.toBeNull();
-    expect(personDiv.querySelector("h3")?.textContent).toBe("A summary");
-    expect(personDiv.querySelectorAll("table").length).toBe(3);
+    const splitRows = document.querySelectorAll("#split-table tbody tr");
+    expect(
+      splitRows[0].children[2].classList.contains("person-highlight"),
+    ).toBe(true);
+    expect(
+      splitRows[1].children[2].classList.contains("person-highlight"),
+    ).toBe(true);
+    expect(
+      splitRows[2].children[2].classList.contains("person-highlight"),
+    ).toBe(false);
 
-    personDiv.querySelector("button")?.click();
+    const detailRows = document.querySelectorAll("#split-details tbody tr");
+    expect(
+      detailRows[0].children[1].classList.contains("person-highlight"),
+    ).toBe(true);
+    expect(
+      detailRows[1].children[1].classList.contains("person-highlight"),
+    ).toBe(true);
+    expect(
+      detailRows[2].children[1].classList.contains("person-highlight"),
+    ).toBe(false);
+    const totalRow = detailRows[detailRows.length - 1];
+    expect(totalRow.children[1].classList.contains("person-highlight")).toBe(
+      true,
+    );
+
+    expect(document.getElementById("person-summary-separator")).not.toBeNull();
+
+    document.querySelector("#person-summary button")?.click();
     expect(document.getElementById("person-summary")).toBeNull();
-    const cleared = summaryTable
-      ?.querySelectorAll("tbody tr")[0]
-      .classList.contains("person-highlight");
-    expect(cleared).toBe(false);
+    expect(document.getElementById("person-summary-separator")).toBeNull();
+    expect(txRows[0].classList.contains("person-highlight")).toBe(false);
+    expect(
+      splitRows[0].children[2].classList.contains("person-highlight"),
+    ).toBe(false);
+    expect(
+      detailRows[0].children[1].classList.contains("person-highlight"),
+    ).toBe(false);
   });
 });
