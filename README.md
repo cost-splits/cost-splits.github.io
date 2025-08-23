@@ -40,10 +40,11 @@ groups. Try the live demo at
      [Example](https://cost-splits.github.io/?state=N4IgDg9hA2IFwgKIA8CGBbM0CmcAEAMgK4B2AxgBYgA042EW28A2iACKomo1LQCWPAGJ8IXEAF1aAFwBOnAM6oyUkSXktQXdEwTFyVWmQjyp8ACwB2AHQXaYVAE9sM+AAZa8rHynq4zAIzUgf6SIN7Y6L7MoOHo8CAAQkQyAObOPEYm8P4AzFY5tiCe-D4sge6u4gC+1DFSEfEAyqjQqAAmGcamcP7+VgBMABweXqV+7uXVtWH1cQgACqgm3IZd2WZWAKz9IyVRFUHVR1VAA)
 4. In the **View Summary** section, review totals. Click a person's name to see
    their "[Name] summary" below the table, separated by a horizontal rule. The
-   Transactions and Cost Splits sections highlight rows and cells involving the
-   selected person, and split details emphasize their non-zero contributions.
-   Any section with no data will show a friendly note instead. Use **Close** to
-   hide the personal view and remove highlights.
+   Transactions section highlights only rows they paid for, Cost Splits and
+   split details emphasize their non-zero contributions, and each table ends
+   with a total row for quick reference. Any section with no data will show a
+   friendly note instead. Use **Close** to hide the personal view and remove
+   highlights.
 5. Use the **State** section to download or load a JSON file and the **Share**
    section to copy a link to the current state.
 

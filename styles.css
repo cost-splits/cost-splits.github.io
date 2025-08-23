@@ -114,6 +114,11 @@ td {
   border-bottom: 1px solid var(--border-color);
 }
 
+.total-row td {
+  border-top: 3px solid var(--border-color);
+  padding-top: calc(var(--spacing) * 1.5);
+}
+
 tbody tr {
   background-color: var(--section-bg);
 }

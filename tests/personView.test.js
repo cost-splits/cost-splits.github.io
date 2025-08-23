@@ -26,14 +26,16 @@ describe("person view helpers", () => {
     expect(tables.length).toBe(3);
 
     const paidRows = tables[0].querySelectorAll("tbody tr");
-    expect(paidRows.length).toBe(1);
+    expect(paidRows.length).toBe(2);
     expect(paidRows[0].children[0].textContent).toBe("T1");
     expect(paidRows[0].children[1].classList.contains("person-highlight")).toBe(
       true,
     );
+    expect(paidRows[1].classList.contains("total-row")).toBe(true);
+    expect(paidRows[1].children[2].textContent).toBe("$10.00");
 
     const sharedRows = tables[1].querySelectorAll("tbody tr");
-    expect(sharedRows.length).toBe(2);
+    expect(sharedRows.length).toBe(3);
     expect(sharedRows[0].children[2].textContent).toBe("$5.00");
     expect(sharedRows[1].children[2].textContent).toBe("$10.00");
     expect(
@@ -48,9 +50,11 @@ describe("person view helpers", () => {
     expect(
       sharedRows[1].children[2].classList.contains("person-highlight"),
     ).toBe(true);
+    expect(sharedRows[2].classList.contains("total-row")).toBe(true);
+    expect(sharedRows[2].children[2].textContent).toBe("$15.00");
 
     const settlementRows = tables[2].querySelectorAll("tbody tr");
-    expect(settlementRows.length).toBe(1);
+    expect(settlementRows.length).toBe(2);
     expect(settlementRows[0].children[0].textContent).toBe("A");
     expect(settlementRows[0].children[1].textContent).toBe("B");
     expect(
@@ -60,6 +64,8 @@ describe("person view helpers", () => {
       settlementRows[0].children[1].classList.contains("settlement-person"),
     ).toBe(false);
     expect(settlementRows[0].children[2].textContent).toBe("$5.00");
+    expect(settlementRows[1].classList.contains("total-row")).toBe(true);
+    expect(settlementRows[1].children[2].textContent).toBe("$5.00");
   });
 
   test("renderPersonView handles missing transactions and splits", () => {
@@ -90,9 +96,11 @@ describe("person view helpers", () => {
     ).toBe(true);
 
     const txRows = document.querySelectorAll("#transaction-table tbody tr");
+    expect(txRows.length).toBe(4);
     expect(txRows[0].classList.contains("person-highlight")).toBe(true);
-    expect(txRows[1].classList.contains("person-highlight")).toBe(true);
+    expect(txRows[1].classList.contains("person-highlight")).toBe(false);
     expect(txRows[2].classList.contains("person-highlight")).toBe(false);
+    expect(txRows[3].classList.contains("person-highlight")).toBe(false);
 
     const splitRows = document.querySelectorAll("#split-table tbody tr");
     expect(

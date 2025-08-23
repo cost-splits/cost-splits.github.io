@@ -986,6 +986,7 @@ function calculateSummary() {
   });
 
   const totalRow = document.createElement("tr");
+  totalRow.classList.add("total-row");
   totalRow.innerHTML = `<td><b>Total</b></td>
         <td><b>$${totalPaid.toFixed(2)}</b></td>
         <td><b>$${totalOwes.toFixed(2)}</b></td>
@@ -1098,11 +1099,7 @@ function showPersonSummary(index) {
   txRows.forEach((row, ti) => {
     if (ti >= transactions.length) return;
     const t = transactions[ti];
-    const involved =
-      t.payer === index ||
-      t.splits[index] > 0 ||
-      (Array.isArray(t.items) && t.items.some((it) => it.splits[index] > 0));
-    if (involved) row.classList.add("person-highlight");
+    if (t.payer === index) row.classList.add("person-highlight");
   });
 
   document
@@ -1131,7 +1128,7 @@ function showPersonSummary(index) {
  * @param {typeof transactions} txns - Transactions to display.
  * @param {number} [personIndex] - Person index to show individual shares for.
  * @param {number} [highlightIndex] - Person index whose payer cells should be highlighted.
- * @returns {HTMLTableElement} Table element with transaction details.
+ * @returns {HTMLTableElement} Table element with transaction details and a total row.
  */
 function buildTransactionsTable(txns, personIndex, highlightIndex) {
   const table = document.createElement("table");
@@ -1147,6 +1144,7 @@ function buildTransactionsTable(txns, personIndex, highlightIndex) {
   table.appendChild(thead);
 
   const tbody = document.createElement("tbody");
+  let total = 0;
   txns.forEach((t) => {
     const row = document.createElement("tr");
 
@@ -1169,9 +1167,17 @@ function buildTransactionsTable(txns, personIndex, highlightIndex) {
     }
     costCell.textContent = `$${cost.toFixed(2)}`;
     row.appendChild(costCell);
+    total += cost;
 
     tbody.appendChild(row);
   });
+
+  const totalRow = document.createElement("tr");
+  totalRow.classList.add("total-row");
+  totalRow.innerHTML =
+    "<td><b>Total</b></td><td></td><td><b>$" + total.toFixed(2) + "</b></td>";
+  tbody.appendChild(totalRow);
+
   table.appendChild(tbody);
   return table;
 }
@@ -1181,7 +1187,7 @@ function buildTransactionsTable(txns, personIndex, highlightIndex) {
  *
  * @param {Array<{from:number,to:number,amount:number}>} settlements - Suggested settlements.
  * @param {number} [personIndex] - Person index to highlight within the table.
- * @returns {HTMLTableElement} Table element with settlement details.
+ * @returns {HTMLTableElement} Table element with settlement details and a total row.
  */
 function buildSettlementTable(settlements, personIndex) {
   const table = document.createElement("table");
@@ -1196,6 +1202,7 @@ function buildSettlementTable(settlements, personIndex) {
   table.appendChild(thead);
 
   const tbody = document.createElement("tbody");
+  let total = 0;
   settlements.forEach((s) => {
     const row = document.createElement("tr");
 
@@ -1216,9 +1223,17 @@ function buildSettlementTable(settlements, personIndex) {
     const amountCell = document.createElement("td");
     amountCell.textContent = `$${s.amount.toFixed(2)}`;
     row.appendChild(amountCell);
+    total += s.amount;
 
     tbody.appendChild(row);
   });
+
+  const totalRow = document.createElement("tr");
+  totalRow.classList.add("total-row");
+  totalRow.innerHTML =
+    "<td><b>Total</b></td><td></td><td><b>$" + total.toFixed(2) + "</b></td>";
+  tbody.appendChild(totalRow);
+
   table.appendChild(tbody);
   return table;
 }
