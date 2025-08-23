@@ -38,6 +38,59 @@ h1 {
   color: var(--primary-color);
 }
 
+.site-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: calc(var(--spacing) * 2);
+  margin-bottom: calc(var(--spacing) * 2);
+  background: linear-gradient(
+    135deg,
+    var(--primary-color),
+    var(--accent-color)
+  );
+  color: #fff;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing);
+}
+
+.brand img {
+  height: 3rem;
+}
+
+.header-tabs {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing);
+}
+
+.tab-link {
+  color: #fff;
+  cursor: pointer;
+  padding: var(--spacing);
+  text-decoration: none;
+}
+
+.tab-link:hover,
+.tab-link:focus {
+  color: var(--accent-color);
+  text-decoration: underline;
+}
+
+.tab-link.active {
+  border-bottom: 2px solid var(--accent-color);
+}
+
+.header-tabs .github-icon {
+  margin-left: 0;
+}
+
 h2 {
   margin-top: calc(var(--spacing) * 4);
 }
