@@ -10,23 +10,26 @@
 
   <body>
     <header class="site-header">
-      <img src="assets/icon-banner.png" alt="Cost Split Calculator logo" />
-      <h1>Cost Split Calculator</h1>
+      <div class="brand">
+        <img src="assets/icon-banner.png" alt="Cost Split Calculator logo" />
+        <h1>Cost Split Calculator</h1>
+      </div>
+      <nav class="header-tabs">
+        <span class="tab-link active" data-tab="calculator-tab"
+          >Calculator</span
+        >
+        <span class="tab-link" data-tab="about-tab">About</span>
+        <a
+          class="tab-link"
+          href="https://github.com/cost-splits/cost-splits.github.io"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="GitHub source code"
+        >
+          <img src="assets/github-mark.svg" alt="GitHub" class="github-icon" />
+        </a>
+      </nav>
     </header>
-
-    <nav class="tab-nav">
-      <button class="tab-button active" data-tab="calculator-tab">
-        Calculator
-      </button>
-      <button class="tab-button" data-tab="about-tab">About</button>
-      <a
-        class="tab-button"
-        href="https://github.com/cost-splits/cost-splits.github.io"
-        target="_blank"
-        rel="noopener noreferrer"
-        >Source</a
-      >
-    </nav>
 
     <main id="calculator-tab" class="tab-panel">
       <section id="pool-section" class="section-block">

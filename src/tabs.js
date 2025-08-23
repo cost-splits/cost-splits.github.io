@@ -7,17 +7,17 @@
  * @returns {void}
  */
 export function initTabs() {
-  const buttons = document.querySelectorAll(".tab-button[data-tab]");
+  const tabs = document.querySelectorAll(".tab-link[data-tab]");
   const panels = document.querySelectorAll(".tab-panel");
 
-  buttons.forEach((button) => {
-    button.addEventListener("click", () => {
-      const targetId = button.getAttribute("data-tab");
+  tabs.forEach((tab) => {
+    tab.addEventListener("click", () => {
+      const targetId = tab.getAttribute("data-tab");
       panels.forEach((panel) => panel.classList.add("hidden"));
       document.getElementById(targetId).classList.remove("hidden");
 
-      buttons.forEach((btn) => btn.classList.remove("active"));
-      button.classList.add("active");
+      tabs.forEach((t) => t.classList.remove("active"));
+      tab.classList.add("active");
     });
   });
 }

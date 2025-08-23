@@ -9,9 +9,9 @@ groups. Try the live demo at
 ## Features
 
 - Responsive layout for phones and desktops
-- Branded header with gradient background and logo for a polished first
-  impression
-- Tabbed navigation with an About section and direct link to the GitHub source
+- Branded header with gradient background, logo, and built-in navigation links
+- Header tabs include an About section and GitHub source link with the GitHub
+  icon
 - Clear sky-blue section bubbles with subtle contrast for easy scanning
 - Slightly darker gray page background with sky-blue bubbles, complementary
   orange buttons, and subtle shadows for a consistent look
