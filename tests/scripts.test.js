@@ -118,6 +118,11 @@ describe("calculateSummary settlements", () => {
     resetState();
   });
 
+  test("skips rendering summary table when there are no people", () => {
+    calculateSummary();
+    expect(document.querySelector("#summary table")).toBeNull();
+  });
+
   test("renders settlement suggestions", () => {
     people.push("Alice", "Bob");
     transactions.push({ payer: 0, cost: 30, splits: [1, 1] });
