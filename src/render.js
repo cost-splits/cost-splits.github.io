@@ -954,10 +954,17 @@ function renderSplitDetails() {
 // ---- SUMMARY ----
 /**
  * Render a summary table of totals paid, owed and net for each person.
+ * Clears the summary area when there are no participants.
+ *
+ * @returns {void}
  */
 function calculateSummary() {
   const summaryEl = document.getElementById("summary");
   if (!summaryEl) return;
+  if (people.length === 0) {
+    summaryEl.innerHTML = "";
+    return;
+  }
   const { paid, owes, nets } = computeSummary(people, transactions);
   const settlements = computeSettlements(people, transactions);
   const maxAbs = Math.max(...nets.map((n) => Math.abs(n)), 1);
