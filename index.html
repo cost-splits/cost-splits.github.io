@@ -55,6 +55,20 @@
       <section id="transactions-section" class="section-block">
         <h2>2. Add Transactions</h2>
         <div id="transaction-table" class="table-container"></div>
+        <div class="flex-row">
+          <button id="receipt-upload" type="button">
+            Create transaction from receipt
+          </button>
+          <button id="receipt-debug" type="button">
+            Debug: sample receipt
+          </button>
+          <input
+            id="receipt-file"
+            type="file"
+            accept="image/*"
+            class="hidden"
+          />
+        </div>
       </section>
 
       <section id="splits-section" class="section-block">
@@ -182,6 +196,22 @@
         </a>
       </p>
     </footer>
+
+    <div
+      id="receipt-modal"
+      class="modal hidden"
+      role="dialog"
+      aria-modal="true"
+    >
+      <div class="modal-content">
+        <img id="receipt-preview" alt="Receipt preview" />
+        <div id="receipt-proposed"></div>
+        <div class="flex-row">
+          <button id="receipt-add" type="button">Add Transaction</button>
+          <button id="receipt-cancel" type="button">Cancel</button>
+        </div>
+      </div>
+    </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js"></script>
     <script type="module" src="src/main.js"></script>
