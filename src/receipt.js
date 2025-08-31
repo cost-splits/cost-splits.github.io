@@ -57,7 +57,10 @@ export function initReceiptUpload() {
     hideModal();
   });
 
-  cancelBtn.addEventListener("click", hideModal);
+  cancelBtn.addEventListener("click", () => {
+    hideModal();
+    fileInput.value = "";
+  });
 
   /**
    * Display the modal with the provided image and transaction.
