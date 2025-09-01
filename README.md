@@ -35,7 +35,7 @@ groups. Try the live demo at
 1. In the **People** section, add the names of all participants.
 2. In the **Transactions** section, add transactions with a name, payee, and
    cost. Use **Create transaction from receipt** to extract details from an
-   image (experimental).
+   image and edit the proposed transaction in a modal (experimental).
 3. In the **Cost Splits** section, choose how each expense is divided:
    - **Even** – split equally among participants.
      [Example](https://cost-splits.github.io/?state=N4IgDg9hA2IFwgKIA8CGBbM0CmcAEAIgJYB2J2ATiADTjYRbbwDaIAgtEQMZO0BCEAEY0QAYVQUYIALq0ALhVQkAzqi5yiEFS1AkMTBMTKURXCMrnwA7AA4AdABYAzLTCoAnibgAGWsqxEcsosAIzUYSHSAL7RQA)

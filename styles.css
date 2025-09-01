@@ -483,10 +483,17 @@ input[data-action="editItemSplit"] {
   border-radius: 0.5rem;
 }
 
-#receipt-preview {
+#receipt-preview-container {
   max-width: 100%;
-  height: auto;
+  max-height: 300px;
+  overflow-y: auto;
   margin-bottom: var(--spacing);
+}
+
+#receipt-preview {
+  width: 100%;
+  height: auto;
+  display: block;
 }
 
 footer {
