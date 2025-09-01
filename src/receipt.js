@@ -143,8 +143,10 @@ export function initReceiptUpload() {
         } else {
           clearError(itemCostEl);
         }
-        const splits = people.map((_, pi) => {
-          const splitEl = row.querySelector(`#receipt-item-${ii}-split-${pi}`);
+        const splitEls = people.map((_, pi) =>
+          row.querySelector(`#receipt-item-${ii}-split-${pi}`),
+        );
+        const splits = splitEls.map((splitEl) => {
           const splitVal = splitEl.value.trim();
           if (!isValidNumber(splitVal, true)) {
             showError(splitEl, NUMBER_FORMAT_MSG);
@@ -156,8 +158,20 @@ export function initReceiptUpload() {
         });
         const splitTotal = splits.reduce((a, b) => a + b, 0);
         if (splitTotal <= 0) {
-          const firstSplit = row.querySelector(`#receipt-item-${ii}-split-0`);
-          showError(firstSplit, SPLIT_SUM_MSG);
+          splitEls.forEach((el, idx) => {
+            if (idx === splitEls.length - 1) {
+              showError(el, SPLIT_SUM_MSG);
+            } else {
+              el.classList.add("invalid-cell");
+              el.addEventListener(
+                "input",
+                () => {
+                  clearError(el);
+                },
+                { once: true },
+              );
+            }
+          });
           invalid = true;
         }
         items.push({
