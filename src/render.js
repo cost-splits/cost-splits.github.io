@@ -27,6 +27,7 @@ const COST_FORMAT_MSG =
   "Cost must be digits with optional decimal point and up to two decimals (e.g., 12 or 3.50).";
 const NUMBER_FORMAT_MSG =
   "Number must be digits with optional decimals (e.g., 3 or 0.75).";
+const SPLIT_SUM_MSG = "Splits must sum to more than 0.";
 
 /**
  * Display an error indicator next to an invalid field.
@@ -1387,4 +1388,5 @@ export {
   clearError,
   COST_FORMAT_MSG,
   NUMBER_FORMAT_MSG,
+  SPLIT_SUM_MSG,
 };

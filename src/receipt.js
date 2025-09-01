@@ -12,6 +12,7 @@ import {
   clearError,
   COST_FORMAT_MSG,
   NUMBER_FORMAT_MSG,
+  SPLIT_SUM_MSG,
 } from "./render.js";
 
 let currentImageUrl = "";
@@ -47,15 +48,15 @@ export function initReceiptUpload() {
   });
 
   debugBtn.addEventListener("click", () => {
-    const baseSplits = people.map(() => 1);
+    const emptySplits = people.map(() => 0);
     const tx = {
       name: "Sample Store",
       payer: 0,
       cost: 12.34,
-      splits: baseSplits.slice(),
+      splits: emptySplits.slice(),
       items: [
-        { item: "Coffee", cost: 4, splits: baseSplits.slice() },
-        { item: "Bagel", cost: 8.34, splits: baseSplits.slice() },
+        { item: "Coffee", cost: 4, splits: emptySplits.slice() },
+        { item: "Bagel", cost: 8.34, splits: emptySplits.slice() },
       ],
     };
     showModal("assets/icon-banner.png", tx);
@@ -153,6 +154,12 @@ export function initReceiptUpload() {
           }
           return splitVal ? parseFloat(splitVal) : 0;
         });
+        const splitTotal = splits.reduce((a, b) => a + b, 0);
+        if (splitTotal <= 0) {
+          const firstSplit = row.querySelector(`#receipt-item-${ii}-split-0`);
+          showError(firstSplit, SPLIT_SUM_MSG);
+          invalid = true;
+        }
         items.push({
           item: itemNameEl.value.trim(),
           cost: parseFloat(itemCostVal) || 0,
@@ -250,7 +257,8 @@ function renderProposedTransaction(tx) {
     cells += `<td><div class="dollar-field"><span class="prefix">$</span><input id="receipt-item-${ii}-cost" type="text" value="${it.cost.toFixed(2)}" /></div></td>`;
     people.forEach((_, pi) => {
       const val = it.splits?.[pi] ?? 0;
-      cells += `<td><input id="receipt-item-${ii}-split-${pi}" type="text" value="${val}" /></td>`;
+      const display = val > 0 ? val : "";
+      cells += `<td><input id="receipt-item-${ii}-split-${pi}" type="text" value="${display}" /></td>`;
     });
     const row = document.createElement("tr");
     row.innerHTML = cells;
