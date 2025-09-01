@@ -1,5 +1,18 @@
-import { transactions, people, afterChange } from "./state.js";
-import { renderTransactionTable, renderSplitTable } from "./render.js";
+import {
+  transactions,
+  people,
+  afterChange,
+  isValidDollar,
+  isValidNumber,
+} from "./state.js";
+import {
+  renderTransactionTable,
+  renderSplitTable,
+  showError,
+  clearError,
+  COST_FORMAT_MSG,
+  NUMBER_FORMAT_MSG,
+} from "./render.js";
 
 let currentImageUrl = "";
 
@@ -96,7 +109,9 @@ export function initReceiptUpload() {
   /**
    * Collect transaction data from the modal inputs.
    *
-   * @returns {object} Transaction object assembled from user edits.
+   * Validates all numeric fields and returns null if any are invalid.
+   *
+   * @returns {object|null} Transaction object assembled from user edits or null if invalid.
    */
   function collectTransactionFromModal() {
     const name = document.getElementById("receipt-t-name").value.trim();
@@ -104,26 +119,54 @@ export function initReceiptUpload() {
       document.getElementById("receipt-t-payer").value,
       10,
     );
-    const cost =
-      parseFloat(document.getElementById("receipt-t-cost").value) || 0;
+    const costInput = document.getElementById("receipt-t-cost");
+    const costVal = costInput.value.trim();
+    let invalid = false;
+    if (!isValidDollar(costVal)) {
+      showError(costInput, COST_FORMAT_MSG);
+      invalid = true;
+    } else {
+      clearError(costInput);
+    }
     const items = [];
     const table = document.getElementById("receipt-items-table");
     if (table) {
       const rows = table.querySelectorAll("tbody tr");
       rows.forEach((row, ii) => {
-        const item = row.querySelector(`#receipt-item-${ii}-name`).value.trim();
-        const itemCost =
-          parseFloat(row.querySelector(`#receipt-item-${ii}-cost`).value) || 0;
+        const itemNameEl = row.querySelector(`#receipt-item-${ii}-name`);
+        const itemCostEl = row.querySelector(`#receipt-item-${ii}-cost`);
+        const itemCostVal = itemCostEl.value.trim();
+        if (!isValidDollar(itemCostVal)) {
+          showError(itemCostEl, COST_FORMAT_MSG);
+          invalid = true;
+        } else {
+          clearError(itemCostEl);
+        }
         const splits = people.map((_, pi) => {
-          const val = row.querySelector(
-            `#receipt-item-${ii}-split-${pi}`,
-          ).value;
-          return val ? parseFloat(val) : 0;
+          const splitEl = row.querySelector(`#receipt-item-${ii}-split-${pi}`);
+          const splitVal = splitEl.value.trim();
+          if (!isValidNumber(splitVal, true)) {
+            showError(splitEl, NUMBER_FORMAT_MSG);
+            invalid = true;
+          } else {
+            clearError(splitEl);
+          }
+          return splitVal ? parseFloat(splitVal) : 0;
         });
-        items.push({ item, cost: itemCost, splits });
+        items.push({
+          item: itemNameEl.value.trim(),
+          cost: parseFloat(itemCostVal) || 0,
+          splits,
+        });
       });
     }
-    const tx = { name, payer, cost, splits: people.map(() => 0) };
+    if (invalid) return null;
+    const tx = {
+      name,
+      payer,
+      cost: parseFloat(costVal) || 0,
+      splits: people.map(() => 0),
+    };
     if (items.length > 0) tx.items = items;
     return tx;
   }
@@ -178,7 +221,7 @@ function renderProposedTransaction(tx) {
 
   const costVal = typeof tx.cost === "number" ? tx.cost.toFixed(2) : "0";
   const costRow = document.createElement("tr");
-  costRow.innerHTML = `<th>Total Cost</th><td><input id="receipt-t-cost" type="number" step="0.01" value="${costVal}" /></td>`;
+  costRow.innerHTML = `<th>Total Cost</th><td><div class="dollar-field"><span class="prefix">$</span><input id="receipt-t-cost" type="text" value="${costVal}" /></div></td>`;
   txBody.appendChild(costRow);
 
   txTable.appendChild(txBody);
@@ -204,12 +247,10 @@ function renderProposedTransaction(tx) {
     let cells = `<td><input id="receipt-item-${ii}-name" type="text" value="${
       it.item || ""
     }" /></td>`;
-    cells += `<td><input id="receipt-item-${ii}-cost" type="number" step="0.01" value="${it.cost.toFixed(
-      2,
-    )}" /></td>`;
+    cells += `<td><div class="dollar-field"><span class="prefix">$</span><input id="receipt-item-${ii}-cost" type="text" value="${it.cost.toFixed(2)}" /></div></td>`;
     people.forEach((_, pi) => {
       const val = it.splits?.[pi] ?? 0;
-      cells += `<td><input id="receipt-item-${ii}-split-${pi}" type="number" min="0" value="${val}" /></td>`;
+      cells += `<td><input id="receipt-item-${ii}-split-${pi}" type="text" value="${val}" /></td>`;
     });
     const row = document.createElement("tr");
     row.innerHTML = cells;

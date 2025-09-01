@@ -1383,4 +1383,8 @@ export {
   renderSavedPoolsTable,
   renderPersonView,
   showPersonSummary,
+  showError,
+  clearError,
+  COST_FORMAT_MSG,
+  NUMBER_FORMAT_MSG,
 };
