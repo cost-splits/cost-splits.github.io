@@ -34,6 +34,10 @@ body {
   color: var(--text-color);
 }
 
+body.modal-open {
+  overflow: hidden;
+}
+
 h1 {
   color: var(--primary-color);
 }
@@ -455,6 +459,50 @@ input[data-action="editItemSplit"] {
 .table-container {
   width: 100%;
   overflow-x: auto;
+}
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal.hidden {
+  display: none;
+}
+
+.modal-content {
+  background: #fff;
+  padding: var(--spacing);
+  max-width: 90%;
+  max-height: 90%;
+  overflow-y: auto;
+  border-radius: 0.5rem;
+}
+
+#receipt-preview-container {
+  max-width: 100%;
+  max-height: 500px;
+  overflow: auto;
+  margin-bottom: var(--spacing);
+}
+
+#receipt-preview {
+  max-height: 500px;
+  width: auto;
+  display: block;
+  margin: 0 auto;
+}
+
+#receipt-proposed {
+  padding-bottom: calc(var(--spacing) * 2);
 }
 
 footer {

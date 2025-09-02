@@ -23,6 +23,7 @@ import {
   updatePoolSaveStatus,
 } from "./share.js";
 import { initTabs } from "./tabs.js";
+import { initReceiptUpload } from "./receipt.js";
 
 setAfterChange(() => {
   updateCurrentStateJson();
@@ -77,6 +78,8 @@ document.getElementById("save-local").addEventListener("click", () => {
   savePoolToLocalStorage(pool, { people, transactions });
   renderSavedPoolsTable();
 });
+
+initReceiptUpload();
 
 document.getElementById("new-pool").addEventListener("click", () => {
   if (hasUnsavedChanges() && !confirm("You have unsaved changes. Continue?")) {

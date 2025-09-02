@@ -1,0 +1,303 @@
+import {
+  transactions,
+  people,
+  afterChange,
+  isValidDollar,
+  isValidNumber,
+} from "./state.js";
+import {
+  renderTransactionTable,
+  renderSplitTable,
+  showError,
+  clearError,
+  COST_FORMAT_MSG,
+  NUMBER_FORMAT_MSG,
+  SPLIT_SUM_MSG,
+} from "./render.js";
+
+let currentImageUrl = "";
+
+/**
+ * Initialize receipt upload and debug buttons.
+ *
+ * Sets up handlers for uploading a receipt image, extracting a transaction,
+ * and displaying a modal preview. Includes a debug button that injects a
+ * sample image and transaction.
+ *
+ * @returns {void}
+ */
+export function initReceiptUpload() {
+  const uploadBtn = document.getElementById("receipt-upload");
+  const debugBtn = document.getElementById("receipt-debug");
+  const fileInput = document.getElementById("receipt-file");
+  const modal = document.getElementById("receipt-modal");
+  const preview = document.getElementById("receipt-preview");
+  const proposed = document.getElementById("receipt-proposed");
+  const addBtn = document.getElementById("receipt-add");
+  const cancelBtn = document.getElementById("receipt-cancel");
+
+  uploadBtn.addEventListener("click", () => fileInput.click());
+
+  fileInput.addEventListener("change", async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    const tx = await extractTransactionFromImage(file);
+    showModal(url, tx);
+    fileInput.value = "";
+  });
+
+  debugBtn.addEventListener("click", () => {
+    const emptySplits = people.map(() => 0);
+    const tx = {
+      name: "Sample Store",
+      payer: 0,
+      cost: 12.34,
+      splits: emptySplits.slice(),
+      items: [
+        { item: "Coffee", cost: 4, splits: emptySplits.slice() },
+        { item: "Bagel", cost: 8.34, splits: emptySplits.slice() },
+      ],
+    };
+    showModal("assets/icon-banner.png", tx);
+  });
+
+  addBtn.addEventListener("click", () => {
+    const tx = collectTransactionFromModal();
+    if (!tx) return;
+    transactions.push(tx);
+    renderTransactionTable();
+    renderSplitTable();
+    afterChange();
+    hideModal();
+  });
+
+  cancelBtn.addEventListener("click", () => {
+    hideModal();
+    fileInput.value = "";
+  });
+
+  /**
+   * Display the modal with the provided image and transaction.
+   *
+   * Locks background scrolling while the modal is active.
+   *
+   * @param {string} imgUrl - Image URL for preview.
+   * @param {object} tx - Transaction data to display.
+   * @returns {void}
+   */
+  function showModal(imgUrl, tx) {
+    currentImageUrl = imgUrl;
+    preview.src = imgUrl;
+    proposed.innerHTML = "";
+    proposed.appendChild(renderProposedTransaction(tx));
+    document.body.classList.add("modal-open");
+    modal.classList.remove("hidden");
+  }
+
+  /**
+   * Hide the receipt modal and clean up resources.
+   *
+   * Re-enables background scrolling once closed.
+   *
+   * @returns {void}
+   */
+  function hideModal() {
+    modal.classList.add("hidden");
+    document.body.classList.remove("modal-open");
+    preview.src = "";
+    proposed.innerHTML = "";
+    if (currentImageUrl.startsWith("blob:")) {
+      URL.revokeObjectURL(currentImageUrl);
+    }
+    currentImageUrl = "";
+  }
+
+  /**
+   * Collect transaction data from the modal inputs.
+   *
+   * Validates all numeric fields and returns null if any are invalid.
+   *
+   * @returns {object|null} Transaction object assembled from user edits or null if invalid.
+   */
+  function collectTransactionFromModal() {
+    const name = document.getElementById("receipt-t-name").value.trim();
+    const payer = parseInt(
+      document.getElementById("receipt-t-payer").value,
+      10,
+    );
+    const costInput = document.getElementById("receipt-t-cost");
+    const costVal = costInput.value.trim();
+    let invalid = false;
+    if (!isValidDollar(costVal)) {
+      showError(costInput, COST_FORMAT_MSG);
+      invalid = true;
+    } else {
+      clearError(costInput);
+    }
+    const items = [];
+    const table = document.getElementById("receipt-items-table");
+    if (table) {
+      const rows = table.querySelectorAll("tbody tr");
+      rows.forEach((row, ii) => {
+        const itemNameEl = row.querySelector(`#receipt-item-${ii}-name`);
+        const itemCostEl = row.querySelector(`#receipt-item-${ii}-cost`);
+        const itemCostVal = itemCostEl.value.trim();
+        if (!isValidDollar(itemCostVal)) {
+          showError(itemCostEl, COST_FORMAT_MSG);
+          invalid = true;
+        } else {
+          clearError(itemCostEl);
+        }
+        const splitEls = people.map((_, pi) =>
+          row.querySelector(`#receipt-item-${ii}-split-${pi}`),
+        );
+        const splits = splitEls.map((splitEl) => {
+          const splitVal = splitEl.value.trim();
+          if (!isValidNumber(splitVal, true)) {
+            showError(splitEl, NUMBER_FORMAT_MSG);
+            invalid = true;
+          } else {
+            clearError(splitEl);
+          }
+          return splitVal ? parseFloat(splitVal) : 0;
+        });
+        const splitTotal = splits.reduce((a, b) => a + b, 0);
+        if (splitTotal <= 0) {
+          splitEls.forEach((el, idx) => {
+            if (idx === splitEls.length - 1) {
+              showError(el, SPLIT_SUM_MSG);
+            } else {
+              el.classList.add("invalid-cell");
+              el.addEventListener(
+                "input",
+                () => {
+                  clearError(el);
+                },
+                { once: true },
+              );
+            }
+          });
+          invalid = true;
+        }
+        items.push({
+          item: itemNameEl.value.trim(),
+          cost: parseFloat(itemCostVal) || 0,
+          splits,
+        });
+      });
+    }
+    if (invalid) return null;
+    const tx = {
+      name,
+      payer,
+      cost: parseFloat(costVal) || 0,
+      splits: people.map(() => 0),
+    };
+    if (items.length > 0) tx.items = items;
+    return tx;
+  }
+}
+
+/**
+ * Stub for extracting transaction data from a receipt image.
+ *
+ * This placeholder simply returns an empty transaction structure. Future
+ * implementations can replace this with real receipt parsing logic.
+ *
+ * @param {File} _file - Image file to parse.
+ * @returns {Promise<object>} Proposed transaction data.
+ */
+export async function extractTransactionFromImage(_file) {
+  return {
+    name: "Receipt",
+    payer: 0,
+    cost: 0,
+    splits: people.map(() => 0),
+    items: [{ item: "", cost: 0, splits: people.map(() => 0) }],
+  };
+}
+
+/**
+ * Render an editable transaction proposal form.
+ *
+ * @param {object} tx - Transaction data to prefill.
+ * @returns {HTMLElement} Container with form inputs.
+ */
+function renderProposedTransaction(tx) {
+  const container = document.createElement("div");
+
+  const nameRow = document.createElement("div");
+  nameRow.className = "flex-row";
+  const nameLabel = document.createElement("label");
+  nameLabel.htmlFor = "receipt-t-name";
+  nameLabel.textContent = "Transaction";
+  const nameInput = document.createElement("input");
+  nameInput.id = "receipt-t-name";
+  nameInput.type = "text";
+  nameInput.value = tx.name || "";
+  nameRow.append(nameLabel, nameInput);
+  container.appendChild(nameRow);
+
+  const payerRow = document.createElement("div");
+  payerRow.className = "flex-row";
+  const payerLabel = document.createElement("label");
+  payerLabel.htmlFor = "receipt-t-payer";
+  payerLabel.textContent = "Payer";
+  const payerSelect = document.createElement("select");
+  payerSelect.id = "receipt-t-payer";
+  people.forEach((p, i) => {
+    const opt = document.createElement("option");
+    opt.value = i;
+    opt.textContent = p;
+    if (i === (tx.payer || 0)) opt.selected = true;
+    payerSelect.appendChild(opt);
+  });
+  payerRow.append(payerLabel, payerSelect);
+  container.appendChild(payerRow);
+
+  const costRow = document.createElement("div");
+  costRow.className = "flex-row";
+  const costLabel = document.createElement("label");
+  costLabel.htmlFor = "receipt-t-cost";
+  costLabel.textContent = "Total Cost";
+  const costVal = typeof tx.cost === "number" ? tx.cost.toFixed(2) : "0";
+  const costField = document.createElement("div");
+  costField.className = "dollar-field";
+  costField.innerHTML = `<span class="prefix">$</span><input id="receipt-t-cost" type="text" value="${costVal}" />`;
+  costRow.append(costLabel, costField);
+  container.appendChild(costRow);
+
+  const items =
+    Array.isArray(tx.items) && tx.items.length > 0
+      ? tx.items
+      : [{ item: "", cost: 0, splits: people.map(() => 0) }];
+  const table = document.createElement("table");
+  table.id = "receipt-items-table";
+  const thead = document.createElement("thead");
+  let header = "<tr><th>Item</th><th>Cost</th>";
+  people.forEach((p) => {
+    header += `<th>${p}</th>`;
+  });
+  header += "</tr>";
+  thead.innerHTML = header;
+  table.appendChild(thead);
+
+  const tbody = document.createElement("tbody");
+  items.forEach((it, ii) => {
+    let cells = `<td><input id="receipt-item-${ii}-name" type="text" value="${it.item || ""}" /></td>`;
+    cells += `<td><div class="dollar-field"><span class="prefix">$</span><input id="receipt-item-${ii}-cost" type="text" value="${it.cost.toFixed(2)}" /></div></td>`;
+    people.forEach((_, pi) => {
+      const val = it.splits?.[pi] ?? 0;
+      const display = val > 0 ? val : "";
+      cells += `<td><input id="receipt-item-${ii}-split-${pi}" type="text" value="${display}" /></td>`;
+    });
+    const row = document.createElement("tr");
+    row.innerHTML = cells;
+    tbody.appendChild(row);
+  });
+  table.appendChild(tbody);
+  container.appendChild(table);
+
+  return container;
+}
