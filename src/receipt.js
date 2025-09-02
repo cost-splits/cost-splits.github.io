@@ -221,32 +221,46 @@ export async function extractTransactionFromImage(_file) {
 function renderProposedTransaction(tx) {
   const container = document.createElement("div");
 
-  const txTable = document.createElement("table");
-  const txBody = document.createElement("tbody");
+  const nameRow = document.createElement("div");
+  nameRow.className = "flex-row";
+  const nameLabel = document.createElement("label");
+  nameLabel.htmlFor = "receipt-t-name";
+  nameLabel.textContent = "Transaction";
+  const nameInput = document.createElement("input");
+  nameInput.id = "receipt-t-name";
+  nameInput.type = "text";
+  nameInput.value = tx.name || "";
+  nameRow.append(nameLabel, nameInput);
+  container.appendChild(nameRow);
 
-  const nameRow = document.createElement("tr");
-  nameRow.innerHTML = `<th>Transaction</th><td><input id="receipt-t-name" type="text" value="${
-    tx.name || ""
-  }" /></td>`;
-  txBody.appendChild(nameRow);
-
-  let payerCell = '<th>Payer</th><td><select id="receipt-t-payer">';
+  const payerRow = document.createElement("div");
+  payerRow.className = "flex-row";
+  const payerLabel = document.createElement("label");
+  payerLabel.htmlFor = "receipt-t-payer";
+  payerLabel.textContent = "Payer";
+  const payerSelect = document.createElement("select");
+  payerSelect.id = "receipt-t-payer";
   people.forEach((p, i) => {
-    const sel = i === (tx.payer || 0) ? " selected" : "";
-    payerCell += `<option value="${i}"${sel}>${p}</option>`;
+    const opt = document.createElement("option");
+    opt.value = i;
+    opt.textContent = p;
+    if (i === (tx.payer || 0)) opt.selected = true;
+    payerSelect.appendChild(opt);
   });
-  payerCell += "</select></td>";
-  const payerRow = document.createElement("tr");
-  payerRow.innerHTML = payerCell;
-  txBody.appendChild(payerRow);
+  payerRow.append(payerLabel, payerSelect);
+  container.appendChild(payerRow);
 
+  const costRow = document.createElement("div");
+  costRow.className = "flex-row";
+  const costLabel = document.createElement("label");
+  costLabel.htmlFor = "receipt-t-cost";
+  costLabel.textContent = "Total Cost";
   const costVal = typeof tx.cost === "number" ? tx.cost.toFixed(2) : "0";
-  const costRow = document.createElement("tr");
-  costRow.innerHTML = `<th>Total Cost</th><td><div class="dollar-field"><span class="prefix">$</span><input id="receipt-t-cost" type="text" value="${costVal}" /></div></td>`;
-  txBody.appendChild(costRow);
-
-  txTable.appendChild(txBody);
-  container.appendChild(txTable);
+  const costField = document.createElement("div");
+  costField.className = "dollar-field";
+  costField.innerHTML = `<span class="prefix">$</span><input id="receipt-t-cost" type="text" value="${costVal}" />`;
+  costRow.append(costLabel, costField);
+  container.appendChild(costRow);
 
   const items =
     Array.isArray(tx.items) && tx.items.length > 0
@@ -265,9 +279,7 @@ function renderProposedTransaction(tx) {
 
   const tbody = document.createElement("tbody");
   items.forEach((it, ii) => {
-    let cells = `<td><input id="receipt-item-${ii}-name" type="text" value="${
-      it.item || ""
-    }" /></td>`;
+    let cells = `<td><input id="receipt-item-${ii}-name" type="text" value="${it.item || ""}" /></td>`;
     cells += `<td><div class="dollar-field"><span class="prefix">$</span><input id="receipt-item-${ii}-cost" type="text" value="${it.cost.toFixed(2)}" /></div></td>`;
     people.forEach((_, pi) => {
       const val = it.splits?.[pi] ?? 0;
