@@ -80,6 +80,8 @@ export function initReceiptUpload() {
   /**
    * Display the modal with the provided image and transaction.
    *
+   * Locks background scrolling while the modal is active.
+   *
    * @param {string} imgUrl - Image URL for preview.
    * @param {object} tx - Transaction data to display.
    * @returns {void}
@@ -89,16 +91,20 @@ export function initReceiptUpload() {
     preview.src = imgUrl;
     proposed.innerHTML = "";
     proposed.appendChild(renderProposedTransaction(tx));
+    document.body.classList.add("modal-open");
     modal.classList.remove("hidden");
   }
 
   /**
    * Hide the receipt modal and clean up resources.
    *
+   * Re-enables background scrolling once closed.
+   *
    * @returns {void}
    */
   function hideModal() {
     modal.classList.add("hidden");
+    document.body.classList.remove("modal-open");
     preview.src = "";
     proposed.innerHTML = "";
     if (currentImageUrl.startsWith("blob:")) {
